@@ -50,8 +50,23 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-
-		</plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>xjc</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <packageName>com.github.nill14.utils.init.schema</packageName> 
+                </configuration>
+            </plugin>
+        </plugins>
 	</build>
 
 	<dependencies>
@@ -66,6 +81,23 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.7</version>
 		</dependency>
+		
+		<dependency>
+		    <groupId>javax.annotation</groupId>
+		    <artifactId>javax.annotation-api</artifactId>
+		    <version>1.2</version>
+		</dependency>
+		<dependency>
+		    <groupId>javax.inject</groupId>
+		    <artifactId>javax.inject</artifactId>
+		    <version>1</version>
+		</dependency>
+<!-- 		<dependency> -->
+<!-- 		    <groupId>com.sun.xml.bind</groupId> -->
+<!-- 		    <artifactId>jaxb-xjc</artifactId> -->
+<!-- 		    <version>2.2.7</version> -->
+<!-- 		</dependency>		 -->
+				
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -78,6 +110,13 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.10.8</version>
 			<scope>test</scope>
 		</dependency>
 

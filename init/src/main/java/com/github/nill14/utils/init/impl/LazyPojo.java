@@ -23,7 +23,7 @@ public class LazyPojo<T> implements ILazyPojo<T> {
 		return new LazyPojo<>(factory, initializer);
 	}
 
-	public static <T, F extends IPojoFactory<T>> ILazyPojo<T> forFactory(Class<T> beanClass, Class<F> factoryClass, IPojoInitializer<? super F> factoryInitializer) {
+	public static <T, F extends IPojoFactory<? extends T>> ILazyPojo<T> forFactory(Class<T> beanClass, Class<F> factoryClass, IPojoInitializer<? super F> factoryInitializer) {
 		FactoryAdapter<T, F> factoryAdapter = new FactoryAdapter<>(beanClass, factoryClass, factoryInitializer);
 		return new LazyPojo<>(factoryAdapter, factoryAdapter);
 	}
@@ -103,7 +103,7 @@ public class LazyPojo<T> implements ILazyPojo<T> {
 	}
 	
 	
-	private static class FactoryAdapter<T, F extends IPojoFactory<T>> implements IPojoFactory<T>, IPojoInitializer<T> {
+	private static class FactoryAdapter<T, F extends IPojoFactory<? extends T>> implements IPojoFactory<T>, IPojoInitializer<T> {
 		private final ILazyPojo<F> lazyFactory;
 		private final Class<T> beanClass;
 

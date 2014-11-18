@@ -1,9 +1,12 @@
 package com.github.nill14.utils.init;
 
+import javax.inject.Inject;
+
 import com.github.nill14.utils.init.api.IPojoFactory;
 
 public class GreeterFactory implements IPojoFactory<IGreeter> {
 
+	@Inject
 	private String greeting;
 	
 	@Override

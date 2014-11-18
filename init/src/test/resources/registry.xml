@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:serviceRegistry xmlns:p="http://www.github.com/nill14/utils/init/serviceRegistry" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.github.com/nill14/utils/init/serviceRegistry ../../main/resources/serviceRegistry.xsd ">
+  <services>
+    <service interface="com.github.nill14.utils.init.ICalc">
+      <bean>com.github.nill14.utils.init.Calc</bean>
+    </service>
+    <service interface="com.github.nill14.utils.init.IGreeter">
+      <factory>com.github.nill14.utils.init.GreeterFactory</factory>
+    </service>
+    <service interface="com.github.nill14.utils.init.ITimeService">
+      <bean>com.github.nill14.utils.init.TimeService</bean>
+    </service>
+  </services>
+  <providers>
+    <provider registrable="com.github.nill14.utils.init.ICalc">
+      <provider>com.github.nill14.utils.init.Calc</provider>
+      <provider>com.github.nill14.utils.init.Calc</provider>
+      <provider>com.github.nill14.utils.init.Calc</provider>
+    </provider>
+  </providers>
+  <properties>
+  	<string name="greeting">Hello World!</string>
+  	<factory>com.github.nill14.utils.init.ZoneIdFactory</factory>
+  	<factory>com.github.nill14.utils.init.TimeServiceSpyFactory</factory>
+  </properties>
+</p:serviceRegistry>

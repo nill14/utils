@@ -35,6 +35,10 @@ public class LazyJdkProxy implements InvocationHandler {
 
     private  static Class<?>[] getImplementedInterfaces(Class<?> clazz) {
         Set<Class<?>> interfaces = Sets.newHashSet();
+        if (clazz.isInterface()) {
+        	interfaces.add(clazz);
+        }
+        
         for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
             interfaces.addAll(Arrays.<Class<?>>asList(c.getInterfaces()));
         }
