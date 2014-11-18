@@ -7,9 +7,7 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Set;
 
-import com.github.nill14.utils.init.api.ILazyObject;
-import com.github.nill14.utils.init.api.IObjectFactory;
-import com.github.nill14.utils.init.api.IObjectInitializer;
+import com.github.nill14.utils.init.api.ILazyPojo;
 import com.google.common.collect.Sets;
 
 public class LazyJdkProxy implements InvocationHandler {
@@ -18,19 +16,18 @@ public class LazyJdkProxy implements InvocationHandler {
 		return iface.cast(newProxy(beanClass));
 	}
 
-	public static <S, T extends S> S newProxy(Class<S> iface, ILazyObject<T> delegate) {
-		return iface.cast(newProxy(delegate));
+	public static <S, T extends S> S newProxy(Class<S> iface, ILazyPojo<T> lazyPojo) {
+		return iface.cast(newProxy(lazyPojo));
 	}
 	
 	public static Object newProxy(Class<?> beanClass) {
-		IObjectFactory<?> factory = BeanObjectFactory.create(beanClass);
-		ILazyObject<?> delegate = new LazyObject<>(factory, IObjectInitializer.empty());
-		return newProxy(delegate);
+		ILazyPojo<?> lazyPojo = LazyPojo.forClass(beanClass);
+		return newProxy(lazyPojo);
 	}
 	
-	public static Object newProxy(ILazyObject<?> delegate) {
-		LazyJdkProxy invocationHandler = new LazyJdkProxy(delegate);
-		Class<?> clazz = delegate.getInstanceType();
+	public static Object newProxy(ILazyPojo<?> lazyPojo) {
+		LazyJdkProxy invocationHandler = new LazyJdkProxy(lazyPojo);
+		Class<?> clazz = lazyPojo.getInstanceType();
 		ClassLoader cl = clazz.getClassLoader();
 		Class<?>[] ifaces = getImplementedInterfaces(clazz);
 		return Proxy.newProxyInstance(cl, ifaces, invocationHandler);
@@ -44,9 +41,9 @@ public class LazyJdkProxy implements InvocationHandler {
         return interfaces.stream().toArray(Class[]::new);
     }
 	
-	private final ILazyObject<?> delegate;
+	private final ILazyPojo<?> delegate;
 
-	private LazyJdkProxy(ILazyObject<?> delegate) {
+	private LazyJdkProxy(ILazyPojo<?> delegate) {
 		this.delegate = delegate;
 	}
 	

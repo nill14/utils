@@ -1,6 +1,6 @@
 package com.github.nill14.utils.init.api;
 
-public interface IObjectFactory<T> {
+public interface IPojoFactory<T> {
 	
 	T newInstance();
 	

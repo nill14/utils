@@ -1,16 +1,16 @@
 package com.github.nill14.utils.init.impl;
 
-import com.github.nill14.utils.init.api.IObjectFactory;
+import com.github.nill14.utils.init.api.IPojoFactory;
 
-public final class BeanObjectFactory<T> implements IObjectFactory<T> {
+public final class PojoFactory<T> implements IPojoFactory<T> {
 	
-	public static <T> IObjectFactory<T> create(Class<T> beanClass) {
-		return new BeanObjectFactory<>(beanClass);
+	public static <T> IPojoFactory<T> create(Class<T> beanClass) {
+		return new PojoFactory<>(beanClass);
 	}
 
 	private final Class<T> beanClass;
 	
-	private BeanObjectFactory(Class<T> beanClass) {
+	private PojoFactory(Class<T> beanClass) {
 		this.beanClass = beanClass;
 	}
 
