@@ -7,8 +7,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
-import com.github.nill14.utils.init.schema.ObjectFactory;
-import com.github.nill14.utils.init.schema.Service;
 import com.github.nill14.utils.init.schema.ServiceRegistry;
  
 public class JaxbDemo {

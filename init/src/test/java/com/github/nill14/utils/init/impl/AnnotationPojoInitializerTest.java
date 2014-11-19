@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import com.github.nill14.utils.init.ITimeService;
 import com.github.nill14.utils.init.TimeService;
 import com.github.nill14.utils.init.api.ILazyPojo;
-import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 
