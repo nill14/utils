@@ -13,6 +13,11 @@ import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceRegistry;
 
+/**
+ * 
+ * The ServiceRegistry must not be serializable. Serializing the registry indicates a programming error.
+ *
+ */
 public class ServiceRegistry implements IServiceRegistry {
 	
 	private final ConcurrentHashMap<Class<?>, Object> services = new ConcurrentHashMap<>();
@@ -84,6 +89,8 @@ public class ServiceRegistry implements IServiceRegistry {
 	
 	private final IPropertyResolver resolver = new IPropertyResolver() {
 		
+		private static final long serialVersionUID = 746185406164849945L;
+
 		@Override
 		public Object resolve(Object pojo, Class<?> propertyType,
 				String propertyName) {

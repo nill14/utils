@@ -1,6 +1,10 @@
 package com.github.nill14.utils.init;
 
-public class Calc implements ICalc {
+import java.io.Serializable;
+
+public class Calc implements ICalc, Serializable {
+
+	private static final long serialVersionUID = -5998894544071451169L;
 
 	@Override
 	public int add(int a, int b) {

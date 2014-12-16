@@ -1,9 +1,10 @@
 package com.github.nill14.utils.init.api;
 
+import java.io.Serializable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-public interface ILazyPojo<T> {
+public interface ILazyPojo<T> extends Serializable {
 
 	T getInstance();
 	

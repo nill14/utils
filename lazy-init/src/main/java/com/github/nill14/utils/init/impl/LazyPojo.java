@@ -10,6 +10,11 @@ import com.github.nill14.utils.init.api.IPojoInitializer;
 
 public class LazyPojo<T> implements ILazyPojo<T> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5927142279116185259L;
+
 	public static <T> ILazyPojo<T> forClass(Class<T> beanClass) {
 		return forClass(beanClass, IPojoInitializer.empty());
 	}
@@ -104,6 +109,11 @@ public class LazyPojo<T> implements ILazyPojo<T> {
 	
 	
 	private static class FactoryAdapter<T, F extends IPojoFactory<? extends T>> implements IPojoFactory<T>, IPojoInitializer<T> {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -3988519477717092909L;
+		
 		private final ILazyPojo<F> lazyFactory;
 		private final Class<T> beanClass;
 

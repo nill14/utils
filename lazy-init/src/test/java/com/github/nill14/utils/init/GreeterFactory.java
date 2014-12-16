@@ -6,6 +6,8 @@ import com.github.nill14.utils.init.api.IPojoFactory;
 
 public class GreeterFactory implements IPojoFactory<IGreeter> {
 
+	private static final long serialVersionUID = -1178927738327191060L;
+
 	@Inject
 	private String greeting;
 	

@@ -1,5 +1,6 @@
 package com.github.nill14.utils.init.impl;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -10,7 +11,12 @@ import java.util.Set;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.google.common.collect.Sets;
 
-public class LazyJdkProxy implements InvocationHandler {
+public class LazyJdkProxy implements InvocationHandler, Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3530731678963079055L;
 
 	public static <S, T extends S> S newProxy(Class<S> iface, Class<T> beanClass) {
 		return iface.cast(newProxy(beanClass));

@@ -1,6 +1,8 @@
 package com.github.nill14.utils.init.api;
 
-public interface IPojoFactory<T> {
+import java.io.Serializable;
+
+public interface IPojoFactory<T> extends Serializable {
 	
 	T newInstance();
 	

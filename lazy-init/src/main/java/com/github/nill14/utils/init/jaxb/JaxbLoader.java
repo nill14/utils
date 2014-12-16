@@ -77,7 +77,9 @@ public class JaxbLoader {
         	
         	serviceRegistry.setDelegateResolver(new IPropertyResolver() {
         		
-        		@Override
+				private static final long serialVersionUID = 6911651120730545150L;
+
+				@Override
         		public Object resolve(Object pojo, Class<?> propertyType, String propertyName) {
         			if (propertyType == String.class) {
         				String value = strings.get(propertyName);

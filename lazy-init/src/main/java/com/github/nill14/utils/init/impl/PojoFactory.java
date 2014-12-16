@@ -4,6 +4,8 @@ import com.github.nill14.utils.init.api.IPojoFactory;
 
 public final class PojoFactory<T> implements IPojoFactory<T> {
 	
+	private static final long serialVersionUID = -8524486418807436934L;
+
 	public static <T> IPojoFactory<T> create(Class<T> beanClass) {
 		return new PojoFactory<>(beanClass);
 	}

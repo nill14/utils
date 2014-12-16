@@ -1,8 +1,10 @@
 package com.github.nill14.utils.init.api;
 
+import java.io.Serializable;
+
 import com.github.nill14.utils.init.impl.EmptyPojoInitializer;
 
-public interface IPojoInitializer<T> {
+public interface IPojoInitializer<T> extends Serializable {
 
 	void init(T instance);
 	

@@ -17,6 +17,11 @@ import com.github.nill14.utils.init.api.IPropertyResolver;
 
 public class AnnotationPojoInitializer implements IPojoInitializer<Object> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6999206469201978450L;
+
 	public static IPojoInitializer<Object> withResolver(IPropertyResolver resolver) {
 		return new AnnotationPojoInitializer(resolver);
 	}
