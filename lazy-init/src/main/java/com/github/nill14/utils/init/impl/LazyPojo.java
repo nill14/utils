@@ -1,5 +1,9 @@
 package com.github.nill14.utils.init.impl;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -35,7 +39,7 @@ public class LazyPojo<T> implements ILazyPojo<T> {
 	
 	private final IPojoFactory<? extends T> factory;
 	private final IPojoInitializer<? super T> initializer;
-	private volatile T instance;
+	private volatile transient T instance;
 
 	public LazyPojo(IPojoFactory<? extends T> factory, IPojoInitializer<? super T> initializer) {
 		this.factory = factory;
@@ -105,6 +109,27 @@ public class LazyPojo<T> implements ILazyPojo<T> {
 				return freeInstance();
 			}
 		});
+	}
+	
+	private void writeObject(ObjectOutputStream stream) throws IOException {
+		stream.defaultWriteObject();
+		synchronized (this) {
+			if (instance instanceof Serializable) {
+				stream.writeObject(instance);
+			} else {
+				stream.writeObject(null);
+			}
+		}
+	}
+
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		Object obj = stream.readObject();
+		synchronized (this) {
+			if (obj != null) {
+				this.instance = getInstanceType().cast(obj);
+			}
+		}
 	}
 	
 	

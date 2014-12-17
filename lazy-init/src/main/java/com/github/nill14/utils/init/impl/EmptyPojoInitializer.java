@@ -25,12 +25,12 @@ public final class EmptyPojoInitializer<T> implements IPojoInitializer<T> {
 	@Override
 	public void destroy(T instance) { }
 
-    private void writeObject(ObjectOutputStream stream) throws IOException { }
+	private void writeObject(ObjectOutputStream stream) throws IOException { }
 
-    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException { }
-    
-    public Object readResolve() {
-        return getInstance();
-     }
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException { }
+
+	public Object readResolve() {
+		return getInstance();
+	}
 	
 }
