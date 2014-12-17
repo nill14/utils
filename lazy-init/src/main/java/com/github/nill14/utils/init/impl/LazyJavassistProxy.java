@@ -1,21 +1,21 @@
 package com.github.nill14.utils.init.impl;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Set;
+
+import javassist.util.proxy.MethodFilter;
+import javassist.util.proxy.MethodHandler;
+import javassist.util.proxy.Proxy;
+import javassist.util.proxy.ProxyFactory;
 
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.google.common.collect.Sets;
 
-public class LazyJdkProxy implements InvocationHandler, Serializable {
+public class LazyJavassistProxy implements MethodHandler, MethodFilter, Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 3530731678963079055L;
 
 	public static <S, T extends S> S newProxy(Class<S> iface, Class<T> beanClass) {
@@ -32,11 +32,24 @@ public class LazyJdkProxy implements InvocationHandler, Serializable {
 	}
 	
 	public static Object newProxy(ILazyPojo<?> lazyPojo) {
-		LazyJdkProxy invocationHandler = new LazyJdkProxy(lazyPojo);
+		LazyJavassistProxy methodHandler = new LazyJavassistProxy(lazyPojo);
 		Class<?> clazz = lazyPojo.getInstanceType();
-		ClassLoader cl = clazz.getClassLoader();
 		Class<?>[] ifaces = getImplementedInterfaces(clazz);
-		return Proxy.newProxyInstance(cl, ifaces, invocationHandler);
+
+		ProxyFactory f = new ProxyFactory();
+		if (!clazz.isInterface()) {
+			f.setSuperclass(clazz);
+		}
+		f.setInterfaces(ifaces);
+		f.setFilter(methodHandler);
+		Class<?> c = f.createClass();
+		try {
+			Proxy foo = (Proxy) c.newInstance();
+			foo.setHandler(methodHandler);
+			return foo;
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new RuntimeException("Cannot create a proxy", e);
+		} 
 	}
 
     private  static Class<?>[] getImplementedInterfaces(Class<?> clazz) {
@@ -53,27 +66,30 @@ public class LazyJdkProxy implements InvocationHandler, Serializable {
 	
 	private final ILazyPojo<?> delegate;
 
-	private LazyJdkProxy(ILazyPojo<?> delegate) {
+	private LazyJavassistProxy(ILazyPojo<?> delegate) {
 		this.delegate = delegate;
 	}
 	
 	@Override
-	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		
-		if (objectEqualsMethod.equals(method)) {
-			return proxy == args[0];
-			
-		} else if (objectHashCodeMethod.equals(method)) {
-			return System.identityHashCode(proxy);
-			
-		} else if (objectToStringMethod.equals(method)) {
-			String hex = Integer.toHexString(System.identityHashCode(proxy));
-			String className = delegate.getInstanceType().getName();
-			return String.format("%s@%s (Proxy)", className, hex);
+	public boolean isHandled(Method m) {
+		if(signatureEquals(objectFinalizeMethod, m)) {
+			return false;
+		} else if (signatureEquals(objectEqualsMethod, m)) {
+			return false;
+		} else if (signatureEquals(objectHashCodeMethod, m)) {
+			return false;
+		} else if (signatureEquals(objectToStringMethod, m)) {
+			return false;
 		}
+		return true;
+	}
+
+	@Override
+	public Object invoke(Object self, Method thisMethod, Method proceed,
+			Object[] args) throws Throwable {
 		
 		try {
-			return method.invoke(delegate.getInstance(), args);
+			return thisMethod.invoke(delegate.getInstance(), args);
 		} catch (InvocationTargetException e) {
 			throw e.getTargetException();
 		}
@@ -87,8 +103,16 @@ public class LazyJdkProxy implements InvocationHandler, Serializable {
             throw new IllegalArgumentException(e);
         }
     }
+
+	private static boolean signatureEquals(Method method, Method otherMethod) {
+	    return method.getDeclaringClass().isAssignableFrom(otherMethod.getDeclaringClass()) &&
+	    		method.getName().equals(otherMethod.getName()) && 
+	    		Arrays.equals(method.getParameterTypes(), otherMethod.getParameterTypes());
+    }
 	
 	private static final Method objectEqualsMethod = getMethod(Object.class, "equals", Object.class);
 	private static final Method objectHashCodeMethod = getMethod(Object.class, "hashCode");
 	private static final Method objectToStringMethod = getMethod(Object.class, "toString");
+	private static final Method objectFinalizeMethod = getMethod(Object.class, "finalize");
+
 }
