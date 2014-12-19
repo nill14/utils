@@ -1,7 +1,7 @@
 package com.github.nill14.utils.init;
 
 
-public class Calc implements ICalc {
+public class Calculator implements ICalculator {
 
 	@Override
 	public int add(int a, int b) {

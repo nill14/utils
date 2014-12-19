@@ -10,8 +10,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.nill14.utils.init.Calc;
-import com.github.nill14.utils.init.ICalc;
+import com.github.nill14.utils.init.Calculator;
+import com.github.nill14.utils.init.ICalculator;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -19,25 +19,25 @@ import com.github.nill14.utils.init.api.IPojoInitializer;
 public class LazyJdkProxyTest {
 
 	private static final Logger log = LoggerFactory.getLogger(LazyJdkProxyTest.class);
-	private static ICalc calcProxy;
-	private static ILazyPojo<Calc> lazyObject;
+	private static ICalculator calcProxy;
+	private static ILazyPojo<Calculator> lazyObject;
 	private static AtomicInteger instances = new AtomicInteger();
 
-	private static final IPojoInitializer<ICalc> initializer = new IPojoInitializer<ICalc>() {
-		public void init(ICalc instance) {
+	private static final IPojoInitializer<ICalculator> initializer = new IPojoInitializer<ICalculator>() {
+		public void init(ICalculator instance) {
 			instances.incrementAndGet();
 		}
 		
-		public void destroy(ICalc instance) {
+		public void destroy(ICalculator instance) {
 			instances.decrementAndGet();
 		}
 	};
 	
 	@BeforeClass
 	public static void setUp() {
-		IPojoFactory<Calc> factory = PojoFactory.create(Calc.class);
+		IPojoFactory<Calculator> factory = PojoFactory.create(Calculator.class);
 		lazyObject = new LazyPojo<>(factory, initializer);
-		calcProxy = LazyJdkProxy.newProxy(ICalc.class, lazyObject);
+		calcProxy = LazyJdkProxy.newProxy(ICalculator.class, lazyObject);
 	}
 	
 	@Before

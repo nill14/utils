@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Calendar;
 
 import org.junit.After;
 import org.junit.Before;
@@ -13,6 +14,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.nill14.utils.init.ICalculator;
 import com.github.nill14.utils.init.ITimeService;
 import com.github.nill14.utils.init.TimeService;
 import com.github.nill14.utils.init.api.ILazyPojo;
@@ -34,6 +36,8 @@ public class AnnotationPojoInitializerTest {
 
 		resolver = mock(IPropertyResolver.class);
 		doReturn("greeting").when(resolver).resolve(any(), eq(String.class), eq("greeting"));
+		doReturn(new ICalculator[0]).when(resolver).resolve(any(), eq(ICalculator[].class), anyString());
+		doReturn(null).when(resolver).resolve(any(), eq(Calendar.class), eq("calendar"));
 		doReturn(ZoneId.systemDefault()).when(resolver).resolve(any(), eq(ZoneId.class), anyString());
 		doReturn(spy).when(resolver).resolve(any(), eq(TimeService.class), eq("spy"));
 		

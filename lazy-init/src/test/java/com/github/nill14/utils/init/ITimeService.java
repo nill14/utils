@@ -7,5 +7,5 @@ public interface ITimeService {
 
 	LocalDateTime getNow();
 	
-	List<ICalc> getProviders();
+	List<ICalculator> getProviders();
 }

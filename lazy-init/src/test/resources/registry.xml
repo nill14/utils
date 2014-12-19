@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <p:serviceRegistry xmlns:p="http://www.github.com/nill14/utils/init/serviceRegistry" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.github.com/nill14/utils/init/serviceRegistry ../../main/resources/serviceRegistry.xsd ">
   <services>
-    <service interface="com.github.nill14.utils.init.ICalc">
-      <bean>com.github.nill14.utils.init.Calc</bean>
+    <service interface="com.github.nill14.utils.init.ICalculator">
+      <bean>com.github.nill14.utils.init.Calculator</bean>
     </service>
     <service interface="com.github.nill14.utils.init.IGreeter">
       <factory>com.github.nill14.utils.init.GreeterFactory</factory>
@@ -12,10 +12,10 @@
     </service>
   </services>
   <providers>
-    <provider registrable="com.github.nill14.utils.init.ICalc">
-      <provider>com.github.nill14.utils.init.Calc</provider>
-      <provider>com.github.nill14.utils.init.Calc</provider>
-      <provider>com.github.nill14.utils.init.Calc</provider>
+    <provider registrable="com.github.nill14.utils.init.ICalculator">
+      <provider>com.github.nill14.utils.init.Calculator</provider>
+      <provider>com.github.nill14.utils.init.Calculator</provider>
+      <provider>com.github.nill14.utils.init.Calculator</provider>
     </provider>
   </providers>
   <properties>

@@ -1,6 +1,6 @@
 package com.github.nill14.utils.init;
 
-public interface ICalc {
+public interface ICalculator {
 	int add(int a, int b);
 	
 	@Override

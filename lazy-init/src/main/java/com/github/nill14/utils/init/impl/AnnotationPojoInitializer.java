@@ -8,9 +8,12 @@ import java.lang.reflect.Modifier;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+
+import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+
 
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -90,12 +93,18 @@ public class AnnotationPojoInitializer implements IPojoInitializer<Object> {
 	
 	private void doInject(Object instance) {
 		getFields(instance).forEach(f -> {
-			f.setAccessible(true);
 			Object value = resolver.resolve(instance, f.getType(), f.getName());
-			try {
-				f.set(instance, value);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
+			if (value != null) {
+				try {
+					f.setAccessible(true);
+					f.set(instance, value);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			} else if (!f.isAnnotationPresent(Nullable.class)) { 
+				throw new RuntimeException(String.format(
+						"Cannot resolve property %s %s on bean %s", 
+						f.getType(), f.getName(), instance));
 			}
 		});
 	}

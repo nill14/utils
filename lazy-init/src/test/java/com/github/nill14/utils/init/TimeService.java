@@ -2,11 +2,14 @@ package com.github.nill14.utils.init;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import com.github.nill14.utils.init.ICalculator;
 
 import org.junit.Assert;
 import org.slf4j.Logger;
@@ -22,10 +25,14 @@ public class TimeService extends AbstractService implements ITimeService {
 	private ZoneId zone;
 	
 	@Inject
+	@Nullable
+	private Calendar calendar;
+	
+	@Inject
 	private TimeService spy;
 	
 	@Inject
-	private ICalc[] calcs;
+	private ICalculator[] calcs;
 	
 	@Override
 	@PostConstruct
@@ -50,7 +57,7 @@ public class TimeService extends AbstractService implements ITimeService {
 	}
 	
 	@Override
-	public List<ICalc> getProviders() {
+	public List<ICalculator> getProviders() {
 		return ImmutableList.copyOf(calcs);
 	}
 	

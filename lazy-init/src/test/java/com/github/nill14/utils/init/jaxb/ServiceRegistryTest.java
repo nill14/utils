@@ -10,7 +10,7 @@ import javax.xml.bind.JAXBException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.github.nill14.utils.init.ICalc;
+import com.github.nill14.utils.init.ICalculator;
 import com.github.nill14.utils.init.IGreeter;
 import com.github.nill14.utils.init.ITimeService;
 import com.github.nill14.utils.init.api.IServiceRegistry;
@@ -38,7 +38,7 @@ public class ServiceRegistryTest {
 	
 	@Test
 	public void testCalc() {
-		ICalc calc = registry.getService(ICalc.class);
+		ICalculator calc = registry.getService(ICalculator.class);
 		assertEquals(8, calc.add(5, 3));
 	}
 

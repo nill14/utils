@@ -111,7 +111,8 @@ public class ServiceRegistry implements IServiceRegistry {
 				Class<?> registrable = propertyType.getComponentType();
 				return getProviders(registrable);
 			}
-			throw new RuntimeException(String.format("Cannot resolve property %s %s on bean %s", propertyType, propertyName, pojo));
+			
+			return null;
 		}
 	};
 	
