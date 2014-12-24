@@ -39,8 +39,15 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	
+
 
 	<build>
+		<resources>
+			<resource>
+				<directory>target/generated-sources/jaxb</directory>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -130,6 +137,12 @@
 			<artifactId>javassist</artifactId>
 			<version>3.18.2-GA</version>
 			<optional>true</optional>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.github.nill14.utils</groupId>
+			<artifactId>java8-utils</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
