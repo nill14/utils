@@ -1,4 +1,4 @@
-package com.github.nill14.utils.moduledi;
+package com.github.nill14.utils.moduledi.service;
 
 import com.google.inject.Inject;
 

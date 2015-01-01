@@ -1,25 +1,54 @@
 package com.github.nill14.utils.moduledi;
 
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.junit.Test;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.github.nill14.parsers.dependency.IDependencyGraph;
+import com.github.nill14.parsers.dependency.UnsatisfiedDependencyException;
+import com.github.nill14.parsers.dependency.impl.DependencyGraphFactory;
+import com.github.nill14.parsers.dependency.impl.ModuleRankingsPrinter;
+import com.github.nill14.parsers.graph.CyclicGraphException;
+import com.github.nill14.utils.init.api.IServiceRegistry;
+import com.github.nill14.utils.init.impl.ServiceRegistry;
+import com.github.nill14.utils.moduledi.module.BreadModule;
+import com.github.nill14.utils.moduledi.module.DeliveryModule;
+import com.github.nill14.utils.moduledi.module.SnackModule;
+import com.google.common.collect.ImmutableSet;
 
 public class ModuleTest {
 
 	@Test
-	public void test() {
-	    /*
-	     * Guice.createInjector() takes your Modules, and returns a new Injector
-	     * instance. Most applications will call this method exactly once, in their
-	     * main() method.
-	     */
-	    Injector injector = Guice.createInjector(new BreadModule(), new SnackModule());
-
-	    /*
-	     * Now that we've got the injector, we can build objects.
-	     */
-	    ISnackService snackService = injector.getInstance(ISnackService.class);
-	    System.out.println(snackService);
+	public void test() throws UnsatisfiedDependencyException, CyclicGraphException, ExecutionException {
+		
+		try {
+			IServiceRegistry registry = new ServiceRegistry();
+			
+			Set<AbstractModule> modules = ImmutableSet.of(new BreadModule(), new SnackModule(), new DeliveryModule());
+			
+			modules.forEach(m -> m.prepareModule(registry));
+			
+			IDependencyGraph<AbstractModule> dependencyGraph = 
+					DependencyGraphFactory.newInstance(modules, m -> m.getDependencyDescriptor());
+			
+			ExecutorService executor = Executors.newCachedThreadPool();
+			// execute first ModuleA and ModuleC in parallel and when completed, executes ModuleB
+			dependencyGraph.walkGraph(executor, module -> module.startModule());
+			
+			// prints out the dependency tree to System.out
+			new ModuleRankingsPrinter<>(dependencyGraph).toConsole();
+			
+			
+//	    ISnackService snackService = injector.getInstance(ISnackService.class);
+//	    System.out.println(snackService);
+			
+		} catch (UnsatisfiedDependencyException | CyclicGraphException | ExecutionException e) {
+			e.printStackTrace();
+			throw e;
+		}
+		
 	}
 }
