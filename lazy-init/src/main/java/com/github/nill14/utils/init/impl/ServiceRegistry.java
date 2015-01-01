@@ -1,6 +1,7 @@
 package com.github.nill14.utils.init.impl;
 
 import java.lang.reflect.Array;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
@@ -12,6 +13,8 @@ import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceRegistry;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 
 /**
  * 
@@ -87,6 +90,13 @@ public class ServiceRegistry implements IServiceRegistry {
 		return queue.toArray(arr);
 	}
 	
+	public Collection<Class<?>> getBeans() {
+		Builder<Class<?>> builder = ImmutableList.builder();
+		builder.addAll(services.keySet());
+//		builder.addAll(providers.values())
+		return builder.build();
+	}
+	
 	private final IPropertyResolver resolver = new IPropertyResolver() {
 		
 		private static final long serialVersionUID = 746185406164849945L;
@@ -115,6 +125,11 @@ public class ServiceRegistry implements IServiceRegistry {
 			return null;
 		}
 	};
+	
+	
+	public IPropertyResolver toResolver() {
+		return resolver;
+	}
 	
 	private final IPojoInitializer<Object> annotationInitializer = AnnotationPojoInitializer.withResolver(resolver);
 
