@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -17,7 +18,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 
 import com.github.nill14.utils.init.api.IServiceRegistry;
-import com.github.nill14.utils.moduledi.service.BreadService;
 
 public class GlobalBeanFactory implements ApplicationContext {
 
@@ -29,49 +29,47 @@ public class GlobalBeanFactory implements ApplicationContext {
 	
 	@Override
 	public Object getBean(String name) throws BeansException {
-		// TODO Auto-generated method stub
-		return null;
+		return registry.getOptionalService(Object.class, name)
+				.orElseThrow(() -> new BeanCreationException(name));
 	}
 
 	@Override
 	public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
-		// TODO Auto-generated method stub
-		return (T) new BreadService();
+		if (requiredType == null) {
+			requiredType = (Class<T>) Object.class;
+		}
+		return registry.getOptionalService(requiredType, name)
+				.orElseThrow(() -> new BeanCreationException(name));
 	}
 
 	@Override
 	public <T> T getBean(Class<T> requiredType) throws BeansException {
-		// TODO Auto-generated method stub
-		return null;
+		return registry.getOptionalService(requiredType)
+				.orElseThrow(() -> new BeanCreationException(requiredType.toGenericString()));
 	}
 
 	@Override
 	public Object getBean(String name, Object... args) throws BeansException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new BeanCreationException("unsupported");
 	}
 
 	@Override
 	public <T> T getBean(Class<T> requiredType, Object... args) throws BeansException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new BeanCreationException("unsupported");
 	}
 
 	@Override
 	public boolean containsBean(String name) {
-		// TODO Auto-generated method stub
-		return false;
+		return registry.getOptionalService(Object.class, name).isPresent();
 	}
 
 	@Override
 	public boolean isSingleton(String name) throws NoSuchBeanDefinitionException {
-		// TODO Auto-generated method stub
-		return false;
+		return containsBean(name);
 	}
 
 	@Override
 	public boolean isPrototype(String name) throws NoSuchBeanDefinitionException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -89,8 +87,7 @@ public class GlobalBeanFactory implements ApplicationContext {
 
 	@Override
 	public String[] getAliases(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return new String[0];
 	}
 
 	@Override
@@ -101,8 +98,7 @@ public class GlobalBeanFactory implements ApplicationContext {
 
 	@Override
 	public boolean containsBeanDefinition(String beanName) {
-		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException(beanName);
 	}
 
 	@Override
@@ -112,20 +108,18 @@ public class GlobalBeanFactory implements ApplicationContext {
 
 	@Override
 	public String[] getBeanDefinitionNames() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public String[] getBeanNamesForType(Class<?> type) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException(type.toGenericString());
 	}
 
 	@Override
 	public String[] getBeanNamesForType(Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
 		// TODO Auto-generated method stub
-		return null;
+		return new String[] {"snackService"};//FIXME
 	}
 
 	@Override
@@ -137,40 +131,34 @@ public class GlobalBeanFactory implements ApplicationContext {
 	@Override
 	public <T> Map<String, T> getBeansOfType(Class<T> type, boolean includeNonSingletons,
 			boolean allowEagerInit) throws BeansException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException(type.toGenericString());
 	}
 
 	@Override
 	public String[] getBeanNamesForAnnotation(Class<? extends Annotation> annotationType) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException(annotationType.toGenericString());
 	}
 
 	@Override
 	public Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType)
 			throws BeansException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException(annotationType.toGenericString());
 	}
 
 	@Override
 	public <A extends Annotation> A findAnnotationOnBean(String beanName, Class<A> annotationType)
 			throws NoSuchBeanDefinitionException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException(beanName);
 	}
 
 	@Override
 	public BeanFactory getParentBeanFactory() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean containsLocalBean(String name) {
-		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException(name);
 	}
 
 	@Override
@@ -217,38 +205,32 @@ public class GlobalBeanFactory implements ApplicationContext {
 
 	@Override
 	public String getId() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getApplicationName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "";
 	}
 
 	@Override
 	public String getDisplayName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "global";
 	}
 
 	@Override
 	public long getStartupDate() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public ApplicationContext getParent() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public AutowireCapableBeanFactory getAutowireCapableBeanFactory() throws IllegalStateException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IllegalStateException();
 	}
 
 }

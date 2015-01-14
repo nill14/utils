@@ -15,6 +15,7 @@ import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceRegistry;
 import com.github.nill14.utils.init.api.IType;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableSet;
@@ -107,6 +108,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <S> Collection<S> getServices(Class<S> registrable) {
+		Preconditions.checkNotNull(registrable);
 		Queue<S> queue = (Queue<S>) services.get(registrable);
 		if (queue != null) {
 			return ImmutableList.copyOf(queue);

@@ -29,12 +29,11 @@ public abstract class AbstractModule extends com.google.inject.AbstractModule {
 		buildDependencies(dependencyBuilder);
 		dependencyDescriptor = dependencyBuilder.build();
 		serviceBuilder.buildServices(registry);
-		
-		
-		initApplicationContext(registry);
 	}
 	
-	public void startModule() {
+	public void startModule(IServiceRegistry registry) {
+		
+		initApplicationContext(registry);
 	}
 	
 	public void buildDependencies(IDependencyDescriptorBuilder<Class<?>> builder) {}
@@ -48,19 +47,18 @@ public abstract class AbstractModule extends com.google.inject.AbstractModule {
 		if (inputStream == null) {
 			return;
 		}
-		GlobalBeanFactory parent = new GlobalBeanFactory(null);
+//		GlobalBeanFactory parent = new GlobalBeanFactory(serviceRegistry);
 		
-//		InputStreamResource resource = new InputStreamResource(inputStream);
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] {name}, false, null);
 		
 		ctx.addBeanFactoryPostProcessor(new ModuleBeanDefinitionRegistryPostProcessor(serviceRegistry));
 		
-		
-		ctx.refresh();//FIXME on startModule
+		 ctx.refresh();
 		
 		System.out.println(ctx.getBean(Snack.class).getBread().getName());
 		System.out.println(ctx.getBean(Snack.class).getSnackService());
-		
+
+			
 //		@SuppressWarnings({ "unused", "resource" })
 //		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(resource);
 		

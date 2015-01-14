@@ -11,13 +11,14 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import org.springframework.beans.factory.support.MergedBeanDefinitionPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.core.PriorityOrdered;
 
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.inject.FieldInjectionDescriptor;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 
 public class ModuleAnnotationBeanPostProcessor implements BeanPostProcessor, 
-	MergedBeanDefinitionPostProcessor, BeanFactoryAware, InstantiationAwareBeanPostProcessor {
+	MergedBeanDefinitionPostProcessor, BeanFactoryAware, InstantiationAwareBeanPostProcessor, PriorityOrdered {
 
 	
 	private final IPropertyResolver resolver;
@@ -37,7 +38,19 @@ public class ModuleAnnotationBeanPostProcessor implements BeanPostProcessor,
 	}
 	
 	@Override
+	public int getOrder() {
+		return -10;
+	}
+	
+	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+//		doInject(bean);
+		
+		return bean;
+	}
+
+	private void doInject(Object bean) {
+		if (beanFactory == null) return;
 		PojoInjectionDescriptor pojoDescriptor = new PojoInjectionDescriptor(bean.getClass());
 		
 		for (FieldInjectionDescriptor injector : pojoDescriptor.getFieldDescriptors() ) {
@@ -59,8 +72,6 @@ public class ModuleAnnotationBeanPostProcessor implements BeanPostProcessor,
 				throw new RuntimeException(); //TODO
 			}
 		}
-		
-		return bean;
 	}
 
 	@Override
@@ -87,6 +98,8 @@ public class ModuleAnnotationBeanPostProcessor implements BeanPostProcessor,
 	@Override
 	public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds,
 			Object bean, String beanName) throws BeansException {
+		
+		doInject(bean);
 		return pvs;
 	}
 

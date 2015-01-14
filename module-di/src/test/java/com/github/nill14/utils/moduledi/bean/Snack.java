@@ -19,14 +19,14 @@ public class Snack {
 	private Bread bread;
 	
 	@Inject
-	private ISnackService snack;
+	private ISnackService snackService;
 
 	public Bread getBread() {
 		return bread;
 	}
 	
 	public ISnackService getSnackService() {
-		return snack;
+		return snackService;
 	}
 
 	

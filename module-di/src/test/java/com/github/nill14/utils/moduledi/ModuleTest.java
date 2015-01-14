@@ -36,7 +36,7 @@ public class ModuleTest {
 			
 			ExecutorService executor = Executors.newCachedThreadPool();
 			// execute first ModuleA and ModuleC in parallel and when completed, executes ModuleB
-			dependencyGraph.walkGraph(executor, module -> module.startModule());
+			dependencyGraph.walkGraph(executor, module -> module.startModule(registry));
 			
 			// prints out the dependency tree to System.out
 			new ModuleRankingsPrinter<>(dependencyGraph).toConsole();
@@ -50,5 +50,9 @@ public class ModuleTest {
 			throw e;
 		}
 		
+	}
+	
+	public static void main(String[] args) throws Exception {
+		new ModuleTest().test();
 	}
 }
