@@ -1,22 +1,30 @@
 package com.github.nill14.utils.init.api;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public interface IServiceRegistry {
 
-	<S, T extends S> void putService(Class<S> iface, Class<T> serviceBean);
+	<T> void addSingleton(T serviceBean);
 	
-	<S, F extends IPojoFactory<? extends S>> void putServiceFactory(Class<S> iface, Class<F> factoryBean);
-
+	<T> void addSingleton(String name, T serviceBean);
+	
+	<T> void addService(Class<T> serviceBean);
+	
+	<S, T extends S> void addService(String name, Class<T> serviceBean);
+	
+	<S, F extends IPojoFactory<? extends S>> void addServiceFactory(Class<S> iface, String name, Class<F> factoryBean);
+	
+	<S, F extends IPojoFactory<? extends S>> void addServiceFactory(Class<S> iface, Class<F> factoryBean);
+	
 	<S> S getService(Class<S> iface);
 
 	<S> Optional<S> getOptionalService(Class<S> iface);
 	
+	<S> S getService(Class<S> iface, String name);
+
+	<S> Optional<S> getOptionalService(Class<S> iface, String name);
 	
-	<S, T extends S> void addProvider(Class<S> registrable, Class<T> providerClass);
-	
-	<S, F extends IPojoFactory<? extends S>> void addProviderFactory(Class<S> registrable, Class<F> providerFactoryClass);
-	
-	<S> S[] getProviders(Class<S> registrable);
+	<S> Collection<S> getServices(Class<S> registrable);
 
 }

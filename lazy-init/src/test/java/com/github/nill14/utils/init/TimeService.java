@@ -4,12 +4,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
-import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import com.github.nill14.utils.init.ICalculator;
 
 import org.junit.Assert;
 import org.slf4j.Logger;
@@ -25,14 +24,13 @@ public class TimeService extends AbstractService implements ITimeService {
 	private ZoneId zone;
 	
 	@Inject
-	@Nullable
-	private Calendar calendar;
+	private Optional<Calendar> calendar;
 	
 	@Inject
 	private TimeService spy;
 	
 	@Inject
-	private ICalculator[] calcs;
+	private List<ICalculator> calcs;
 	
 	@Override
 	@PostConstruct

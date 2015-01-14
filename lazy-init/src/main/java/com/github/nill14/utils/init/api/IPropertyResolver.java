@@ -13,6 +13,6 @@ public interface IPropertyResolver extends Serializable {
 	 * @param propertyName The {@link Named} value or the property name
 	 * @return The resolved property or null if property could not be resolved.
 	 */
-	Object resolve(Object pojo, Class<?> propertyType, String propertyName);
+	Object resolve(Object pojo, IType type);
 	
 }

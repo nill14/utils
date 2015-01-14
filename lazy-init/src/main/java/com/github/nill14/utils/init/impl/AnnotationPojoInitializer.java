@@ -80,14 +80,14 @@ public class AnnotationPojoInitializer implements IPojoInitializer<Object> {
 	private void doInject(Object instance) {
 		PojoInjectionDescriptor injector = new PojoInjectionDescriptor(instance.getClass());
 		injector.getFieldDescriptors().forEach(fd -> {
-			Object value = resolver.resolve(instance, fd.getType(), fd.getName());
+			Object value = resolver.resolve(instance, fd);
 			if (value != null) {
 				fd.inject(instance, value);
 				
-			} else if (fd.isMandatory()) /* field is null and mandatory */ { 
+			} else { 
 				throw new RuntimeException(String.format(
-						"Cannot resolve property %s %s on bean %s", 
-						fd.getType(), fd.getName(), instance));
+						"Cannot resolve property %s on bean %s", 
+						fd, instance));
 				
 			}
 			

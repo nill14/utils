@@ -42,14 +42,14 @@ public class ModuleAnnotationBeanPostProcessor implements BeanPostProcessor,
 		
 		for (FieldInjectionDescriptor injector : pojoDescriptor.getFieldDescriptors() ) {
 			
-			Object value = beanFactory.getBean(injector.getName(), injector.getType());
+			Object value = beanFactory.getBean(injector.getName(), injector.getRawType());
 			
 			if (value == null) {
-				value = beanFactory.getBean(injector.getType());
+				value = beanFactory.getBean(injector.getRawType());
 			}
 			
 			if (value == null) {
-				value = resolver.resolve(bean, injector.getType(), injector.getName());
+				value = resolver.resolve(bean, injector);
 			}
 			
 			if (value != null) {

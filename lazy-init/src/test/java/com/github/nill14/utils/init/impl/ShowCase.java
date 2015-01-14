@@ -53,8 +53,8 @@ public class ShowCase {
 	
 	void test() {
 		IServiceRegistry registry = new ServiceRegistry();
-		registry.putService(ISeedService.class, SeedService.class);
-		registry.putService(IDiceService.class, DiceService.class);
+		registry.addService("seedService", SeedService.class);
+		registry.addService("diceService", DiceService.class);
 		registry.getService(IDiceService.class).rollDice();
 	}
 	

@@ -22,7 +22,7 @@ public class ServiceBuilder implements IServiceBuilder {
 	@Override
 	public IServiceBuilder buildServices(IServiceRegistry serviceRegistry) {
 		
-		beans.forEach((serviceBean, service) -> serviceRegistry.putService((Class) service, serviceBean));
+		beans.forEach((serviceBean, service) -> serviceRegistry.addService(serviceBean));
 		
 		return this;
 	}

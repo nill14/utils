@@ -11,6 +11,7 @@ import javax.xml.transform.stream.StreamSource;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceRegistry;
+import com.github.nill14.utils.init.api.IType;
 import com.github.nill14.utils.init.impl.PojoFactory;
 import com.github.nill14.utils.init.schema.BeanProperty;
 import com.github.nill14.utils.init.schema.FactoryProperty;
@@ -38,10 +39,10 @@ public class JaxbLoader {
         		Class iface = Class.forName(service.getInterface());
         		if (service.getBean() != null) {
         			Class serviceBean = Class.forName(service.getBean());
-        			serviceRegistry.putService(iface, serviceBean);
+        			serviceRegistry.addService(serviceBean);
         		} else {
         			Class factoryBean = Class.forName(service.getFactory());
-        			serviceRegistry.putServiceFactory(iface, factoryBean);
+        			serviceRegistry.addServiceFactory(iface, factoryBean);
         		}
         	}
         }
@@ -51,11 +52,11 @@ public class JaxbLoader {
         		Class registrable = Class.forName(service.getRegistrable());
         		for (String bean : service.getProvider()) {
         			Class providerClass = Class.forName(bean);
-        			serviceRegistry.addProvider(registrable, providerClass);
+        			serviceRegistry.addService(providerClass);
         		}
         		for (String bean : service.getProviderFactory()) {
         			Class providerFactoryClass = Class.forName(bean);
-        			serviceRegistry.addProviderFactory(registrable, providerFactoryClass);
+        			serviceRegistry.addServiceFactory(registrable, providerFactoryClass);
         		}
         	}
         }
@@ -80,14 +81,14 @@ public class JaxbLoader {
 				private static final long serialVersionUID = 6911651120730545150L;
 
 				@Override
-        		public Object resolve(Object pojo, Class<?> propertyType, String propertyName) {
-        			if (propertyType == String.class) {
-        				String value = strings.get(propertyName);
+        		public Object resolve(Object pojo, IType type) {
+        			if (type.getRawType() == String.class) {
+        				String value = strings.get(type.getName());
         				if (value != null) {
         					return value;
         				}
         			} 
-        			IPojoFactory factory = factories.get(propertyType);
+        			IPojoFactory factory = factories.get(type.getRawType());
         			if (factory != null) {
         				return factory.newInstance();
         			}

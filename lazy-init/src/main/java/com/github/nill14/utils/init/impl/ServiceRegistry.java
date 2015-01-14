@@ -1,10 +1,10 @@
 package com.github.nill14.utils.init.impl;
 
-import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -13,8 +13,11 @@ import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceRegistry;
+import com.github.nill14.utils.init.api.IType;
+import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * 
@@ -23,8 +26,8 @@ import com.google.common.collect.ImmutableList.Builder;
  */
 public class ServiceRegistry implements IServiceRegistry {
 	
-	private final ConcurrentHashMap<Class<?>, Object> services = new ConcurrentHashMap<>();
-	private final ConcurrentHashMap<Class<?>, LinkedBlockingQueue<Object>> providers = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<String, Object> beans = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<Class<?>, LinkedBlockingQueue<Object>> services = new ConcurrentHashMap<>();
 	private IPropertyResolver delegateResolver;
 	
 	/**
@@ -38,56 +41,91 @@ public class ServiceRegistry implements IServiceRegistry {
 		this.delegateResolver = delegateResolver;
 	}
 	
+	private String generateName(Class<?> type) {
+		return type.getTypeName();
+	}
+	
 	@Override
-	public <S, T extends S> void putService(Class<S> iface, Class<T> serviceBean) {
+	public <T> void addService(Class<T> serviceBean) {
+		addService(generateName(serviceBean), serviceBean);
+	}
+	
+	@Override
+	public <S, T extends S> void addService(String name, Class<T> serviceBean) {
 		ILazyPojo<T> lazyPojo = LazyPojo.forClass(serviceBean, annotationInitializer);
-		services.put(iface, LazyJdkProxy.newProxy(lazyPojo));
+		Object proxy = LazyJdkProxy.newProxy(lazyPojo);
+		Set<Class<?>> types = new PojoInjectionDescriptor(serviceBean).getDeclaredTypes();
+		types.forEach((type) -> addElement(type, proxy));
+		beans.put(name, proxy);
+	}
+	
+	@Override
+	public <S, F extends IPojoFactory<? extends S>> void addServiceFactory(
+			Class<S> iface, Class<F> factoryBean) {
+		addServiceFactory(iface, generateName(iface), factoryBean);
 	}
 
 	@Override
-	public <S, F extends IPojoFactory<? extends S>> void putServiceFactory(
-			Class<S> iface, Class<F> factoryBean) {
+	public <S, F extends IPojoFactory<? extends S>> void addServiceFactory(
+			Class<S> iface, String name, Class<F> factoryBean) {
 		ILazyPojo<S> lazyPojo = LazyPojo.forFactory(iface, factoryBean, annotationInitializer);
-		services.put(iface, LazyJdkProxy.newProxy(lazyPojo));		
+		Object proxy = LazyJdkProxy.newProxy(lazyPojo);
+		Set<Class<?>> types = new PojoInjectionDescriptor(iface).getDeclaredTypes();
+		types.forEach((type) -> addElement(type, proxy));
+		beans.put(name, proxy);
 	}
 
 	@Override
 	public <S> S getService(Class<S> iface) {
-		S service = iface.cast(services.get(iface));
+		Optional<S> optional = getOptionalService(iface);
+		return iface.cast(optional.get());
+	}
+	
+	@Override
+	public <S> S getService(Class<S> iface, String name) {
+		S service = iface.cast(beans.get(name));
 		Objects.requireNonNull(service);
 		return service;
 	}
 
 	@Override
 	public <S> Optional<S> getOptionalService(Class<S> iface) {
-		S service = iface.cast(services.get(iface));
+		return getServices(iface).stream().findFirst();
+	}
+	
+	@Override
+	public <S> Optional<S> getOptionalService(Class<S> iface, String name) {
+		S service = iface.cast(beans.get(name));
 		return Optional.ofNullable(service);
 	}
 
-	@Override
-	public <S, T extends S> void addProvider(Class<S> registrable,
-			Class<T> providerClass) {
-		
-		ILazyPojo<T> lazyPojo = LazyPojo.forClass(providerClass, annotationInitializer);
-		Queue<Object> queue = providers.computeIfAbsent(registrable, r -> new LinkedBlockingQueue<>());
-		queue.add(LazyJdkProxy.newProxy(lazyPojo));
+	private void addElement(Class<?> registrable, Object proxy) {
+		Queue<Object> queue = services.computeIfAbsent(registrable, r -> new LinkedBlockingQueue<>());
+		queue.add(proxy);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public <S, F extends IPojoFactory<? extends S>> void addProviderFactory(
-			Class<S> registrable, Class<F> providerFactoryClass) {
+	public <S> Collection<S> getServices(Class<S> registrable) {
+		Queue<S> queue = (Queue<S>) services.get(registrable);
+		if (queue != null) {
+			return ImmutableList.copyOf(queue);
 		
-		ILazyPojo<S> lazyPojo = LazyPojo.forFactory(registrable, providerFactoryClass, annotationInitializer);
-		Queue<Object> queue = providers.computeIfAbsent(registrable, r -> new LinkedBlockingQueue<>());
-		queue.add(LazyJdkProxy.newProxy(lazyPojo));		
+		} else {
+			return ImmutableList.of();
+		}
 	}
-
+	
 	@Override
-	public <S> S[] getProviders(Class<S> registrable) {
-		Queue<Object> queue = providers.get(registrable);
-        @SuppressWarnings("unchecked")
-		S[] arr = (S[]) Array.newInstance(registrable, queue.size());
-		return queue.toArray(arr);
+	public <T> void addSingleton(T serviceBean) {
+		addSingleton(Objects.toString(serviceBean), serviceBean);
+	}
+	
+	@Override
+	public <T> void addSingleton(String name, T serviceBean) {
+		Set<Class<?>> types = new PojoInjectionDescriptor(serviceBean.getClass()).getDeclaredTypes();
+		types.forEach((type) -> addElement(type, serviceBean));
+		beans.put(name, serviceBean);
 	}
 	
 	public Collection<Class<?>> getBeans() {
@@ -102,24 +140,43 @@ public class ServiceRegistry implements IServiceRegistry {
 		private static final long serialVersionUID = 746185406164849945L;
 
 		@Override
-		public Object resolve(Object pojo, Class<?> propertyType,
-				String propertyName) {
+		public Object resolve(Object pojo, IType type) {
 			
 			if (delegateResolver != null) {
-				Object resolve = delegateResolver.resolve(pojo, propertyType, propertyName);
+				Object resolve = delegateResolver.resolve(pojo, type);
 				if (resolve != null) {
 					return resolve;
 				}
 			}
-			
-			Optional<?> optional = getOptionalService(propertyType);
-			if (optional.isPresent()) {
-				return optional.get();
-			}
 
-			if (propertyType.isArray()) {
-				Class<?> registrable = propertyType.getComponentType();
-				return getProviders(registrable);
+			Optional<?> optionalNamed = getOptionalService(type.getRawType(), type.getName());
+			if (optionalNamed.isPresent()) {
+				return optionalNamed.get();
+			}
+			
+			if (type.isParametrized()) {
+				Class<?> rawType = type.getRawType();
+				Class<?> paramClass = type.getFirstParamClass();
+
+				if (Optional.class.isAssignableFrom(rawType)) {
+					Optional<?> optional = getOptionalService(paramClass);
+					return optional;
+				}
+				
+				if (Collection.class.isAssignableFrom(rawType)) {
+					Collection<?> providers = getServices(paramClass);
+					
+					if (Set.class.isAssignableFrom(rawType)) {
+						return ImmutableSet.copyOf(providers);
+					} else {
+						return ImmutableList.copyOf(providers);
+					}
+				}
+			}
+			
+			Optional<?> optionalTyped = getOptionalService(type.getRawType());
+			if (optionalTyped.isPresent()) {
+				return optionalTyped.get();
 			}
 			
 			return null;

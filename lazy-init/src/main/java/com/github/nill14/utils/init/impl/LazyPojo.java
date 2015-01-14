@@ -8,11 +8,13 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import javax.inject.Provider;
+
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 
-public class LazyPojo<T> implements ILazyPojo<T> {
+public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 
 	/**
 	 * 
@@ -49,6 +51,11 @@ public class LazyPojo<T> implements ILazyPojo<T> {
 	@Override
 	public Class<? extends T> getInstanceType() {
 		return factory.getType();
+	}
+	
+	@Override
+	public T get() {
+		return getInstance();
 	}
 	
 	@Override

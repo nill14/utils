@@ -20,7 +20,7 @@ public class PojoInjectionDescriptor {
 	private final ImmutableList<FieldInjectionDescriptor> properties;
 
 	public PojoInjectionDescriptor(Class<?> pojoClazz) {
-		this.clazz = pojoClazz;
+		clazz = pojoClazz;
 		properties = properties(pojoClazz);
 	}
 
@@ -66,9 +66,8 @@ public class PojoInjectionDescriptor {
 	private Stream<? extends FieldInjectionDescriptor> injectableFields(Stream<Field> nonStaticFields) {
 		return nonStaticFields.map(f -> {
 			if (f.isAnnotationPresent(javax.inject.Inject.class)) {
-				boolean mandatory = !f.isAnnotationPresent(javax.annotation.Nullable.class);
 				Named named = f.getAnnotation(javax.inject.Named.class);
-				return new FieldInjectionDescriptor(f, mandatory, named);
+				return new FieldInjectionDescriptor(f, named);
 			} 
 			//else if ... com.google.inject.Inject from Guice have the optional parameter
 			else return null;
@@ -82,14 +81,12 @@ public class PojoInjectionDescriptor {
 	
 	public List<Class<?>> getMandatoryDependencies() {
 		return ImmutableList.copyOf(properties.stream()
-				.filter(p -> p.isMandatory())
-				.map(p -> p.getType()).iterator());
+				.map(p -> p.getRawType()).iterator());
 	}
 
 	public List<Class<?>> getOptionalDependencies() {
 		return ImmutableList.copyOf(properties.stream()
-				.filter(p -> !p.isMandatory())
-				.map(p -> p.getType()).iterator());
+				.map(p -> p.getRawType()).iterator());
 	}
 	
 	public Class<?> getType() {
