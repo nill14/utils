@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.inject.Named;
@@ -25,6 +26,17 @@ public class PojoInjectionDescriptor {
 
 	public ImmutableList<FieldInjectionDescriptor> getFieldDescriptors() {
 		return properties;
+	}
+	
+	public Set<Class<?>> getInterfaces() {
+		return declaredClasses(clazz)
+				.flatMap(cls -> Stream.of(cls.getInterfaces()))
+				.collect(GuavaCollectors.toImmutableSet());
+	}
+	
+	public Set<Class<?>> getDeclaredTypes() {
+		return Stream.concat(declaredClasses(clazz), getInterfaces().stream())
+				.collect(GuavaCollectors.toImmutableSet());
 	}
 	
 	private Stream<Class<?>> declaredClasses(Class<?> clazz) {
