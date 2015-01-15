@@ -8,6 +8,7 @@ import com.github.nill14.parsers.dependency.IDependencyDescriptor;
 import com.github.nill14.parsers.dependency.IDependencyDescriptorBuilder;
 import com.github.nill14.parsers.dependency.impl.DependencyDescriptor;
 import com.github.nill14.utils.init.api.IServiceRegistry;
+import com.github.nill14.utils.init.impl.ServiceRegistry;
 import com.github.nill14.utils.moduledi.bean.Snack;
 import com.github.nill14.utils.moduledi.spring.GlobalBeanFactory;
 import com.github.nill14.utils.moduledi.spring.ModuleBeanDefinitionRegistryPostProcessor;
@@ -47,11 +48,12 @@ public abstract class AbstractModule extends com.google.inject.AbstractModule {
 		if (inputStream == null) {
 			return;
 		}
-//		GlobalBeanFactory parent = new GlobalBeanFactory(serviceRegistry);
+		GlobalBeanFactory parent = new GlobalBeanFactory((ServiceRegistry) serviceRegistry);
 		
-		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] {name}, false, null);
+		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] {name}, false, parent);
 		
 		ctx.addBeanFactoryPostProcessor(new ModuleBeanDefinitionRegistryPostProcessor(serviceRegistry));
+//		ctx.getAutowireCapableBeanFactory().autowireBeanProperties(existingBean, autowireMode, dependencyCheck);reBean(object)
 		
 		 ctx.refresh();
 		

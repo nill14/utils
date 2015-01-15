@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -17,13 +18,13 @@ import org.springframework.context.NoSuchMessageException;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 
-import com.github.nill14.utils.init.api.IServiceRegistry;
+import com.github.nill14.utils.init.impl.ServiceRegistry;
 
 public class GlobalBeanFactory implements ApplicationContext {
 
-	private final IServiceRegistry registry;
+	private final ServiceRegistry registry;
 
-	public GlobalBeanFactory(IServiceRegistry registry) {
+	public GlobalBeanFactory(ServiceRegistry registry) {
 		this.registry = registry;
 	}
 	
@@ -35,11 +36,16 @@ public class GlobalBeanFactory implements ApplicationContext {
 
 	@Override
 	public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
-		if (requiredType == null) {
-			requiredType = (Class<T>) Object.class;
+		Object bean = registry.getBean(name);
+		
+		if (bean == null) {
+			throw new BeanCreationException(name);
 		}
-		return registry.getOptionalService(requiredType, name)
-				.orElseThrow(() -> new BeanCreationException(name));
+		
+		if (requiredType != null && !requiredType.isAssignableFrom(bean.getClass())) {
+			throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());
+		}
+		return (T) bean;
 	}
 
 	@Override
@@ -60,12 +66,12 @@ public class GlobalBeanFactory implements ApplicationContext {
 
 	@Override
 	public boolean containsBean(String name) {
-		return registry.getOptionalService(Object.class, name).isPresent();
+		return registry.getBean(name) != null;
 	}
 
 	@Override
 	public boolean isSingleton(String name) throws NoSuchBeanDefinitionException {
-		return containsBean(name);
+		return false;
 	}
 
 	@Override
@@ -75,14 +81,19 @@ public class GlobalBeanFactory implements ApplicationContext {
 
 	@Override
 	public boolean isTypeMatch(String name, Class<?> targetType) throws NoSuchBeanDefinitionException {
-		// TODO Auto-generated method stub
-		return false;
+		Object bean = registry.getBean(name);
+		return bean != null & targetType.isAssignableFrom(bean.getClass());
 	}
 
 	@Override
 	public Class<?> getType(String name) throws NoSuchBeanDefinitionException {
-		// TODO Auto-generated method stub
-		return null;
+		Object bean = registry.getBean(name);
+		if (bean != null) {
+			return bean.getClass();
+		}
+		else {
+			return null;
+		}
 	}
 
 	@Override
@@ -92,23 +103,22 @@ public class GlobalBeanFactory implements ApplicationContext {
 
 	@Override
 	public Environment getEnvironment() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean containsBeanDefinition(String beanName) {
-		throw new UnsupportedOperationException(beanName);
+		return registry.getBeanNames().contains(beanName);
 	}
 
 	@Override
 	public int getBeanDefinitionCount() {
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public String[] getBeanDefinitionNames() {
-		throw new UnsupportedOperationException();
+		return registry.getBeanNames().stream().toArray(String[]::new);
 	}
 
 	@Override
@@ -118,20 +128,18 @@ public class GlobalBeanFactory implements ApplicationContext {
 
 	@Override
 	public String[] getBeanNamesForType(Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
-		// TODO Auto-generated method stub
-		return new String[] {"snackService"};//FIXME
+		return registry.getBeansOfType(type).keySet().stream().toArray(String[]::new);
 	}
 
 	@Override
 	public <T> Map<String, T> getBeansOfType(Class<T> type) throws BeansException {
-		// TODO Auto-generated method stub
-		return null;
+		return registry.getBeansOfType(type);
 	}
 
 	@Override
 	public <T> Map<String, T> getBeansOfType(Class<T> type, boolean includeNonSingletons,
 			boolean allowEagerInit) throws BeansException {
-		throw new UnsupportedOperationException(type.toGenericString());
+		return registry.getBeansOfType(type);
 	}
 
 	@Override
@@ -158,74 +166,66 @@ public class GlobalBeanFactory implements ApplicationContext {
 
 	@Override
 	public boolean containsLocalBean(String name) {
-		throw new UnsupportedOperationException(name);
+		return containsBean(name);
 	}
 
 	@Override
 	public String getMessage(String code, Object[] args, String defaultMessage, Locale locale) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public String getMessage(String code, Object[] args, Locale locale) throws NoSuchMessageException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public String getMessage(MessageSourceResolvable resolvable, Locale locale) throws NoSuchMessageException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void publishEvent(ApplicationEvent event) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public Resource[] getResources(String locationPattern) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Resource getResource(String location) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public ClassLoader getClassLoader() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public String getId() {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public String getApplicationName() {
-		return "";
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public String getDisplayName() {
-		return "global";
+		return getClass().toGenericString();
 	}
 
 	@Override
 	public long getStartupDate() {
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public ApplicationContext getParent() {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

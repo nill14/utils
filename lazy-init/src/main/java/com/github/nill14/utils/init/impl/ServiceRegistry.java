@@ -1,6 +1,8 @@
 package com.github.nill14.utils.init.impl;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
@@ -28,7 +30,7 @@ import com.google.common.collect.ImmutableSet;
 public class ServiceRegistry implements IServiceRegistry {
 	
 	private final ConcurrentHashMap<String, Object> beans = new ConcurrentHashMap<>();
-	private final ConcurrentHashMap<Class<?>, LinkedBlockingQueue<Object>> services = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<Class<?>, Map<String, Object>> services = new ConcurrentHashMap<>();
 	private IPropertyResolver delegateResolver;
 	
 	/**
@@ -56,7 +58,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		ILazyPojo<T> lazyPojo = LazyPojo.forClass(serviceBean, annotationInitializer);
 		Object proxy = LazyJdkProxy.newProxy(lazyPojo);
 		Set<Class<?>> types = new PojoInjectionDescriptor(serviceBean).getDeclaredTypes();
-		types.forEach((type) -> addElement(type, proxy));
+		types.forEach((type) -> addElement(type, name, proxy));
 		beans.put(name, proxy);
 	}
 	
@@ -72,7 +74,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		ILazyPojo<S> lazyPojo = LazyPojo.forFactory(iface, factoryBean, annotationInitializer);
 		Object proxy = LazyJdkProxy.newProxy(lazyPojo);
 		Set<Class<?>> types = new PojoInjectionDescriptor(iface).getDeclaredTypes();
-		types.forEach((type) -> addElement(type, proxy));
+		types.forEach((type) -> addElement(type, name, proxy));
 		beans.put(name, proxy);
 	}
 
@@ -100,18 +102,18 @@ public class ServiceRegistry implements IServiceRegistry {
 		return Optional.ofNullable(service);
 	}
 
-	private void addElement(Class<?> registrable, Object proxy) {
-		Queue<Object> queue = services.computeIfAbsent(registrable, r -> new LinkedBlockingQueue<>());
-		queue.add(proxy);
+	private void addElement(Class<?> registrable, String name, Object proxy) {
+		Map<String, Object> map = services.computeIfAbsent(registrable, r -> new ConcurrentHashMap<>());
+		map.put(name, proxy);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public <S> Collection<S> getServices(Class<S> registrable) {
 		Preconditions.checkNotNull(registrable);
-		Queue<S> queue = (Queue<S>) services.get(registrable);
-		if (queue != null) {
-			return ImmutableList.copyOf(queue);
+		Map<String, S> map = (Map<String, S>) services.getOrDefault(registrable, Collections.emptyMap());
+		if (map != null) {
+			return ImmutableList.copyOf(map.values());
 		
 		} else {
 			return ImmutableList.of();
@@ -126,7 +128,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	@Override
 	public <T> void addSingleton(String name, T serviceBean) {
 		Set<Class<?>> types = new PojoInjectionDescriptor(serviceBean.getClass()).getDeclaredTypes();
-		types.forEach((type) -> addElement(type, serviceBean));
+		types.forEach((type) -> addElement(type, name, serviceBean));
 		beans.put(name, serviceBean);
 	}
 	
@@ -135,6 +137,18 @@ public class ServiceRegistry implements IServiceRegistry {
 		builder.addAll(services.keySet());
 //		builder.addAll(providers.values())
 		return builder.build();
+	}
+	
+	public Collection<String> getBeanNames() {
+		return beans.keySet();
+	}
+	
+	public <T> Map<String, T> getBeansOfType(Class<T> type) {
+		return (Map<String, T>) services.getOrDefault(type, Collections.emptyMap());
+	}
+	
+	public Object getBean(String name) {
+		return beans.get(name);
 	}
 	
 	private final IPropertyResolver resolver = new IPropertyResolver() {

@@ -46,7 +46,7 @@ public class ModuleTest {
 //	    System.out.println(snackService);
 			
 		} catch (UnsatisfiedDependencyException | CyclicGraphException | ExecutionException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 			throw e;
 		}
 		
