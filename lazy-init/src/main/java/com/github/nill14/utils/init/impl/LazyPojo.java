@@ -25,7 +25,7 @@ public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 		return forClass(beanClass, IPojoInitializer.empty());
 	}
 
-	public static <T> ILazyPojo<T> forFactory(Class<T> beanClass, Class<? extends IPojoFactory<T>> factoryClass) {
+	public static <T, F extends IPojoFactory<T>> ILazyPojo<T> forFactory(Class<T> beanClass, Class<F> factoryClass) {
 		return forFactory(beanClass, factoryClass, IPojoInitializer.empty());
 	}
 	

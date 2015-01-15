@@ -11,13 +11,6 @@
       <bean>com.github.nill14.utils.init.TimeService</bean>
     </service>
   </services>
-  <providers>
-    <provider registrable="com.github.nill14.utils.init.ICalculator">
-      <provider>com.github.nill14.utils.init.Calculator</provider>
-      <provider>com.github.nill14.utils.init.Calculator</provider>
-      <provider>com.github.nill14.utils.init.Calculator</provider>
-    </provider>
-  </providers>
   <properties>
   	<string name="greeting">Hello World!</string>
   	<factory>com.github.nill14.utils.init.ZoneIdFactory</factory>

@@ -5,10 +5,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
@@ -59,7 +57,8 @@ public class ServiceRegistry implements IServiceRegistry {
 		Object proxy = LazyJdkProxy.newProxy(lazyPojo);
 		Set<Class<?>> types = new PojoInjectionDescriptor(serviceBean).getDeclaredTypes();
 		types.forEach((type) -> addElement(type, name, proxy));
-		beans.put(name, proxy);
+		Object old = beans.put(name, proxy);
+		Preconditions.checkArgument(old == null, "Duplicate bean " + old);
 	}
 	
 	@Override
@@ -143,6 +142,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		return beans.keySet();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public <T> Map<String, T> getBeansOfType(Class<T> type) {
 		return (Map<String, T>) services.getOrDefault(type, Collections.emptyMap());
 	}

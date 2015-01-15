@@ -2,6 +2,7 @@ package com.github.nill14.utils.moduledi;
 
 import java.io.InputStream;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.github.nill14.parsers.dependency.IDependencyDescriptor;
@@ -9,7 +10,6 @@ import com.github.nill14.parsers.dependency.IDependencyDescriptorBuilder;
 import com.github.nill14.parsers.dependency.impl.DependencyDescriptor;
 import com.github.nill14.utils.init.api.IServiceRegistry;
 import com.github.nill14.utils.init.impl.ServiceRegistry;
-import com.github.nill14.utils.moduledi.bean.Snack;
 import com.github.nill14.utils.moduledi.spring.GlobalBeanFactory;
 import com.github.nill14.utils.moduledi.spring.ModuleBeanDefinitionRegistryPostProcessor;
 
@@ -42,11 +42,11 @@ public abstract class AbstractModule extends com.google.inject.AbstractModule {
 	public abstract void buildServices(IServiceBuilder builder);
 	
 	
-	private void initApplicationContext(IServiceRegistry serviceRegistry) {
+	protected ApplicationContext initApplicationContext(IServiceRegistry serviceRegistry) {
 		String name = getClass().getSimpleName() + ".xml";
 		InputStream inputStream = getClass().getClassLoader().getResourceAsStream(name);
 		if (inputStream == null) {
-			return;
+			return null;
 		}
 		GlobalBeanFactory parent = new GlobalBeanFactory((ServiceRegistry) serviceRegistry);
 		
@@ -57,8 +57,7 @@ public abstract class AbstractModule extends com.google.inject.AbstractModule {
 		
 		 ctx.refresh();
 		
-		System.out.println(ctx.getBean(Snack.class).getBread().getName());
-		System.out.println(ctx.getBean(Snack.class).getSnackService());
+		 return ctx;
 
 			
 //		@SuppressWarnings({ "unused", "resource" })

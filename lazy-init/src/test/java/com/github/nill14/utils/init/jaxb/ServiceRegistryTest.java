@@ -52,6 +52,6 @@ public class ServiceRegistryTest {
 	public void testTimeService() {
 		ITimeService service = registry.getService(ITimeService.class);
 		assertNotNull(service.getNow());
-		assertEquals(3, service.getProviders().size());
+		assertEquals(1, service.getProviders().size());
 	}
 }

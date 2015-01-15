@@ -76,7 +76,7 @@ public class PojoInjectionDescriptor {
 	
 	private ImmutableList<FieldInjectionDescriptor> properties(Class<?> pojoClazz) {
 		return injectableFields(nonStaticFields(declaredClasses(pojoClazz)))
-				.collect(GuavaCollectors.toImmutableList());
+				.collect(GuavaCollectors.<FieldInjectionDescriptor>toImmutableList());
 	}
 	
 	public List<Class<?>> getMandatoryDependencies() {
