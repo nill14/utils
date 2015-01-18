@@ -6,13 +6,10 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
-	<context:component-scan base-package="com.github.nill14.utils.moduledi.bean.snack"/>
 	
-	<bean id="keyword" class="java.lang.String" scope="conversation">
-		<constructor-arg value="keyword"/>
-	</bean>
-
+	<bean id="slaBean" class="com.github.nill14.utils.moduledi.bean.customer.SLABean" scope="SLA" />
 	
+	<bean id="ticketBean" class="com.github.nill14.utils.moduledi.bean.customer.TicketBean" scope="Ticket" />	
 	
 </beans>
 

@@ -1,4 +1,4 @@
-package com.github.nill14.utils.moduledi.bean;
+package com.github.nill14.utils.moduledi.bean.snack;
 
 import org.springframework.stereotype.Service;
 

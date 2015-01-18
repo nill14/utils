@@ -2,7 +2,6 @@ package com.github.nill14.utils.moduledi;
 
 import java.io.InputStream;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.github.nill14.parsers.dependency.IDependencyDescriptor;
@@ -42,11 +41,11 @@ public abstract class AbstractModule extends com.google.inject.AbstractModule {
 	public abstract void buildServices(IServiceBuilder builder);
 	
 	
-	protected ApplicationContext initApplicationContext(IServiceRegistry serviceRegistry) {
+	protected void initApplicationContext(IServiceRegistry serviceRegistry) {
 		String name = getClass().getSimpleName() + ".xml";
 		InputStream inputStream = getClass().getClassLoader().getResourceAsStream(name);
 		if (inputStream == null) {
-			return null;
+			return;
 		}
 		GlobalBeanFactory parent = new GlobalBeanFactory((ServiceRegistry) serviceRegistry);
 		
@@ -55,9 +54,7 @@ public abstract class AbstractModule extends com.google.inject.AbstractModule {
 		ctx.addBeanFactoryPostProcessor(new ModuleBeanDefinitionRegistryPostProcessor(serviceRegistry));
 //		ctx.getAutowireCapableBeanFactory().autowireBeanProperties(existingBean, autowireMode, dependencyCheck);reBean(object)
 		
-		 ctx.refresh();
-		
-		 return ctx;
+		refreshContext(ctx, serviceRegistry);
 
 			
 //		@SuppressWarnings({ "unused", "resource" })
@@ -65,5 +62,10 @@ public abstract class AbstractModule extends com.google.inject.AbstractModule {
 		
 //		   MyBean obj = new MyBean();
 //		   ctx.autowireBean(obj);
+	}
+	
+	
+	protected void refreshContext(ClassPathXmlApplicationContext ctx, IServiceRegistry serviceRegistry) {
+		ctx.refresh();
 	}
 }
