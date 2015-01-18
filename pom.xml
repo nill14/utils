@@ -41,13 +41,13 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.verbose>true</maven.compiler.verbose>
+        <maven.compiler.verbose>false</maven.compiler.verbose>
 	</properties>
 
     <modules>
         <module>java8-utils</module>
         <module>lazy-init</module>
-        <module>module-di</module>
+<!--         <module>module-di</module> -->
     </modules>
 
 	<build>

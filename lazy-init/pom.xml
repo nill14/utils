@@ -43,7 +43,14 @@
                     <packageName>com.github.nill14.utils.init.schema</packageName> 
                 </configuration>
             </plugin>
-        </plugins>
+            <plugin>
+            	<artifactId>maven-javadoc-plugin</artifactId>
+            	<configuration>
+            		<excludePackageNames>com.github.nill14.utils.init.schema</excludePackageNames>
+            	</configuration>
+            </plugin>
+		</plugins>
+        
 	</build>
 
 	<dependencies>

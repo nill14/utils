@@ -34,6 +34,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	/**
 	 * 
 	 * Not thread-safe
+	 * @param delegateResolver The extra resolver which can provide the answer first.
 	 */
 	public void setDelegateResolver(IPropertyResolver delegateResolver) {
 		if(this.delegateResolver != null) {
