@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.nill14.utils</groupId>
 	<artifactId>utils</artifactId>
-	<version>0.1.0</version>
+	<version>0.1.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<parent>
@@ -46,7 +46,7 @@
     <modules>
         <module>java8-utils</module>
         <module>lazy-init</module>
-<!--         <module>module-di</module> -->
+        <module>module-di</module>
     </modules>
 
 	<build>
