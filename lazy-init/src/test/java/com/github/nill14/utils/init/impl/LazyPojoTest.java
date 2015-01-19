@@ -33,14 +33,14 @@ public class LazyPojoTest {
 	private static IPojoInitializer<GreeterFactory> factoryInitializer = new IPojoInitializer<GreeterFactory>() {
 		
 		@Override
-		public void init(GreeterFactory instance) {
+		public void init(ILazyPojo<?> lazyPojo, GreeterFactory instance) {
 			assertThat(instance.getGreeting(), not(GREETING));
 			instances.incrementAndGet();
 			instance.setGreeting(GREETING);
 		}
 		
 		@Override
-		public void destroy(GreeterFactory instance) {
+		public void destroy(ILazyPojo<?> lazyPojo, GreeterFactory instance) {
 			assertThat(instance.getGreeting(), is(GREETING));
 			instances.decrementAndGet();
 			instance.setGreeting(DESTROYED);

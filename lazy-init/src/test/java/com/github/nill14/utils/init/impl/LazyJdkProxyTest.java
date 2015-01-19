@@ -24,11 +24,13 @@ public class LazyJdkProxyTest {
 	private static AtomicInteger instances = new AtomicInteger();
 
 	private static final IPojoInitializer<ICalculator> initializer = new IPojoInitializer<ICalculator>() {
-		public void init(ICalculator instance) {
+		@Override
+		public void init(ILazyPojo<?> lazyPojo, ICalculator instance) {
 			instances.incrementAndGet();
 		}
 		
-		public void destroy(ICalculator instance) {
+		@Override
+		public void destroy(ILazyPojo<?> lazyPojo, ICalculator instance) {
 			instances.decrementAndGet();
 		}
 	};

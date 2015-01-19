@@ -14,17 +14,13 @@ import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 
+@SuppressWarnings("serial")
 public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5927142279116185259L;
 
 	public static <T> ILazyPojo<T> forClass(Class<T> beanClass) {
 		return forClass(beanClass, IPojoInitializer.empty());
 	}
-
+	
 	public static <T, F extends IPojoFactory<T>> ILazyPojo<T> forFactory(Class<T> beanClass, Class<F> factoryClass) {
 		return forFactory(beanClass, factoryClass, IPojoInitializer.empty());
 	}
@@ -35,7 +31,8 @@ public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 	}
 
 	public static <T, F extends IPojoFactory<? extends T>> ILazyPojo<T> forFactory(Class<T> beanClass, Class<F> factoryClass, IPojoInitializer<? super F> factoryInitializer) {
-		FactoryAdapter<T, F> factoryAdapter = new FactoryAdapter<>(beanClass, factoryClass, factoryInitializer);
+		IPojoFactory<F> factoryFactory = PojoFactory.create(factoryClass);
+		FactoryAdapter<T, F> factoryAdapter = new FactoryAdapter<>(beanClass, factoryFactory, factoryInitializer);
 		return new LazyPojo<>(factoryAdapter, factoryAdapter);
 	}
 	
@@ -68,7 +65,7 @@ public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 				if (instance == null) {
 					
 					instance = factory.newInstance();
-					initializer.init(instance);
+					initializer.init(this, instance);
 					this.instance = instance;
 				}
 			}
@@ -87,7 +84,7 @@ public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 				if (instance != null) {
 					
 					this.instance = null;
-					initializer.destroy(instance);
+					initializer.destroy(this, instance);
 					released = true;
 				}
 			}
@@ -140,17 +137,13 @@ public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 	}
 	
 	
-	private static class FactoryAdapter<T, F extends IPojoFactory<? extends T>> implements IPojoFactory<T>, IPojoInitializer<T> {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -3988519477717092909L;
+	public static class FactoryAdapter<T, F extends IPojoFactory<? extends T>> implements IPojoFactory<T>, IPojoInitializer<T> {
 		
 		private final ILazyPojo<F> lazyFactory;
 		private final Class<T> beanClass;
 
-		public FactoryAdapter(Class<T> beanClass, Class<F> factoryClass, IPojoInitializer<? super F> factoryInitializer) {
-			IPojoFactory<F> factoryFactory = PojoFactory.create(factoryClass);
+		@SuppressWarnings("unchecked")
+		public FactoryAdapter(Class<T> beanClass, IPojoFactory<F> factoryFactory, IPojoInitializer<? super F> factoryInitializer) {
 			this.lazyFactory = new LazyPojo<>(factoryFactory, factoryInitializer);
 			this.beanClass = beanClass;
 		}
@@ -163,18 +156,20 @@ public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 
 		@Override
 		public Class<T> getType() {
+			//type of the bean, not of the factory
 			return beanClass;
 		}
 
 
 		@Override
-		public void init(T instance) {
-			//nothing to do, here is already late
+		public void init(ILazyPojo<?> lazyPojo, T instance) {
+			//nothing to do, we want to initialize pojoFactory, not the instance created by the factory
+			//factoryInitializer was invoked by lazyFactory.getInstance() call
 		}
 		
 		@Override
-		public void destroy(T instance) {
-			//destroying of bean is being handled by the factory
+		public void destroy(ILazyPojo<?> lazyPojo, T instance) {
+			//delegate the destruction to the factoryInitializer
 			//the factory is not re-used but re-created for each object
 			lazyFactory.freeInstance();
 		}

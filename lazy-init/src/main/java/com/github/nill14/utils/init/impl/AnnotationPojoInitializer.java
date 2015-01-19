@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
@@ -29,14 +30,14 @@ public class AnnotationPojoInitializer implements IPojoInitializer<Object> {
 	}
 	
 	@Override
-	public void init(Object instance) {
+	public void init(ILazyPojo<?> lazyPojo, Object instance) {
 		doInject(instance);
 		
 		doPostConstruct(instance);
 	}
 
 	@Override
-	public void destroy(Object instance) {
+	public void destroy(ILazyPojo<?> lazyPojo, Object instance) {
 		doPreDestroy(instance);
 		
 	}
