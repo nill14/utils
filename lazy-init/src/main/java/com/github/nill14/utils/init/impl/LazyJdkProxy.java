@@ -43,14 +43,13 @@ public class LazyJdkProxy implements InvocationHandler, Serializable {
 	 * Normally, the implemented interfaces are detected automatically. Prefer {@link #newProxy(ILazyPojo)} 
 	 * 
 	 * @param lazyPojo
+	 * @param classLoader
 	 * @param implementedInterfaces
 	 * @return Proxy
 	 */
-	public static Object newProxy(ILazyPojo<?> lazyPojo, Class<?>[] implementedInterfaces) {
+	public static Object newProxy(ILazyPojo<?> lazyPojo, ClassLoader classLoader, Class<?>[] implementedInterfaces) {
 		LazyJdkProxy invocationHandler = new LazyJdkProxy(lazyPojo);
-		Class<?> clazz = lazyPojo.getInstanceType();
-		ClassLoader cl = clazz.getClassLoader();
-		return Proxy.newProxyInstance(cl, implementedInterfaces, invocationHandler);
+		return Proxy.newProxyInstance(classLoader, implementedInterfaces, invocationHandler);
 	}
 	
     private static Class<?>[] getImplementedInterfaces(Class<?> clazz) {
