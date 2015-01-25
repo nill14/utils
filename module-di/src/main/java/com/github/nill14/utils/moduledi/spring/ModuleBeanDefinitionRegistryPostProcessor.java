@@ -1,18 +1,13 @@
 package com.github.nill14.utils.moduledi.spring;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.AnnotationConfigUtils;
-import org.springframework.core.io.ResourceLoader;
 
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceRegistry;
@@ -34,11 +29,7 @@ public class ModuleBeanDefinitionRegistryPostProcessor implements BeanDefinition
 		beanFactory.registerSingleton("registry", serviceRegistry);
 		beanFactory.registerSingleton("moduleAnnotationBeanPostProcessor", new ModuleAnnotationBeanPostProcessor(resolver));
 		
-//		if (!registry.containsBeanDefinition(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME)) {
-//			RootBeanDefinition def = new RootBeanDefinition(AutowiredAnnotationBeanPostProcessor.class);
-//			def.setSource(source);
-//			beanDefs.add(registerPostProcessor(registry, def, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME));
-//		}
+
 		
 //		beanFactory.ignoreDependencyInterface(ApplicationContextAware.class);
 //		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
@@ -51,6 +42,13 @@ public class ModuleBeanDefinitionRegistryPostProcessor implements BeanDefinition
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+		
+		if (!registry.containsBeanDefinition(AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME)) {
+			/* annotation config might be activated as well by 
+			 * <context:annotation-config> or by 
+			 * <context:component-scan>.*/
+			AnnotationConfigUtils.registerAnnotationConfigProcessors(registry, this);
+		}
 //		if (!registry.containsBeanDefinition(AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 //			RootBeanDefinition def = new RootBeanDefinition(AutowiredAnnotationBeanPostProcessor.class);
 //			def.setSource(source);

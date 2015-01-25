@@ -7,9 +7,16 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
 	
-	<bean id="slaBean" class="com.github.nill14.utils.moduledi.bean.customer.SLABean" scope="SLA" />
+<!-- 	<bean id="slaBean" class="com.github.nill14.utils.moduledi.bean.customer.SLABean" scope="SLA" /> -->
 	
-	<bean id="ticketBean" class="com.github.nill14.utils.moduledi.bean.customer.TicketBean" scope="Ticket" />	
+<!-- 	<bean id="ticketBean" class="com.github.nill14.utils.moduledi.bean.customer.TicketBean" scope="Ticket" />	 -->
+	
+	<bean id="reporter" class="java.lang.String">
+  		<constructor-arg type="java.lang.String" value="reporter"/>
+	</bean>
+	
+	
+	<bean id="taskBean" class="com.github.nill14.utils.moduledi.bean.customer.TaskBean" scope="singleton"/>
 	
 </beans>
 
