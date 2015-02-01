@@ -77,6 +77,11 @@ public class FieldInjectionDescriptor implements IType {
 	}
 	
 	@Override
+	public boolean isNamed() {
+		return named.isPresent();
+	}
+	
+	@Override
 	public String toString() {
 		return field.toString();
 	}

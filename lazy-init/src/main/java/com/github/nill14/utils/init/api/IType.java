@@ -5,6 +5,8 @@ import java.lang.reflect.Type;
 public interface IType {
 
 	boolean isParametrized();
+	
+	boolean isNamed();
 
 	Type[] getParameterTypes();
 

@@ -30,9 +30,11 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 				if (result != null) {
 					return Optional.of(result);
 				}
-				result = findByType(paramClass);
-				if (result != null) {
-					return Optional.of(result);
+				if (!type.isNamed()) {
+					result = findByType(paramClass);
+					if (result != null) {
+						return Optional.of(result);
+					}
 				}
 				return Optional.empty();
 			}
@@ -56,9 +58,11 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		}
 		
 		// find by type
-		result = findByType(type.getRawType());
-		if (result != null) {
-			return result;
+		if (!type.isNamed()) {
+			result = findByType(type.getRawType());
+			if (result != null) {
+				return result;
+			}
 		}
 		
 		return null;

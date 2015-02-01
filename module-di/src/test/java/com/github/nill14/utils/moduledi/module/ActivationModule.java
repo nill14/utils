@@ -30,8 +30,8 @@ public class ActivationModule extends AbstractModule {
 	public void startModule(IServiceRegistry registry) {
 		
 		ITaskService taskService = registry.getService(ITaskService.class);
-		Assert.assertEquals(Optional.empty(), taskService.getAssignee());
 		Assert.assertEquals(Optional.of("reporter"), taskService.getReporter());
+		Assert.assertEquals(Optional.empty(), taskService.getAssignee());
 		
 //		TaskBean taskBean = taskService.
 //		Assert.assertEquals(Optional.empty(), taskBean.getAssignee());
