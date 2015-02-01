@@ -2,13 +2,16 @@ package com.github.nill14.utils.init.inject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.inject.Named;
 
+import com.github.nill14.utils.init.api.IType;
 import com.github.nill14.utils.java8.stream.GuavaCollectors;
 import com.github.nill14.utils.java8.stream.StreamUtils;
 import com.google.common.collect.ImmutableList;
@@ -81,12 +84,27 @@ public class PojoInjectionDescriptor {
 	
 	public List<Class<?>> getMandatoryDependencies() {
 		return ImmutableList.copyOf(properties.stream()
-				.map(p -> p.getRawType()).iterator());
+				.map(PojoInjectionDescriptor::transformDependency).iterator());
 	}
 
 	public List<Class<?>> getOptionalDependencies() {
 		return ImmutableList.copyOf(properties.stream()
-				.map(p -> p.getRawType()).iterator());
+				.map(PojoInjectionDescriptor::transformDependency).iterator());
+	}
+	
+	private static Class<?> transformDependency(IType type) {
+		Class<?> rawType = type.getRawType();
+		if (type.isParametrized()) {
+			if (Optional.class.equals(rawType)) {
+				return type.getFirstParamClass();
+			} else if (Collection.class.isAssignableFrom(rawType)) {
+				return type.getFirstParamClass();
+			} 
+		} else if (rawType.isArray()) {
+			return rawType.getComponentType();
+		}
+		
+		return rawType;
 	}
 	
 	public Class<?> getType() {

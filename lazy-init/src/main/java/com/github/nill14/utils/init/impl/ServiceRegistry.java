@@ -12,13 +12,12 @@ import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
+import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
-import com.github.nill14.utils.init.api.IType;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
-import com.google.common.collect.ImmutableSet;
 
 /**
  * 
@@ -29,18 +28,15 @@ public class ServiceRegistry implements IServiceRegistry {
 	
 	private final ConcurrentHashMap<String, Object> beans = new ConcurrentHashMap<>();
 	private final ConcurrentHashMap<Class<?>, Map<String, Object>> services = new ConcurrentHashMap<>();
-	private IPropertyResolver delegateResolver;
+	
+	private final ChainingPropertyResolver resolver = new ChainingPropertyResolver(new ServiceRegistryPropertyResolver());
 	
 	/**
 	 * 
-	 * Not thread-safe
 	 * @param delegateResolver The extra resolver which can provide the answer first.
 	 */
-	public void setDelegateResolver(IPropertyResolver delegateResolver) {
-		if(this.delegateResolver != null) {
-			throw new IllegalStateException("can be set only once");
-		}
-		this.delegateResolver = delegateResolver;
+	public void pushDelegateResolver(IPropertyResolver delegateResolver) {
+		resolver.pushResolver(delegateResolver);
 	}
 	
 	private String generateName(Class<?> type) {
@@ -48,13 +44,34 @@ public class ServiceRegistry implements IServiceRegistry {
 	}
 	
 	@Override
-	public <T> void addService(Class<T> serviceBean) {
-		addService(generateName(serviceBean), serviceBean);
+	public <T> void addService(Class<T> serviceBean, IServiceContext context) {
+		addService(generateName(serviceBean), serviceBean, context);
+	}
+	
+	private <T> IPojoInitializer<Object> getInitializer(IServiceContext context) {
+		IPojoInitializer<Object> annotationInitializer = this.annotationInitializer;
+		
+		Optional<IPropertyResolver> contextResolver = context.getCustomResolver();
+		if (contextResolver.isPresent()) {
+			annotationInitializer = AnnotationPojoInitializer.withResolver(contextResolver.get());
+		}
+		
+		Optional<IPojoInitializer<Object>> contextInitializer = context.getInitializer();
+		if (contextInitializer.isPresent()) {
+			return new ChainingPojoInitializer()
+					.addInitializer(contextInitializer.get())
+					.addInitializer(annotationInitializer);
+		} else {
+			return annotationInitializer;
+		}
+		
 	}
 	
 	@Override
-	public <S, T extends S> void addService(String name, Class<T> serviceBean) {
-		ILazyPojo<T> lazyPojo = LazyPojo.forClass(serviceBean, annotationInitializer);
+	public <S, T extends S> void addService(String name, Class<T> serviceBean, IServiceContext context) {
+		
+		IPojoInitializer<Object> initializer = getInitializer(context);
+		ILazyPojo<T> lazyPojo = LazyPojo.forClass(serviceBean, initializer);
 		Object proxy = LazyJdkProxy.newProxy(lazyPojo);
 		Set<Class<?>> types = new PojoInjectionDescriptor(serviceBean).getDeclaredTypes();
 		types.forEach((type) -> addElement(type, name, proxy));
@@ -64,14 +81,16 @@ public class ServiceRegistry implements IServiceRegistry {
 	
 	@Override
 	public <S, F extends IPojoFactory<? extends S>> void addServiceFactory(
-			Class<S> iface, Class<F> factoryBean) {
-		addServiceFactory(iface, generateName(iface), factoryBean);
+			Class<S> iface, Class<F> factoryBean, IServiceContext context) {
+		addServiceFactory(iface, generateName(iface), factoryBean, context);
 	}
 
 	@Override
 	public <S, F extends IPojoFactory<? extends S>> void addServiceFactory(
-			Class<S> iface, String name, Class<F> factoryBean) {
-		ILazyPojo<S> lazyPojo = LazyPojo.forFactory(iface, factoryBean, annotationInitializer);
+			Class<S> iface, String name, Class<F> factoryBean, IServiceContext context) {
+		
+		IPojoInitializer<Object> initializer = getInitializer(context);
+		ILazyPojo<S> lazyPojo = LazyPojo.forFactory(iface, factoryBean, initializer);
 		Object proxy = LazyJdkProxy.newProxy(lazyPojo);
 		Set<Class<?>> types = new PojoInjectionDescriptor(iface).getDeclaredTypes();
 		types.forEach((type) -> addElement(type, name, proxy));
@@ -81,6 +100,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	@Override
 	public <S> S getService(Class<S> iface) {
 		Optional<S> optional = getOptionalService(iface);
+		Preconditions.checkArgument(optional.isPresent(), String.format("Missing %s", iface));
 		return iface.cast(optional.get());
 	}
 	
@@ -152,58 +172,28 @@ public class ServiceRegistry implements IServiceRegistry {
 		return beans.get(name);
 	}
 	
-	private final IPropertyResolver resolver = new IPropertyResolver() {
-		
-		private static final long serialVersionUID = 746185406164849945L;
-
-		@Override
-		public Object resolve(Object pojo, IType type) {
-			
-			if (delegateResolver != null) {
-				Object resolve = delegateResolver.resolve(pojo, type);
-				if (resolve != null) {
-					return resolve;
-				}
-			}
-
-			Optional<?> optionalNamed = getOptionalService(type.getRawType(), type.getName());
-			if (optionalNamed.isPresent()) {
-				return optionalNamed.get();
-			}
-			
-			if (type.isParametrized()) {
-				Class<?> rawType = type.getRawType();
-				Class<?> paramClass = type.getFirstParamClass();
-
-				if (Optional.class.isAssignableFrom(rawType)) {
-					Optional<?> optional = getOptionalService(paramClass);
-					return optional;
-				}
-				
-				if (Collection.class.isAssignableFrom(rawType)) {
-					Collection<?> providers = getServices(paramClass);
-					
-					if (Set.class.isAssignableFrom(rawType)) {
-						return ImmutableSet.copyOf(providers);
-					} else {
-						return ImmutableList.copyOf(providers);
-					}
-				}
-			}
-			
-			Optional<?> optionalTyped = getOptionalService(type.getRawType());
-			if (optionalTyped.isPresent()) {
-				return optionalTyped.get();
-			}
-			
-			return null;
-		}
-	};
-	
-	
 	public IPropertyResolver toResolver() {
 		return resolver;
 	}
+	
+	@SuppressWarnings("serial")
+	private class ServiceRegistryPropertyResolver extends AbstractPropertyResolver {
+
+		@Override
+		protected Object findByName(String name, Class<?> type) {
+			return getOptionalService(type, name).orElse(null);
+		}
+
+		@Override
+		protected Object findByType(Class<?> type) {
+			return getOptionalService(type).orElse(null);
+		}
+
+		@Override
+		protected Collection<?> findAllByType(Class<?> type) {
+			return getServices(type);
+		}
+	};
 	
 	private final IPojoInitializer<Object> annotationInitializer = AnnotationPojoInitializer.withResolver(resolver);
 

@@ -1,5 +1,6 @@
 package com.github.nill14.utils.init.impl;
 
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,6 +15,7 @@ import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
+import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
 
 
@@ -53,8 +55,8 @@ public class ShowCase {
 	
 	void test() {
 		IServiceRegistry registry = new ServiceRegistry();
-		registry.addService("seedService", SeedService.class);
-		registry.addService("diceService", DiceService.class);
+		registry.addService("seedService", SeedService.class, IServiceContext.global());
+		registry.addService("diceService", DiceService.class, IServiceContext.global());
 		registry.getService(IDiceService.class).rollDice();
 	}
 	

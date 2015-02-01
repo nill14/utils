@@ -1,12 +1,9 @@
 package com.github.nill14.utils.moduledi.module;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import com.github.nill14.utils.init.api.IServiceRegistry;
 import com.github.nill14.utils.moduledi.AbstractModule;
 import com.github.nill14.utils.moduledi.IServiceBuilder;
-import com.github.nill14.utils.moduledi.bean.customer.TaskBean;
-import com.github.nill14.utils.moduledi.scope.ExtraScopesBeanPostProcessor;
+import com.github.nill14.utils.moduledi.bean.customer.ITaskService;
+import com.github.nill14.utils.moduledi.bean.customer.TaskService;
 
 public class CustomerModule extends AbstractModule {
 
@@ -16,16 +13,25 @@ public class CustomerModule extends AbstractModule {
 
 	@Override
 	public void buildServices(IServiceBuilder builder) {
+		builder.addBean(TaskService.class, ITaskService.class);
 		
 	}
 	
-	@Override
-	protected void refreshContext(ClassPathXmlApplicationContext ctx, IServiceRegistry serviceRegistry) {
-		ctx.addBeanFactoryPostProcessor(new ExtraScopesBeanPostProcessor(serviceRegistry));
-		super.refreshContext(ctx, serviceRegistry);
-		System.out.println(ctx.getBean(TaskBean.class).getAssignee());
-		System.out.println(ctx.getBean(TaskBean.class).getReporter());
-	}
+//	@Override
+//	protected void refreshContext(ClassPathXmlApplicationContext ctx, IServiceRegistry serviceRegistry) {
+//		ctx.addBeanFactoryPostProcessor(new ExtraScopesBeanPostProcessor(serviceRegistry));
+//		super.refreshContext(ctx, serviceRegistry);
+//		
+//		TaskBean taskBean = ctx.getBean(TaskBean.class);
+//		Assert.assertEquals(Optional.empty(), taskBean.getAssignee());
+//		Assert.assertEquals(Optional.of("reporter"), taskBean.getReporter());
+//		
+//	}
+	
+	
+//	@Override
+//	public void startModule(IServiceRegistry registry) {
+//	}
 	
 	
 	

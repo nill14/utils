@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.github.nill14.parsers.dependency.IDependencyDescriptorBuilder;
+import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.google.common.collect.Maps;
@@ -11,18 +12,23 @@ import com.google.common.collect.Maps;
 public class ServiceBuilder implements IServiceBuilder {
 
 	private final Map<Class<?>, Class<?>> beans = Maps.newHashMap();
+	private final IServiceContext context;
  	
+	public ServiceBuilder(IServiceContext context) {
+		this.context = context;
+	}
+
 	@Override
 	public <S, T extends S> IServiceBuilder addBean(Class<T> impl, Class<S> iface) {
 		beans.put(impl, iface);
 		return this;
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public IServiceBuilder buildServices(IServiceRegistry serviceRegistry) {
 		
-		beans.forEach((serviceBean, service) -> serviceRegistry.addService(serviceBean));
+		beans.forEach((serviceBean, service) -> 
+			serviceRegistry.addService(serviceBean, context));
 		
 		return this;
 	}

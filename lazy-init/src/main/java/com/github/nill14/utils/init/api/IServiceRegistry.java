@@ -9,13 +9,15 @@ public interface IServiceRegistry {
 	
 	<T> void addSingleton(String name, T serviceBean);
 	
-	<T> void addService(Class<T> serviceBean);
+	<T> void addService(Class<T> serviceBean, IServiceContext context);
 	
-	<S, T extends S> void addService(String name, Class<T> serviceBean);
+	<S, T extends S> void addService(String name, Class<T> serviceBean, IServiceContext context);
 	
-	<S, F extends IPojoFactory<? extends S>> void addServiceFactory(Class<S> iface, String name, Class<F> factoryBean);
+	<S, F extends IPojoFactory<? extends S>> void addServiceFactory(
+			Class<S> iface, String name, Class<F> factoryBean, IServiceContext context);
 	
-	<S, F extends IPojoFactory<? extends S>> void addServiceFactory(Class<S> iface, Class<F> factoryBean);
+	<S, F extends IPojoFactory<? extends S>> void addServiceFactory(
+			Class<S> iface, Class<F> factoryBean, IServiceContext context);
 	
 	<S> S getService(Class<S> iface);
 
@@ -26,5 +28,7 @@ public interface IServiceRegistry {
 	<S> Optional<S> getOptionalService(Class<S> iface, String name);
 	
 	<S> Collection<S> getServices(Class<S> registrable);
+
+
 
 }

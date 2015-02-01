@@ -1,6 +1,7 @@
 package com.github.nill14.utils.init.jaxb;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -10,6 +11,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
+import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
 import com.github.nill14.utils.init.api.IType;
 import com.github.nill14.utils.init.impl.PojoFactory;
@@ -39,10 +41,10 @@ public class JaxbLoader {
         		Class iface = Class.forName(service.getInterface());
         		if (service.getBean() != null) {
         			Class serviceBean = Class.forName(service.getBean());
-        			serviceRegistry.addService(serviceBean);
+        			serviceRegistry.addService(serviceBean, IServiceContext.global());
         		} else {
         			Class factoryBean = Class.forName(service.getFactory());
-        			serviceRegistry.addServiceFactory(iface, factoryBean);
+        			serviceRegistry.addServiceFactory(iface, factoryBean, IServiceContext.global());
         		}
         	}
         }
@@ -52,11 +54,11 @@ public class JaxbLoader {
         		Class registrable = Class.forName(service.getRegistrable());
         		for (String bean : service.getProvider()) {
         			Class providerClass = Class.forName(bean);
-        			serviceRegistry.addService(providerClass);
+        			serviceRegistry.addService(providerClass, IServiceContext.global());
         		}
         		for (String bean : service.getProviderFactory()) {
         			Class providerFactoryClass = Class.forName(bean);
-        			serviceRegistry.addServiceFactory(registrable, providerFactoryClass);
+        			serviceRegistry.addServiceFactory(registrable, providerFactoryClass, IServiceContext.global());
         		}
         	}
         }
@@ -76,7 +78,7 @@ public class JaxbLoader {
         		factories.put(factory.getType(), factory);
         	}
         	
-        	serviceRegistry.setDelegateResolver(new IPropertyResolver() {
+        	serviceRegistry.pushDelegateResolver(new IPropertyResolver() {
         		
 				private static final long serialVersionUID = 6911651120730545150L;
 

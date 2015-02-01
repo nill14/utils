@@ -1,2 +1,3 @@
-See how support optional dependencies, whether @Inject Optional<Dep> might be a good alternative. 
+See how support optional dependencies, whether @Inject Optional<Dep> might be a good alternative. - OK (TaskBean) 
 Test integration with few scopes, e.g. SLAScope, TicketScope.
+Test context activation event (support module)

@@ -82,7 +82,7 @@ public class GlobalBeanFactory implements ApplicationContext {
 	@Override
 	public boolean isTypeMatch(String name, Class<?> targetType) throws NoSuchBeanDefinitionException {
 		Object bean = registry.getBean(name);
-		return bean != null & targetType.isAssignableFrom(bean.getClass());
+		return bean != null && targetType.isAssignableFrom(bean.getClass());
 	}
 
 	@Override
