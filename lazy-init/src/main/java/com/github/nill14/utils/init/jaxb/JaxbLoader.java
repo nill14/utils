@@ -1,7 +1,6 @@
 package com.github.nill14.utils.init.jaxb;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -37,7 +36,7 @@ public class JaxbLoader {
         com.github.nill14.utils.init.impl.ServiceRegistry serviceRegistry = new com.github.nill14.utils.init.impl.ServiceRegistry();
         
         if (registry.getServices() != null) {
-        	for (Service service : registry.getServices().getService()) {
+        	for (Service service : registry.getServices()) {
         		Class iface = Class.forName(service.getInterface());
         		if (service.getBean() != null) {
         			Class serviceBean = Class.forName(service.getBean());
@@ -50,13 +49,13 @@ public class JaxbLoader {
         }
 
         if (registry.getProviders() != null) {
-        	for (Provider service : registry.getProviders().getProvider()) {
+        	for (Provider service : registry.getProviders()) {
         		Class registrable = Class.forName(service.getRegistrable());
-        		for (String bean : service.getProvider()) {
+        		for (String bean : service.getProviders()) {
         			Class providerClass = Class.forName(bean);
         			serviceRegistry.addService(providerClass, IServiceContext.global());
         		}
-        		for (String bean : service.getProviderFactory()) {
+        		for (String bean : service.getProviderFactories()) {
         			Class providerFactoryClass = Class.forName(bean);
         			serviceRegistry.addServiceFactory(registrable, providerFactoryClass, IServiceContext.global());
         		}
@@ -66,14 +65,14 @@ public class JaxbLoader {
         Map<String, String> strings = Maps.newHashMap();
         Map<Class, IPojoFactory> factories = Maps.newHashMap();
         if (registry.getProperties() != null) {
-        	for (StringProperty property : registry.getProperties().getString()) {
+        	for (StringProperty property : registry.getProperties().getStrings()) {
     			strings.put(property.getName(), property.getValue());
         	}
-        	for (BeanProperty property : registry.getProperties().getBean()) {
+        	for (BeanProperty property : registry.getProperties().getBeen()) {
         		Class beanClass = Class.forName(property.getValue());
     			factories.put(beanClass, PojoFactory.create(beanClass));
         	}
-        	for (FactoryProperty property : registry.getProperties().getFactory()) {
+        	for (FactoryProperty property : registry.getProperties().getFactories()) {
         		IPojoFactory factory = (IPojoFactory) Class.forName(property.getValue()).newInstance();
         		factories.put(factory.getType(), factory);
         	}
