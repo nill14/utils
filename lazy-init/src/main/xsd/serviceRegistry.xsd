@@ -31,6 +31,10 @@ xmlns="http://www.github.com/nill14/utils/init/serviceRegistry">
     		<xsd:element name="properties" type="Properties"
     			maxOccurs="1" minOccurs="0">
     		</xsd:element>
+  
+<!-- 	        <xsd:sequence> -->
+<!-- 	          <xsd:element name="collectionElement" type="xsd:string" maxOccurs="unbounded" /> -->
+<!-- 	        </xsd:sequence> -->
     	</xsd:sequence>
     </xsd:complexType>
 

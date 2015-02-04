@@ -1,0 +1,11 @@
+<jxb:bindings xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:jxb="http://java.sun.com/xml/ns/jaxb" 
+  xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+  version="2.1">
+
+  <jxb:globalBindings>
+    <xjc:simple />
+  </jxb:globalBindings>
+
+
+</jxb:bindings>

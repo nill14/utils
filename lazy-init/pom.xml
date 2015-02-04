@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>lazy-init</artifactId>
 
@@ -19,40 +20,65 @@
 			<url>http://www.spdx.org/licenses/Apache-2.0</url>
 		</license>
 	</licenses>
-	
+
 
 
 	<build>
 		<resources>
 			<resource>
+				<directory>src/main/xjb</directory>
+			</resource>
+			<resource>
+				<directory>src/main/xsd</directory>
+			</resource>
+			<resource>
 				<directory>target/generated-sources/jaxb</directory>
 			</resource>
 		</resources>
 		<plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>1.6</version>
-                <executions>
-                    <execution>
-                        <id>xjc</id>
-                        <goals>
-                            <goal>xjc</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <packageName>com.github.nill14.utils.init.schema</packageName> 
-                </configuration>
-            </plugin>
-            <plugin>
-            	<artifactId>maven-javadoc-plugin</artifactId>
-            	<configuration>
-            		<excludePackageNames>com.github.nill14.utils.init.schema</excludePackageNames>
-            	</configuration>
-            </plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>xjc</id>
+						<goals>
+							<goal>xjc</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<packageName>com.github.nill14.utils.init.schema</packageName>
+					<extension>true</extension>
+					<arguments>-no-header -Xxew -Xxew:instantiate lazy</arguments>
+					<bindingFiles>bindings.xml</bindingFiles>
+				</configuration>
+				<dependencies> 
+<!-- 				see the following for a reference -->
+<!-- 				http://stackoverflow.com/questions/2447091/how-generate-xmlelementwrapper-annotation-with-xjc-and-customized-binding -->
+<!-- 				http://stackoverflow.com/questions/23011547/webservice-client-generation-error-with-jdk8 -->
+<!-- 				https://github.com/dmak/jaxb-xew-plugin -->
+					<dependency>
+						<groupId>com.github.jaxb-xew-plugin</groupId>
+						<artifactId>jaxb-xew-plugin</artifactId>
+						<version>1.4</version>
+					</dependency>
+					<dependency>
+						<groupId>com.sun.xml.bind</groupId>
+						<artifactId>jaxb-xjc</artifactId>
+						<version>2.2.4-1</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<excludePackageNames>com.github.nill14.utils.init.schema</excludePackageNames>
+				</configuration>
+			</plugin>
 		</plugins>
-        
+
 	</build>
 
 	<dependencies>
@@ -65,18 +91,18 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>javax.annotation</groupId>
-		    <artifactId>javax.annotation-api</artifactId>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>com.google.code.findbugs</groupId>
-		    <artifactId>jsr305</artifactId>
-		</dependency>		
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+		</dependency>
 		<dependency>
-		    <groupId>javax.inject</groupId>
-		    <artifactId>javax.inject</artifactId>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
 		</dependency>
 
 		<dependency>
@@ -90,7 +116,7 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
@@ -102,7 +128,7 @@
 			<artifactId>javassist</artifactId>
 			<optional>true</optional>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>java8-utils</artifactId>
