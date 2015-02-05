@@ -26,12 +26,12 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			Class<?> paramClass = type.getFirstParamClass();
 
 			if (Optional.class.isAssignableFrom(rawType)) {
-				Object result = findByName(name, paramClass);
+				Object result = findByName(pojo, name, paramClass);
 				if (result != null) {
 					return Optional.of(result);
 				}
 				if (!type.isNamed()) {
-					result = findByType(paramClass);
+					result = findByType(pojo, paramClass);
 					if (result != null) {
 						return Optional.of(result);
 					}
@@ -40,7 +40,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			}
 			
 			if (Collection.class.isAssignableFrom(rawType)) {
-				Collection<?> providers = findAllByType(paramClass);
+				Collection<?> providers = findAllByType(pojo, paramClass);
 				Preconditions.checkNotNull(providers);
 				
 				if (Set.class.isAssignableFrom(rawType)) {
@@ -52,14 +52,14 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		}
 		
 		// find by name
-		Object result = findByName(name, type.getRawType());
+		Object result = findByName(pojo, name, type.getRawType());
 		if (result != null) {
 			return result;
 		}
 		
 		// find by type
 		if (!type.isNamed()) {
-			result = findByType(type.getRawType());
+			result = findByType(pojo, type.getRawType());
 			if (result != null) {
 				return result;
 			}
@@ -68,8 +68,8 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		return null;
 	}
 	
-	protected abstract Object findByName(String name, Class<?> type);
-	protected abstract Object findByType(Class<?> type);
-	protected abstract Collection<?> findAllByType(Class<?> type);
+	protected abstract Object findByName(Object pojo, String name, Class<?> type);
+	protected abstract Object findByType(Object pojo, Class<?> type);
+	protected abstract Collection<?> findAllByType(Object pojo, Class<?> type);
 
 }

@@ -19,7 +19,7 @@ public class AnnotationPojoInitializer implements IPojoInitializer<Object> {
 
 	private static final long serialVersionUID = -6999206469201978450L;
 
-	public static IPojoInitializer<Object> withResolver(IPropertyResolver resolver) {
+	public static AnnotationPojoInitializer withResolver(IPropertyResolver resolver) {
 		return new AnnotationPojoInitializer(resolver);
 	}
 	

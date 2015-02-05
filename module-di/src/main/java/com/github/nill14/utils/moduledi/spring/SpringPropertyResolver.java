@@ -18,7 +18,7 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 
 
 	@Override
-	protected Object findByName(String name, Class<?> type) {
+	protected Object findByName(Object pojo, String name, Class<?> type) {
 		if (context.isTypeMatch(name, type)) {
 			return context.getBean(name, type);
 		}
@@ -26,7 +26,7 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Object findByType(Class<?> type) {
+	protected Object findByType(Object pojo, Class<?> type) {
 		String[] names = context.getBeanNamesForType(type);
 		if (names.length > 0) {
 			return context.getBean(names[0], type);
@@ -35,7 +35,7 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Collection<?> findAllByType(Class<?> type) {
+	protected Collection<?> findAllByType(Object pojo, Class<?> type) {
 		return context.getBeansOfType(type).values();
 	}
 

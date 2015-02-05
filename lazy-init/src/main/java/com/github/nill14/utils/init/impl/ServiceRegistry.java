@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -176,21 +177,25 @@ public class ServiceRegistry implements IServiceRegistry {
 		return resolver;
 	}
 	
+	public IBeanInjector toBeanInjector() {
+		return new ServiceRegistryBeanInjector(this);
+	}
+	
 	@SuppressWarnings("serial")
 	private class ServiceRegistryPropertyResolver extends AbstractPropertyResolver {
 
 		@Override
-		protected Object findByName(String name, Class<?> type) {
+		protected Object findByName(Object pojo, String name, Class<?> type) {
 			return getOptionalService(type, name).orElse(null);
 		}
 
 		@Override
-		protected Object findByType(Class<?> type) {
+		protected Object findByType(Object pojo, Class<?> type) {
 			return getOptionalService(type).orElse(null);
 		}
 
 		@Override
-		protected Collection<?> findAllByType(Class<?> type) {
+		protected Collection<?> findAllByType(Object pojo, Class<?> type) {
 			return getServices(type);
 		}
 	};

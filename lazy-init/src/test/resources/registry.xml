@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<p:serviceRegistry xmlns:p="http://www.github.com/nill14/utils/init/serviceRegistry" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.github.com/nill14/utils/init/serviceRegistry ../../main/resources/serviceRegistry.xsd ">
+<p:serviceRegistry xmlns:p="http://www.github.com/nill14/utils/init/serviceRegistry" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.github.com/nill14/utils/init/serviceRegistry ../../main/xsd/serviceRegistry.xsd">
+	
   <services>
     <service interface="com.github.nill14.utils.init.ICalculator">
       <bean>com.github.nill14.utils.init.Calculator</bean>
@@ -11,6 +14,7 @@
       <bean>com.github.nill14.utils.init.TimeService</bean>
     </service>
   </services>
+  
   <properties>
   	<string name="greeting">Hello World!</string>
   	<factory>com.github.nill14.utils.init.ZoneIdFactory</factory>
