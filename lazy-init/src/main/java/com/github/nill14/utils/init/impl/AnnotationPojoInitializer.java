@@ -87,8 +87,7 @@ public class AnnotationPojoInitializer implements IPojoInitializer<Object> {
 				
 			} else { 
 				throw new RuntimeException(String.format(
-						"Cannot resolve property %s on bean %s", 
-						fd, instance));
+						"Cannot resolve property %s", fd));
 				
 			}
 			
