@@ -178,7 +178,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	}
 	
 	public IBeanInjector toBeanInjector() {
-		return new ServiceRegistryBeanInjector(this);
+		return new BeanInjector(toResolver());
 	}
 	
 	@SuppressWarnings("serial")

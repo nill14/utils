@@ -4,8 +4,10 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
+import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IType;
+import com.github.nill14.utils.init.meta.Wire;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -63,6 +65,11 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			if (result != null) {
 				return result;
 			}
+		}
+		
+		if (type.getQualifier(Wire.class).isPresent()) {
+			IBeanInjector injector = new BeanInjector(this);
+			return injector.wire(type.getRawType());
 		}
 		
 		return null;

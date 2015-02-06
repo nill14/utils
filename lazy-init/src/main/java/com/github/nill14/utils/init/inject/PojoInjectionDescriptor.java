@@ -69,8 +69,8 @@ public class PojoInjectionDescriptor {
 	private Stream<? extends FieldInjectionDescriptor> injectableFields(Stream<Field> nonStaticFields) {
 		return nonStaticFields.map(f -> {
 			if (f.isAnnotationPresent(javax.inject.Inject.class)) {
-				Named named = f.getAnnotation(javax.inject.Named.class);
-				return new FieldInjectionDescriptor(f, named);
+				
+				return new FieldInjectionDescriptor(f);
 			} 
 			//else if ... com.google.inject.Inject from Guice have the optional parameter
 			else return null;
