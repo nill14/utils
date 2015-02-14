@@ -2,7 +2,6 @@ package com.github.nill14.utils.init.impl;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -11,6 +10,7 @@ import com.github.nill14.utils.init.meta.Wire;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 
 @SuppressWarnings("serial")
 public abstract class AbstractPropertyResolver implements IPropertyResolver {
@@ -41,14 +41,18 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 				return Optional.empty();
 			}
 			
-			if (Collection.class.isAssignableFrom(rawType)) {
+			if (Iterable.class.isAssignableFrom(rawType)) {
 				Collection<?> providers = findAllByType(pojo, paramClass);
 				Preconditions.checkNotNull(providers);
 				
-				if (Set.class.isAssignableFrom(rawType)) {
-					return ImmutableSet.copyOf(providers);
-				} else {
+				if (rawType.isAssignableFrom(ImmutableList.class)) {
 					return ImmutableList.copyOf(providers);
+				
+				} else if (rawType.isAssignableFrom(ImmutableSet.class)) {
+					return ImmutableSet.copyOf(providers);
+				
+				} else if (rawType.isAssignableFrom(ImmutableSortedSet.class)) {
+					return ImmutableSortedSet.copyOf(providers);
 				}
 			}
 		}
