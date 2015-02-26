@@ -15,12 +15,17 @@ public interface IType {
 
 	Class<?> getRawType();
 
+	Type getGenericType();
+	
 	String getName();
 
 	Class<?> getFirstParamClass();
 	
 	Collection<Annotation> getQualifiers();
 	
-	Optional<Annotation> getQualifier(Class<? extends Annotation> annotation);
+	Optional<Annotation> getAnnotation(Class<? extends Annotation> annotation);
+	
+	Collection<Annotation> getAnnotations();
+	
 
 }

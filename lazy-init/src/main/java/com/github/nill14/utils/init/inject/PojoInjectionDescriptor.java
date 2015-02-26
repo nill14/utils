@@ -1,5 +1,6 @@
 package com.github.nill14.utils.init.inject;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -9,12 +10,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import javax.inject.Named;
+import javax.inject.Qualifier;
 
 import com.github.nill14.utils.init.api.IType;
+import com.github.nill14.utils.init.meta.AnnotationScanner;
 import com.github.nill14.utils.java8.stream.GuavaCollectors;
 import com.github.nill14.utils.java8.stream.StreamUtils;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class PojoInjectionDescriptor {
 
@@ -58,6 +61,10 @@ public class PojoInjectionDescriptor {
 				return result;
 			}
 		});
+	}
+	
+	public Set<Annotation> getDeclaredQualifiers() {
+		return ImmutableSet.copyOf(AnnotationScanner.findAnnotations(clazz, Qualifier.class).values());
 	}
 	
 	private Stream<Field> nonStaticFields(Stream<Class<?>> declaredClasses) {

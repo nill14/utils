@@ -8,9 +8,10 @@ import java.util.Collection;
 import java.util.Optional;
 
 import javax.inject.Named;
+import javax.inject.Qualifier;
 
 import com.github.nill14.utils.init.api.IType;
-import com.github.nill14.utils.init.meta.Wire;
+import com.github.nill14.utils.init.meta.AnnotationScanner;
 import com.google.common.collect.ImmutableMap;
 
 public class FieldInjectionDescriptor implements IType {
@@ -19,22 +20,15 @@ public class FieldInjectionDescriptor implements IType {
 	private final Field field;
 	private final Optional<String> named;
 	private final ImmutableMap<Class<?>, Annotation> qualifiers;
+	private final ImmutableMap<Class<?>, Annotation> annotations;
 
 	public FieldInjectionDescriptor(Field f) {
 		field = f;
 		Named named = f.getAnnotation(javax.inject.Named.class);
-		Wire wire = f.getAnnotation(Wire.class);
 		this.named = Optional.ofNullable(named).map(n -> n.value());
 		
-		ImmutableMap.Builder<Class<?>, Annotation> builder = ImmutableMap.builder();
-		if (wire != null) {
-			builder.put(Wire.class, wire);
-		} 
-		if (named != null) {
-			builder.put(Named.class, named);
-		}
-		qualifiers = builder.build();
-		
+		qualifiers = ImmutableMap.copyOf(AnnotationScanner.findAnnotations(f, Qualifier.class));
+		annotations = ImmutableMap.copyOf(AnnotationScanner.findAnnotations(f));
 	}
 	
 	public void inject(Object instance, Object value) {
@@ -79,6 +73,7 @@ public class FieldInjectionDescriptor implements IType {
 		throw new IllegalStateException();
 	}
 	
+	@Override
 	public Type getGenericType() {
 		return field.getGenericType();
 	}
@@ -107,11 +102,16 @@ public class FieldInjectionDescriptor implements IType {
 	public Collection<Annotation> getQualifiers() {
 		return qualifiers.values();
 	}
+
+	@Override
+	public Collection<Annotation> getAnnotations() {
+		return annotations.values();
+	}
 	
 	@Override
-	public Optional<Annotation> getQualifier(
+	public Optional<Annotation> getAnnotation(
 			Class<? extends Annotation> annotation) {
 		
-		return Optional.ofNullable(qualifiers.get(annotation));
+		return Optional.ofNullable(annotations.get(annotation));
 	}
 }

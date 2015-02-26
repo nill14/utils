@@ -7,12 +7,14 @@ import java.lang.reflect.Modifier;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
+import com.github.nill14.utils.init.inject.FieldInjectionDescriptor;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 
 public class AnnotationPojoInitializer implements IPojoInitializer<Object> {
@@ -80,19 +82,17 @@ public class AnnotationPojoInitializer implements IPojoInitializer<Object> {
 	
 	private void doInject(Object instance) {
 		PojoInjectionDescriptor injector = new PojoInjectionDescriptor(instance.getClass());
-		injector.getFieldDescriptors().forEach(fd -> {
+		for (FieldInjectionDescriptor fd : injector.getFieldDescriptors()) {
 			Object value = resolver.resolve(instance, fd);
 			if (value != null) {
 				fd.inject(instance, value);
 				
-			} else { 
+			} else if (!fd.getAnnotation(Nullable.class).isPresent()){ 
 				throw new RuntimeException(String.format(
 						"Cannot resolve property %s", fd));
 				
 			}
-			
-		});
-		
+		}
 	}
 	
 	

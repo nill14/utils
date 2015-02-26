@@ -2,74 +2,114 @@ package com.github.nill14.utils.init.impl;
 
 import static org.junit.Assert.*;
 
-import java.util.Collection;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Qualifier;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
-import com.github.nill14.utils.init.api.IPropertyResolver;
+import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.meta.Wire;
 
 public class QualifiersTest {
 
 	private static final Logger log = LoggerFactory.getLogger(QualifiersTest.class);
-	private final IPropertyResolver resolver = new AbstractPropertyResolver() {
-		
-		@Override
-		protected Object findByType(Object pojo, Class<?> type) {
-			return null;
-		}
-		
-		@Override
-		protected Object findByName(Object pojo, String name, Class<?> type) {
-			return null;
-		}
-		
-		@Override
-		protected Collection<?> findAllByType(Object pojo, Class<?> type) {
-			return null;
-		}
-	};
+	private IBeanInjector beanInjector;
 	
-	@Test
-	public void testStrawberry() {
-		IBeanInjector injector = new BeanInjector(resolver);
-		Strawberry strawberry = injector.wire(Strawberry.class);
-		assertNotNull(strawberry);
+	@Before
+	public void prepare() {
+		ServiceRegistry serviceRegistry = new ServiceRegistry();
+		serviceRegistry.addService(MangoSync.class, IServiceContext.global());
+		serviceRegistry.addService(MangoAsync.class, IServiceContext.global());
+		serviceRegistry.addService(MangoHello.class, IServiceContext.global());
+		beanInjector = serviceRegistry.toBeanInjector();
 	}
 	
 	@Test
-	public void testOnion() {
-		IBeanInjector injector = new BeanInjector(resolver);
-		Onion onion = injector.wire(Onion.class);
-		assertNotNull(onion.strawberry);
+	public void testMangoBean() {
+		MangoBean bean = beanInjector.wire(MangoBean.class);
+		
+		assertNotNull(bean);
+		assertThat(bean.asyncMango, CoreMatchers.instanceOf(MangoAsync.class));
+		assertThat(bean.syncMango, CoreMatchers.instanceOf(MangoSync.class));
+		assertThat(bean.helloMango, CoreMatchers.instanceOf(MangoHello.class));
+		assertNull(bean.missingMango);
 	}
 	
-	@Test
-	public void testMango() {
-		IBeanInjector injector = new BeanInjector(resolver);
-		Mango mango = injector.wire(Mango.class);
-		assertNotNull(mango.onion);
-	}
-	
-	
-	public static class Onion {
-		@Inject
-		@Wire
-		Strawberry strawberry;
-	}
-	
-	public static class Strawberry {
-		final String hello = "hello";
-	}
-	
-	public static class Mango {
+	public abstract static class Mango {
 		@Inject
 		@Wire
 		Onion onion;
+	}
+	
+	public static class Onion {
+	}
+	
+	
+	@Qualifier
+	@Retention(RetentionPolicy.RUNTIME)
+	public static @interface Synchronous {
+		
+	}
+	
+	@Qualifier
+	@Retention(RetentionPolicy.RUNTIME)
+	public static @interface Asynchronous {
+		
+	}
+	
+	@Qualifier
+	@Retention(RetentionPolicy.RUNTIME)
+	public static @interface AnotherNamed {
+		String value();
+	}
+	
+	@Synchronous
+	public static class MangoSync extends Mango {
+		
+	}
+	
+	@Asynchronous
+	public static class MangoAsync extends Mango {
+		
+	}
+	
+	@AnotherNamed("hello")
+	@Named("helloMango")
+	public static class MangoHello extends Mango {
+		
+	}
+	
+	public static class MangoBean {
+		
+		@Inject
+		@Synchronous
+		@Nullable
+		Mango syncMango;
+		
+		@Inject
+		@Asynchronous
+		@Nullable
+		Mango asyncMango;
+		
+		@Inject
+		@AnotherNamed("hello")
+		@Named("helloMango")
+		@Nullable
+		Mango helloMango;
+		
+		@Inject
+		@AnotherNamed("missing")
+		@Nullable
+		Mango missingMango;
 	}
 }

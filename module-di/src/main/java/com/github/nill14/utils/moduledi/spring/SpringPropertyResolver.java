@@ -1,11 +1,17 @@
 package com.github.nill14.utils.moduledi.spring;
 
+import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationContext;
 
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
+import com.google.common.collect.Maps;
 
 @SuppressWarnings("serial")
 public class SpringPropertyResolver extends AbstractPropertyResolver implements IPropertyResolver {
@@ -16,6 +22,41 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 		this.context = context;
 	}
 
+
+
+	@Override
+	protected Object findByQualifier(Object pojo, Class<?> type, Annotation qualifier, Iterator<? extends Annotation> nextQualifiers) {
+		Class<? extends Annotation> annotationClass = qualifier.annotationType();
+		Map<String, Object> beansWithAnnotation = context.getBeansWithAnnotation(annotationClass);
+		
+		Map<String, ?> beansOfType = context.getBeansOfType(type);
+		Collection<Object> values = Maps.difference(beansWithAnnotation, beansOfType).entriesInCommon().values();
+		
+		List<Object> result = values.stream()
+				.filter(obj -> qualifier.equals(obj.getClass().getAnnotation(annotationClass)))
+				.collect(Collectors.toList());
+		
+		if (result.isEmpty()) {
+			return null;
+		
+		} else if (result.size() == 1) {
+			Object val = result.get(0);
+			Class<?> clazz = val.getClass();
+			while (nextQualifiers.hasNext()) {
+				Annotation next = nextQualifiers.next();
+				Annotation annotation = clazz.getAnnotation(next.annotationType());
+				if (annotation == null || !annotation.equals(next)) {
+					return null;
+				}
+			}
+			return val;
+			
+		} else {
+			throw new IllegalStateException("Expected one result, got "+ result);
+		}
+	}
+	
+	
 
 	@Override
 	protected Object findByName(Object pojo, String name, Class<?> type) {
@@ -38,5 +79,7 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	protected Collection<?> findAllByType(Object pojo, Class<?> type) {
 		return context.getBeansOfType(type).values();
 	}
+
+
 
 }

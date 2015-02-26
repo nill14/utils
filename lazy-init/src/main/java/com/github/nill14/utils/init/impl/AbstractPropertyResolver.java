@@ -1,6 +1,8 @@
 package com.github.nill14.utils.init.impl;
 
+import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Optional;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
@@ -21,6 +23,12 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	public Object resolve(Object pojo, IType type) {
 		
 		String name = type.getName();
+		Collection<Annotation> qualifiers = type.getQualifiers();
+		
+		if (!qualifiers.isEmpty()) {
+			Iterator<Annotation> iterator = qualifiers.iterator();
+			return findByQualifier(pojo, type.getRawType(), iterator.next(), iterator);
+		}
 		
 		// handle collections, optional
 		if (type.isParametrized()) {
@@ -71,7 +79,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			}
 		}
 		
-		if (type.getQualifier(Wire.class).isPresent()) {
+		if (type.getAnnotation(Wire.class).isPresent()) {
 			IBeanInjector injector = new BeanInjector(this);
 			return injector.wire(type.getRawType());
 		}
@@ -79,8 +87,11 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		return null;
 	}
 	
+	
 	protected abstract Object findByName(Object pojo, String name, Class<?> type);
 	protected abstract Object findByType(Object pojo, Class<?> type);
 	protected abstract Collection<?> findAllByType(Object pojo, Class<?> type);
 
+	protected abstract Object findByQualifier(Object pojo, Class<?> type, Annotation qualifier, Iterator<? extends Annotation> nextQualifiers);
+	
 }
