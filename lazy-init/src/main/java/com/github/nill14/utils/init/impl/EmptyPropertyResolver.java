@@ -38,9 +38,10 @@ public final class EmptyPropertyResolver extends AbstractPropertyResolver implem
 
 
 	@Override
-	protected Object findByQualifier(Object pojo, Class<?> type, Annotation qualifier,
-			Iterator<? extends Annotation> nextQualifiers) {
+	protected Object findByQualifier(Object pojo, Class<?> type, Annotation qualifier) {
 		return null;
 	}
+
+
 
 }

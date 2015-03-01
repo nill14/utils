@@ -2,7 +2,6 @@ package com.github.nill14.utils.moduledi.spring;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,7 +24,8 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 
 
 	@Override
-	protected Object findByQualifier(Object pojo, Class<?> type, Annotation qualifier, Iterator<? extends Annotation> nextQualifiers) {
+	protected Object findByQualifier(Object pojo, Class<?> type, Annotation qualifier) {
+		
 		Class<? extends Annotation> annotationClass = qualifier.annotationType();
 		Map<String, Object> beansWithAnnotation = context.getBeansWithAnnotation(annotationClass);
 		
@@ -40,16 +40,7 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 			return null;
 		
 		} else if (result.size() == 1) {
-			Object val = result.get(0);
-			Class<?> clazz = val.getClass();
-			while (nextQualifiers.hasNext()) {
-				Annotation next = nextQualifiers.next();
-				Annotation annotation = clazz.getAnnotation(next.annotationType());
-				if (annotation == null || !annotation.equals(next)) {
-					return null;
-				}
-			}
-			return val;
+			return result.get(0);
 			
 		} else {
 			throw new IllegalStateException("Expected one result, got "+ result);

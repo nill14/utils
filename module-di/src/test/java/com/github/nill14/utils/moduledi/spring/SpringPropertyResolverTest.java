@@ -6,8 +6,6 @@ import static org.mockito.Mockito.*;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.Iterator;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -47,10 +45,8 @@ public class SpringPropertyResolverTest {
 	
 		Field field = MangoBean.class.getDeclaredField("helloMango");
 		AnotherNamed annotation = field.getAnnotation(AnotherNamed.class);
-		Named named = field.getAnnotation(Named.class);
-		Iterator<Named> iterator = Collections.singleton(named).iterator();
-
-		Object result = resolver.findByQualifier("pojo", Mango.class, annotation, iterator);
+		
+		Object result = resolver.findByQualifier("pojo", Mango.class, annotation);
 		assertEquals(helloMango, result);
 	}
 	
@@ -62,7 +58,7 @@ public class SpringPropertyResolverTest {
 		Field field = MangoBean.class.getDeclaredField("missingMango");
 		AnotherNamed annotation = field.getAnnotation(AnotherNamed.class);
 		
-		Object result = resolver.findByQualifier("pojo", Mango.class, annotation, Collections.emptyIterator());
+		Object result = resolver.findByQualifier("pojo", Mango.class, annotation);
 		assertEquals(null, result);
 	}
 	

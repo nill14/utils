@@ -15,10 +15,7 @@ import com.github.nill14.parsers.graph.CyclicGraphException;
 import com.github.nill14.utils.init.api.IServiceRegistry;
 import com.github.nill14.utils.init.impl.ServiceRegistry;
 import com.github.nill14.utils.moduledi.module.ActivationModule;
-import com.github.nill14.utils.moduledi.module.BreadModule;
 import com.github.nill14.utils.moduledi.module.CustomerModule;
-import com.github.nill14.utils.moduledi.module.DeliveryModule;
-import com.github.nill14.utils.moduledi.module.SnackModule;
 import com.google.common.collect.ImmutableSet;
 
 public class ModuleTest {

@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Named;
+
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
@@ -44,7 +46,13 @@ public class ServiceRegistry implements IServiceRegistry {
 	}
 	
 	private String generateName(Class<?> type) {
-		return type.getTypeName();
+		Named named = type.getAnnotation(Named.class);
+		if (named != null) {
+			return named.value();
+		
+		} else {
+			return type.getTypeName();
+		}
 	}
 	
 	@Override
@@ -207,23 +215,8 @@ public class ServiceRegistry implements IServiceRegistry {
 	private class ServiceRegistryPropertyResolver extends AbstractPropertyResolver {
 
 		@Override
-		protected Object findByQualifier(
-				Object pojo, Class<?> type, Annotation qualifier, Iterator<? extends Annotation> nextQualifiers) {
-			
-			Map<Annotation, Object> map = qualifiers.getOrDefault(type, Collections.emptyMap());
-			Object result = map.get(qualifier);
-			
-			if (result != null && nextQualifiers.hasNext()) {
-				while (nextQualifiers.hasNext()) {
-					Annotation next = nextQualifiers.next();
-					if (!map.containsKey(next)) {
-						return null;
-					}
-				}
-				
-			} 
-
-			return result;
+		protected Object findByQualifier(Object pojo, Class<?> type, Annotation qualifier) {
+			return qualifiers.getOrDefault(type, Collections.emptyMap()).get(qualifier);
 		}
 		
 		@Override
