@@ -5,6 +5,8 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Optional;
 
+import com.github.nill14.utils.init.impl.ClassType;
+
 public interface IType {
 
 	boolean isParametrized();
@@ -27,5 +29,10 @@ public interface IType {
 	
 	Collection<Annotation> getAnnotations();
 	
+	
+	
+	public static IType fromClass(Class<?> clazz) {
+		return new ClassType(clazz);
+	}
 
 }

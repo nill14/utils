@@ -14,6 +14,11 @@ public class AnnotationScanner {
 			.collect(Collectors.toMap(a -> a.annotationType(), a -> a));	
 	}	
 	
+	public static Map<Class<? extends Annotation>, Annotation> findAnnotations(Class<?> clazz) {
+		return Stream.of(clazz.getAnnotations())
+			.collect(Collectors.toMap(a -> a.annotationType(), a -> a));	
+	}	
+	
 	public static Map<Class<? extends Annotation>, Annotation> findAnnotations(Field field, Class<? extends Annotation> metaAnnotation) {
 		return Stream.of(field.getAnnotations())
 			.filter(a -> a.annotationType().isAnnotationPresent(metaAnnotation))

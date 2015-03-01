@@ -200,7 +200,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	}
 	
 	public IBeanInjector toBeanInjector() {
-		return new BeanInjector(toResolver());
+		return new BeanInjector(toResolver(), annotationInitializer);
 	}
 	
 	@SuppressWarnings("serial")
@@ -243,6 +243,8 @@ public class ServiceRegistry implements IServiceRegistry {
 
 	};
 	
-	private final IPojoInitializer<Object> annotationInitializer = AnnotationPojoInitializer.withResolver(resolver);
+	private final IPojoInitializer<Object> annotationInitializer = new ChainingPojoInitializer()
+			.addInitializer(AnnotationPojoInitializer.withResolver(resolver))
+			.addInitializer(EventBusPojoInitializer.withResolver(resolver));
 
 }
