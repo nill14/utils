@@ -1,0 +1,10 @@
+com.github.nill14.utils.executor
+com.github.nill14.utils.init.api
+com.github.nill14.utils.init.impl
+com.github.nill14.utils.init.inject
+com.github.nill14.utils.init.jaxb
+com.github.nill14.utils.init.meta
+com.github.nill14.utils.java8.stream
+com.github.nill14.utils.moduledi
+com.github.nill14.utils.moduledi.annotation
+com.github.nill14.utils.moduledi.spring
