@@ -2,6 +2,7 @@ package com.github.nill14.utils.init.impl;
 
 import static org.junit.Assert.*;
 
+import java.awt.Color;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -54,6 +55,16 @@ public class QualifiersTest {
 	public static class Onion {
 	}
 	
+	public enum ABC {
+		A, B, C
+	}
+
+	@Qualifier
+	@Retention(RetentionPolicy.RUNTIME)
+	public static @interface AbcQualifier {
+		ABC value();
+	}
+
 	
 	@Qualifier
 	@Retention(RetentionPolicy.RUNTIME)
@@ -83,6 +94,7 @@ public class QualifiersTest {
 		
 	}
 	
+	@AbcQualifier(ABC.A)
 	@AnotherNamed("hello")
 	@Named("helloMango")
 	public static class MangoHello extends Mango {
@@ -102,6 +114,7 @@ public class QualifiersTest {
 		Mango asyncMango;
 		
 		@Inject
+		@AbcQualifier(ABC.A)
 		@AnotherNamed("hello")
 		@Named("helloMango")
 		@Nullable

@@ -59,7 +59,12 @@ public class FieldInjectionDescriptor implements IType {
 		Type genericType = field.getGenericType();
 		if (genericType instanceof ParameterizedType) {
 			Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
-			return Class.class.cast(type);
+			if (type instanceof ParameterizedType) {
+				return Class.class.cast(((ParameterizedType) type).getRawType());
+			} else {
+				return Class.class.cast(type);
+			}
+			
 		}
 		throw new IllegalStateException();
 	}
