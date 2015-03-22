@@ -16,4 +16,6 @@ public interface IBeanInjector {
 	<T> T wire(Class<T> beanClass);
 	
 	<T> T wire(TypeToken<T> typeToken);
+	
+	<T> T wire(IParameterType type);
 }

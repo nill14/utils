@@ -4,6 +4,7 @@ import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
+import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
@@ -41,6 +42,13 @@ public class BeanInjector implements IBeanInjector {
 	@Override
 	public <T> T wire(TypeToken<T> typeToken) {
 		IBeanDescriptor<T> typeDescriptor = new PojoInjectionDescriptor<>(typeToken);
+		Provider<T> factory = new PojoFactory<>(typeDescriptor, resolver);
+		return new LazyPojo<>(factory, typeDescriptor, initializer).getInstance();
+	}
+	
+	@Override
+	public <T> T wire(IParameterType type) {
+		IBeanDescriptor<T> typeDescriptor = new PojoInjectionDescriptor<T>(type);
 		Provider<T> factory = new PojoFactory<>(typeDescriptor, resolver);
 		return new LazyPojo<>(factory, typeDescriptor, initializer).getInstance();
 	}

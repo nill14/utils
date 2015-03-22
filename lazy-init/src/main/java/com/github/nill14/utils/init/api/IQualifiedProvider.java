@@ -28,14 +28,31 @@ public interface IQualifiedProvider<T> {
    *
    * Returns from registry the object of given type and qualified with the annotation.
    * If object is not found, an exception is thrown.
+   * Generates an Annotation for the annotation class. Requires that the annotation is all optionals.
    */
-  T getQualified(Class<? extends Annotation> qualifierClass);
+  T getQualified(Class<? extends Annotation> annotationType);
 
   /**
    * @see Key#get(Class, Class)
    *
    * Returns from registry the object of given type and qualified with the annotation.
+   * Generates an Annotation for the annotation class. Requires that the annotation is all optionals.
    */
-  Optional<T> getOptionalQualified(Class<? extends Annotation> qualifierClass);
+  Optional<T> getOptionalQualified(Class<? extends Annotation> annotationType);
+
+  /**
+   * @see Key#get(Class, Annotation)
+   *
+   * Returns from registry the object of given type and qualified with the annotation.
+   * If object is not found, an exception is thrown.
+   */
+  T getQualified(Annotation qualifier);
+
+  /**
+   * @see Key#get(Class, Annotation)
+   *
+   * Returns from registry the object of given type and qualified with the annotation.
+   */
+  Optional<T> getOptionalQualified(Annotation qualifier);
 
 }

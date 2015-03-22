@@ -5,7 +5,8 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Optional;
 
-import com.github.nill14.utils.init.impl.ClassType;
+import com.github.nill14.utils.init.impl.ParameterTypeBuilder;
+import com.google.common.reflect.TypeToken;
 
 public interface IParameterType {
 
@@ -32,9 +33,12 @@ public interface IParameterType {
 	Optional<String> getNamed();
 
 	static IParameterType of(Class<?> clazz) {
-		return new ClassType(clazz);
+		return ParameterTypeBuilder.builder(clazz).build();
 	}
-	
+
+	static IParameterType of(TypeToken<?> typeToken) {
+		return ParameterTypeBuilder.builder(typeToken).build();
+	}
 	//TODO consider boolean isCollection and TypeToken getDependencyType
 	
 }
