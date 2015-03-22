@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import com.github.nill14.utils.init.meta.Wire;
 import com.google.common.collect.ImmutableMap;
 
 public class SpringPropertyResolverTest {
@@ -64,7 +63,6 @@ public class SpringPropertyResolverTest {
 	
 	public abstract static class Mango {
 		@Inject
-		@Wire
 		Onion onion;
 	}
 	

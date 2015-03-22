@@ -2,7 +2,6 @@ package com.github.nill14.utils.init.impl;
 
 import static org.junit.Assert.*;
 
-import java.awt.Color;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -19,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IServiceContext;
-import com.github.nill14.utils.init.meta.Wire;
+import com.github.nill14.utils.init.api.IServiceRegistry;
 
 public class QualifiersTest {
 
@@ -28,7 +27,7 @@ public class QualifiersTest {
 	
 	@Before
 	public void prepare() {
-		ServiceRegistry serviceRegistry = new ServiceRegistry();
+		IServiceRegistry serviceRegistry = IServiceRegistry.newRegistry();
 		serviceRegistry.addService(MangoSync.class, IServiceContext.global());
 		serviceRegistry.addService(MangoAsync.class, IServiceContext.global());
 		serviceRegistry.addService(MangoHello.class, IServiceContext.global());
@@ -48,7 +47,6 @@ public class QualifiersTest {
 	
 	public abstract static class Mango {
 		@Inject
-		@Wire
 		Onion onion;
 	}
 	

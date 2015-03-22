@@ -16,16 +16,12 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.github.nill14.utils.init.api.ILazyPojo;
-import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceRegistry;
-import com.github.nill14.utils.init.impl.AnnotationPojoInitializer;
 import com.github.nill14.utils.init.impl.EmptyPojoInitializer;
 import com.github.nill14.utils.init.impl.LazyJdkProxy;
 import com.github.nill14.utils.init.impl.LazyPojo;
-import com.github.nill14.utils.init.impl.PojoFactory;
-import com.github.nill14.utils.init.impl.ServiceRegistry;
 
 public class SerializationTest {
 
@@ -88,9 +84,8 @@ public class SerializationTest {
 	@Test(timeout=5000)
 	public void testComplex() throws IOException, ClassNotFoundException {
 		IPropertyResolver resolver = Mockito.mock(IPropertyResolver.class);
-		IPojoInitializer<Object> initializer = AnnotationPojoInitializer.withResolver(resolver);
-		IPojoFactory<Calculator> pojoFactory = PojoFactory.create(Calculator.class);
-		ILazyPojo<ICalculator> calcPojo = new LazyPojo<>(pojoFactory, initializer);
+		IPojoInitializer<Object> initializer = IPojoInitializer.standard();
+		ILazyPojo<Calculator> calcPojo = LazyPojo.forClass(Calculator.class, resolver, initializer);
 		ICalculator calc = LazyJdkProxy.newProxy(ICalculator.class, calcPojo);
 		calc.add(5, 3); //lazy Calc initialization
 		
@@ -100,7 +95,7 @@ public class SerializationTest {
 	
 	@Test(expected=NotSerializableException.class, timeout=5000)
 	public void testServiceRegistry() throws IOException, ClassNotFoundException {
-		IServiceRegistry registry = new ServiceRegistry();
+		IServiceRegistry registry = IServiceRegistry.newRegistry();
 		doTestEquals(registry, IServiceRegistry.class);
 	}
 }

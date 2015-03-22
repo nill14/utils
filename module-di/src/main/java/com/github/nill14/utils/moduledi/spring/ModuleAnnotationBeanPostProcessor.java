@@ -14,8 +14,6 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.PriorityOrdered;
 
 import com.github.nill14.utils.init.api.IPropertyResolver;
-import com.github.nill14.utils.init.inject.FieldInjectionDescriptor;
-import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 
 public class ModuleAnnotationBeanPostProcessor implements BeanPostProcessor, 
 	MergedBeanDefinitionPostProcessor, BeanFactoryAware, InstantiationAwareBeanPostProcessor, PriorityOrdered {
@@ -49,30 +47,30 @@ public class ModuleAnnotationBeanPostProcessor implements BeanPostProcessor,
 		return bean;
 	}
 
-	private void doInject(Object bean) {
-		if (beanFactory == null) return;
-		PojoInjectionDescriptor pojoDescriptor = new PojoInjectionDescriptor(bean.getClass());
-		
-		for (FieldInjectionDescriptor injector : pojoDescriptor.getFieldDescriptors() ) {
-			
-			Object value = beanFactory.getBean(injector.getName(), injector.getRawType());
-			
-			if (value == null) {
-				value = beanFactory.getBean(injector.getRawType());
-			}
-			
-			if (value == null) {
-				value = resolver.resolve(bean, injector);
-			}
-			
-			if (value != null) {
-				injector.inject(bean, value);
-			
-			} else {
-				throw new RuntimeException(); //TODO
-			}
-		}
-	}
+//	private void doInject(Object bean) {
+//		if (beanFactory == null) return;
+//		PojoInjectionDescriptor pojoDescriptor = new PojoInjectionDescriptor(bean.getClass());
+//		
+//		for (FieldInjectionDescriptor injector : pojoDescriptor.getFieldDescriptors() ) {
+//			
+//			Object value = beanFactory.getBean(injector.getName(), injector.getRawType());
+//			
+//			if (value == null) {
+//				value = beanFactory.getBean(injector.getRawType());
+//			}
+//			
+//			if (value == null) {
+//				value = resolver.resolve(bean, injector);
+//			}
+//			
+//			if (value != null) {
+//				injector.inject(bean, value);
+//			
+//			} else {
+//				throw new RuntimeException(); //TODO
+//			}
+//		}
+//	}
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
@@ -99,7 +97,7 @@ public class ModuleAnnotationBeanPostProcessor implements BeanPostProcessor,
 	public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds,
 			Object bean, String beanName) throws BeansException {
 		
-		doInject(bean);
+//		doInject(bean);
 		return pvs;
 	}
 

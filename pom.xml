@@ -163,6 +163,12 @@
 				<artifactId>guava</artifactId>
 				<version>18.0</version>
 			</dependency>
+			
+			<dependency>
+				<groupId>com.google.inject</groupId>
+				<artifactId>guice</artifactId>
+				<version>4.0-beta5</version>
+			</dependency>			
 
 			<dependency>
 				<groupId>org.javassist</groupId>
@@ -192,6 +198,12 @@
 				<version>1.7.7</version>
 			</dependency>
 
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>1.7.9</version>
+		</dependency>
+
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-simple</artifactId>
@@ -212,6 +224,32 @@
 				<version>1.10.8</version>
 				<scope>test</scope>
 			</dependency>
+			
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-framework-bom</artifactId>
+				<version>4.1.3.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>			
+			
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>4.1.3.RELEASE</version>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>		
+			
+			<dependency>
+				<groupId>com.github.nill14.parsers</groupId>
+				<artifactId>dependency-graph</artifactId>
+				<version>2.2.1-SNAPSHOT</version>
+			</dependency>	
 
 		</dependencies>
 

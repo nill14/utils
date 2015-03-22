@@ -10,6 +10,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.inject.Provider;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,6 +22,7 @@ import com.github.nill14.utils.init.GreeterFactory;
 import com.github.nill14.utils.init.IGreeter;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoInitializer;
+import com.github.nill14.utils.init.api.IPropertyResolver;
 
 public class LazyPojoTest {
 	
@@ -33,14 +36,14 @@ public class LazyPojoTest {
 	private static IPojoInitializer<GreeterFactory> factoryInitializer = new IPojoInitializer<GreeterFactory>() {
 		
 		@Override
-		public void init(ILazyPojo<?> lazyPojo, GreeterFactory instance) {
+		public void init(Provider<?> factory, GreeterFactory instance) {
 			assertThat(instance.getGreeting(), not(GREETING));
 			instances.incrementAndGet();
 			instance.setGreeting(GREETING);
 		}
 		
 		@Override
-		public void destroy(ILazyPojo<?> lazyPojo, GreeterFactory instance) {
+		public void destroy(Provider<?> factory, GreeterFactory instance) {
 			assertThat(instance.getGreeting(), is(GREETING));
 			instances.decrementAndGet();
 			instance.setGreeting(DESTROYED);
@@ -49,7 +52,7 @@ public class LazyPojoTest {
 	
 	@BeforeClass
 	public static void setUp() {
-		lazyPojo = LazyPojo.forFactory(IGreeter.class, GreeterFactory.class, factoryInitializer);
+		lazyPojo = LazyPojo.forFactory(IGreeter.class, GreeterFactory.class, IPropertyResolver.empty(), factoryInitializer);
 	}
 	
 	@Before

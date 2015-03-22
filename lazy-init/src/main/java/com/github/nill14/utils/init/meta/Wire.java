@@ -14,7 +14,9 @@ import java.lang.annotation.Target;
  * Class annotated with @Wire can be injected even without being present in container.
  * In such case a new (prototype scope) instance is created and injected. 
  *
+ * @deprecated wire mode is implicit now. Will be removed in the next version.
  */
+@Deprecated
 public @interface Wire {
 
 }

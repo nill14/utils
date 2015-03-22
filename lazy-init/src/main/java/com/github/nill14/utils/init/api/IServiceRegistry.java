@@ -3,6 +3,10 @@ package com.github.nill14.utils.init.api;
 import java.util.Collection;
 import java.util.Optional;
 
+import javax.inject.Provider;
+
+import com.github.nill14.utils.init.impl.ServiceRegistry;
+
 public interface IServiceRegistry {
 
 	<T> void addSingleton(T serviceBean);
@@ -13,10 +17,10 @@ public interface IServiceRegistry {
 	
 	<S, T extends S> void addService(String name, Class<T> serviceBean, IServiceContext context);
 	
-	<S, F extends IPojoFactory<? extends S>> void addServiceFactory(
+	<S, F extends Provider<? extends S>> void addServiceFactory(
 			Class<S> iface, String name, Class<F> factoryBean, IServiceContext context);
 	
-	<S, F extends IPojoFactory<? extends S>> void addServiceFactory(
+	<S, F extends Provider<? extends S>> void addServiceFactory(
 			Class<S> iface, Class<F> factoryBean, IServiceContext context);
 	
 	<S> S getService(Class<S> iface);
@@ -29,6 +33,13 @@ public interface IServiceRegistry {
 	
 	<S> Collection<S> getServices(Class<S> registrable);
 
+	IPropertyResolver toResolver();
 
+	IBeanInjector toBeanInjector();
+
+
+	static IServiceRegistry newRegistry() {
+		return new ServiceRegistry();
+	}
 
 }

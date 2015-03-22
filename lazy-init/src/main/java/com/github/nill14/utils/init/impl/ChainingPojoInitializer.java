@@ -1,37 +1,55 @@
 package com.github.nill14.utils.init.impl;
 
-import java.util.Queue;
+import javax.inject.Provider;
 
-import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoInitializer;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Queues;
+import com.google.common.collect.ImmutableList;
 
 @SuppressWarnings("serial")
-public class ChainingPojoInitializer implements IPojoInitializer<Object> {
+public class ChainingPojoInitializer<T> implements IPojoInitializer<T> {
 	
-	private final Queue<IPojoInitializer<Object>> items = Queues.newConcurrentLinkedQueue();
+	private final ImmutableList<IPojoInitializer<? super T>> items;
 	
 	
-	@SuppressWarnings("unchecked")
-	public ChainingPojoInitializer addInitializer(IPojoInitializer<? extends Object> initializer) {
-		Preconditions.checkNotNull(initializer);
-		items.add((IPojoInitializer<Object>) initializer);
-		return this;
+	@SafeVarargs
+	public ChainingPojoInitializer(IPojoInitializer<? super T>... initializers) {
+		items = ImmutableList.copyOf(initializers);
+	}
+
+	public ChainingPojoInitializer(ImmutableList<IPojoInitializer<? super T>> initializers) {
+		items = initializers;
 	}
 	
-	public ChainingPojoInitializer() {
+	public static ChainingPojoInitializer<Object> defaultInitializer() {
+		return new ChainingPojoInitializer<>(
+				new AnnotationInjectInitializer(),
+				new AnnotationLifecycleInitializer(),
+				new EventBusPojoInitializer());
+	}
+	
+	/**
+	 * 
+	 * @param extraInitializer The first initializer to execute
+	 * @return
+	 */
+	public <S extends T> ChainingPojoInitializer<S> with(IPojoInitializer<S> extraInitializer) {
+		ImmutableList.Builder<IPojoInitializer<? super S>> builder = ImmutableList.builder();
+		ImmutableList<IPojoInitializer<? super S>> initializers = builder.add(extraInitializer).addAll(items).build();
+		return new ChainingPojoInitializer<S>(initializers);
+	}
+	
+	@Override
+	public void init(Provider<?> factory, T instance) {
+		for (IPojoInitializer<? super T> item : items) {
+			item.init(factory, instance);
+		}
 	}
 
 	@Override
-	public void init(ILazyPojo<?> lazyPojo, Object instance) {
-		items.forEach(item -> item.init(lazyPojo, instance));
-
-	}
-
-	@Override
-	public void destroy(ILazyPojo<?> lazyPojo, Object instance) {
-		items.forEach(item -> item.destroy(lazyPojo, instance));
+	public void destroy(Provider<?> factory, T instance) {
+		for (IPojoInitializer<? super T> item : items) {
+			item.destroy(factory, instance);
+		}
 	}
 
 }

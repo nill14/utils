@@ -2,14 +2,14 @@ package com.github.nill14.utils.init.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
-import java.util.Optional;
 
-import javax.inject.Named;
+import javax.inject.Provider;
 
-import com.github.nill14.utils.init.api.IBeanInjector;
+import com.github.nill14.utils.init.api.IBeanDescriptor;
+import com.github.nill14.utils.init.api.IParameterType;
+import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
-import com.github.nill14.utils.init.api.IType;
-import com.github.nill14.utils.init.meta.Wire;
+import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -20,15 +20,20 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	
 
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Object resolve(Object pojo, IType type) {
+	public Object resolve(Object pojo, IParameterType type) {
 		
 		if (type.isParametrized()) { 
 			Class<?> rawType = type.getRawType();
 			Class<?> paramClass = type.getFirstParamClass();
 
-			if (Optional.class.isAssignableFrom(rawType)) {
-				return Optional.ofNullable(doResolve(pojo, type, paramClass));
+			if (java.util.Optional.class.isAssignableFrom(rawType)) {
+				return java.util.Optional.ofNullable(doResolve(pojo, type, paramClass));
+			}
+			
+			if (com.google.common.base.Optional.class.isAssignableFrom(rawType)) {
+				return com.google.common.base.Optional.fromNullable(doResolve(pojo, type, paramClass));
 			}
 			
 			if (Iterable.class.isAssignableFrom(rawType)) {
@@ -41,29 +46,41 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		if (result != null) {
 			return result;
 		}
-		
-		if (type.getAnnotation(Wire.class).isPresent()) {
-			IBeanInjector injector = new BeanInjector(this);
-			return injector.wire(type.getRawType());
+
+		//Wire mode is implicit now
+//		if (type.getAnnotation(Wire.class).isPresent()) {
+//		try {
+		IBeanDescriptor<?> typeDescriptor = new PojoInjectionDescriptor<>(type);
+		if (typeDescriptor.canBeInstantiated()) {
+			@SuppressWarnings({ "rawtypes" })
+			Provider factory = new PojoFactory(typeDescriptor, this);
+			IPojoInitializer<Object> initializer = IPojoInitializer.standard();
+			return new LazyPojo<>(factory, typeDescriptor, initializer).getInstance();
 		}
+//		} catch (RuntimeException e) {
+//			if (!type.isOptionalDependency()) {
+//				throw e;
+//			}
+//		}
+//		}
 		
 		return null;
 	}
 	
-	protected Object doResolve(Object pojo, IType type, Class<?> clazz) {
+	protected Object doResolve(Object pojo, IParameterType type, Class<?> clazz) {
 		Collection<Annotation> qualifiers = type.getQualifiers();
 		if (!qualifiers.isEmpty()) {
 			return doResolveQualifiers(pojo, type, clazz);
 		}
 		
-		if (type.isNamed()) { // find by name
-			Object result = findByName(pojo, type.getName(), type.getRawType());
+		if (type.getNamed().isPresent()) { // find by name
+			Object result = findByName(pojo, type.getNamed().get(), clazz);
 			if (result != null) {
 				return result;
 			}
 		
 		} else { // find by type
-			Object result = findByType(pojo, type.getRawType());
+			Object result = findByType(pojo, clazz);
 			if (result != null) {
 				return result;
 			}
@@ -89,17 +106,17 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		}
 	}
 	
-	protected Object doResolveQualifiers(Object pojo, IType type, Class<?> clazz) {
+	protected Object doResolveQualifiers(Object pojo, IParameterType type, Class<?> clazz) {
 		Object result = null;
 		
 		for (Annotation qualifier : type.getQualifiers()) {
 			Object query = null;
-			if (Named.class.equals(qualifier.annotationType())) {
-				String name = ((Named) qualifier).value();
-				query = findByName(pojo, name, clazz);
-			} else {
+//			if (Named.class.equals(qualifier.annotationType())) {
+//				String name = ((Named) qualifier).value();
+//				query = findByName(pojo, name, clazz);
+//			} else {
 				query = findByQualifier(pojo, clazz, qualifier);
-			}
+//			}
 			
 			if (result != null && !result.equals(query)) {
 				return null;

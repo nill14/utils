@@ -7,4 +7,9 @@ public class SnackService implements ISnackService {
 	@Inject
 	private IBreadService breadService;
 	
+	@Override
+	public IBreadService getBreadService() {
+		return breadService;
+	}
+	
 }

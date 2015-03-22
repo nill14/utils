@@ -8,7 +8,7 @@ import com.github.nill14.utils.init.api.IServiceRegistry;
 public interface IServiceBuilder {
 
 	
-	IServiceBuilder buildServices(IServiceRegistry registry);
+	IServiceBuilder registerServices(IServiceRegistry registry);
 
 	<S, T extends S> IServiceBuilder addBean(Class<T> impl, Class<S> iface);
 

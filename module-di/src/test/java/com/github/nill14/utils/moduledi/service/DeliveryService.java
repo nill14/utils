@@ -7,4 +7,9 @@ public class DeliveryService implements IDeliveryService {
 	@Inject
 	private ISnackService snackService;
 	
+	@Override
+	public ISnackService getSnackService() {
+		return snackService;
+	}
+	
 }

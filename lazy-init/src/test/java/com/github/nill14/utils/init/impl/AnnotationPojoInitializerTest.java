@@ -17,6 +17,8 @@ import com.github.nill14.utils.init.TimeService;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
+import com.github.nill14.utils.init.api.IServiceRegistry;
+import com.github.nill14.utils.moduledi.guice.GuiceServiceRegistry;
 
 public class AnnotationPojoInitializerTest {
 
@@ -31,14 +33,14 @@ public class AnnotationPojoInitializerTest {
 		new TimeService();
 		spy = mock(TimeService.class);
 
-		ServiceRegistry registry = new ServiceRegistry();
+		IServiceRegistry registry = IServiceRegistry.newRegistry();
 		registry.addSingleton(ZoneId.systemDefault());
 		registry.addSingleton("greeting", "greeting");
 		registry.addSingleton(spy);
 		resolver = registry.toResolver();
 		
-		IPojoInitializer<Object> initializer = AnnotationPojoInitializer.withResolver(resolver);
-		lazyPojo = LazyPojo.forClass(TimeService.class, initializer);
+		IPojoInitializer<Object> initializer = IPojoInitializer.standard();
+		lazyPojo = LazyPojo.forClass(TimeService.class, resolver, initializer);
 		timeService = LazyJdkProxy.newProxy(ITimeService.class, lazyPojo);
 	}
 	
@@ -49,8 +51,8 @@ public class AnnotationPojoInitializerTest {
 	
 	@Test
 	public void testIntegration() {
-		IPojoInitializer<Object> initializer = AnnotationPojoInitializer.withResolver(resolver);
-		ILazyPojo<TimeService> lazyPojo = LazyPojo.forClass(TimeService.class, initializer);
+		IPojoInitializer<Object> initializer = IPojoInitializer.standard();
+		ILazyPojo<TimeService> lazyPojo = LazyPojo.forClass(TimeService.class, resolver, initializer);
 		ITimeService timeService = LazyJdkProxy.newProxy(ITimeService.class, lazyPojo);
 		LocalDateTime now = timeService.getNow();
 		log.info("testIntegration: {}", now);

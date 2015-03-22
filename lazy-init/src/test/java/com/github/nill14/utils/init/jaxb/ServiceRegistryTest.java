@@ -22,7 +22,7 @@ public class ServiceRegistryTest {
 
 
 //	@BeforeClass
-	public static void setUp() throws IOException {
+	public static void setUp() throws IOException, NoSuchMethodException, SecurityException {
 
         try {
         	try (InputStream inputStream = 

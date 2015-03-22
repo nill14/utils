@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.inject.Provider;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,8 +15,8 @@ import org.slf4j.LoggerFactory;
 import com.github.nill14.utils.init.Calculator;
 import com.github.nill14.utils.init.ICalculator;
 import com.github.nill14.utils.init.api.ILazyPojo;
-import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
+import com.github.nill14.utils.init.api.IPropertyResolver;
 
 public class LazyJavassistProxyTest {
 
@@ -25,20 +27,19 @@ public class LazyJavassistProxyTest {
 
 	private static final IPojoInitializer<ICalculator> initializer = new IPojoInitializer<ICalculator>() {
 		@Override
-		public void init(ILazyPojo<?> lazyPojo, ICalculator instance) {
+		public void init(Provider<?> factory, ICalculator instance) {
 			instances.incrementAndGet();
 		}
 		
 		@Override
-		public void destroy(ILazyPojo<?> lazyPojo, ICalculator instance) {
+		public void destroy(Provider<?> factory, ICalculator instance) {
 			instances.decrementAndGet();
 		}
 	};
 	
 	@BeforeClass
 	public static void setUp() {
-		IPojoFactory<Calculator> factory = PojoFactory.create(Calculator.class);
-		lazyObject = new LazyPojo<>(factory, initializer);
+		lazyObject = LazyPojo.forClass(Calculator.class, IPropertyResolver.empty(), initializer);
 		calcProxy = LazyJavassistProxy.newProxy(ICalculator.class, lazyObject);
 	}
 	

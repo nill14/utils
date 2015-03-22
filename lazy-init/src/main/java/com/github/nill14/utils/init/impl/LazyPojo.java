@@ -10,46 +10,59 @@ import java.util.concurrent.Future;
 
 import javax.inject.Provider;
 
+import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.ILazyPojo;
-import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
+import com.github.nill14.utils.init.api.IPropertyResolver;
+import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 
 @SuppressWarnings("serial")
 public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 
+	@SuppressWarnings("unchecked")
+	public static <T> ILazyPojo<T> forSingleton(T singleton) {
+		IBeanDescriptor<T> pd = new PojoInjectionDescriptor<>((Class<T>) singleton.getClass());
+		return new LazyPojo<T>(() -> singleton, pd, IPojoInitializer.empty());
+	}
+	
 	public static <T> ILazyPojo<T> forClass(Class<T> beanClass) {
-		return forClass(beanClass, IPojoInitializer.empty());
+		return forClass(beanClass, IPropertyResolver.empty(), IPojoInitializer.empty());
 	}
 	
-	public static <T, F extends IPojoFactory<T>> ILazyPojo<T> forFactory(Class<T> beanClass, Class<F> factoryClass) {
-		return forFactory(beanClass, factoryClass, IPojoInitializer.empty());
+	public static <T, F extends Provider<? extends T>> ILazyPojo<T> forFactory(Class<T> beanClass, Class<F> factoryClass) {
+		return forFactory(beanClass, factoryClass, IPropertyResolver.empty(), IPojoInitializer.empty());
 	}
 	
-	public static <T> ILazyPojo<T> forClass(Class<T> beanClass, IPojoInitializer<? super T> initializer) {
-		IPojoFactory<T> factory = PojoFactory.create(beanClass);
-		return new LazyPojo<>(factory, initializer);
+	public static <T> ILazyPojo<T> forClass(Class<T> beanClass, IPropertyResolver resolver, IPojoInitializer<? super T> initializer) {
+		IBeanDescriptor<T> pd = new PojoInjectionDescriptor<>(beanClass);
+		Provider<T> factory = new PojoFactory<>(pd, resolver);
+		return new LazyPojo<>(factory, pd, initializer);
 	}
 
-	public static <T, F extends IPojoFactory<? extends T>> ILazyPojo<T> forFactory(Class<T> beanClass, Class<F> factoryClass, IPojoInitializer<? super F> factoryInitializer) {
-		IPojoFactory<F> factoryFactory = PojoFactory.create(factoryClass);
-		FactoryAdapter<T, F> factoryAdapter = new FactoryAdapter<>(beanClass, factoryFactory, factoryInitializer);
-		return new LazyPojo<>(factoryAdapter, factoryAdapter);
+	public static <T, F extends Provider<? extends T>> ILazyPojo<T> forFactory(Class<T> beanClass,
+			Class<F> factoryClass, IPropertyResolver resolver, IPojoInitializer<? super F> factoryInitializer) {
+	IBeanDescriptor<T> pd = new PojoInjectionDescriptor<>(beanClass);
+		IBeanDescriptor<F> pdFactory = new PojoInjectionDescriptor<>(factoryClass);
+		FactoryAdapter<T, F> factoryAdapter = new FactoryAdapter<T, F>(beanClass, pdFactory, factoryInitializer);
+		return new LazyPojo<>(factoryAdapter, pd, factoryAdapter);
 	}
 	
-	private final IPojoFactory<? extends T> factory;
+	private final Provider<T> factory;
+	private final IBeanDescriptor<T> pojoType;
 	private final IPojoInitializer<? super T> initializer;
 	private volatile transient T instance;
 
-	public LazyPojo(IPojoFactory<? extends T> factory, IPojoInitializer<? super T> initializer) {
+	public LazyPojo(Provider<T> factory, IBeanDescriptor<T> pojoType, IPojoInitializer<? super T> initializer) {
 		this.factory = factory;
+		this.pojoType = pojoType;
 		this.initializer = initializer;
 	}
 	
 	@Override
 	public Class<? extends T> getInstanceType() {
-		return factory.getType();
+		return pojoType.getRawType();
 	}
-	
+
 	@Override
 	public T get() {
 		return getInstance();
@@ -64,8 +77,8 @@ public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 				instance = this.instance;
 				if (instance == null) {
 					
-					instance = factory.newInstance();
-					initializer.init(this, instance);
+					instance = factory.get();
+					initializer.init(factory, instance);
 					this.instance = instance;
 				}
 			}
@@ -84,7 +97,7 @@ public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 				if (instance != null) {
 					
 					this.instance = null;
-					initializer.destroy(this, instance);
+					initializer.destroy(factory, instance);
 					released = true;
 				}
 			}
@@ -136,39 +149,38 @@ public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 		}
 	}
 	
+	@Override
+	public String toString() {
+		return String.format("%s(%s)@%s", 
+				getClass().getSimpleName(), 
+				pojoType.toString(), 
+				Integer.toHexString(System.identityHashCode(this)));
+	}
 	
-	public static class FactoryAdapter<T, F extends IPojoFactory<? extends T>> implements IPojoFactory<T>, IPojoInitializer<T> {
+	public static class FactoryAdapter<T, F extends Provider<? extends T>> implements Provider<T>, IPojoInitializer<T> {
 		
 		private final ILazyPojo<F> lazyFactory;
-		private final Class<T> beanClass;
 
-		@SuppressWarnings("unchecked")
-		public FactoryAdapter(Class<T> beanClass, IPojoFactory<F> factoryFactory, IPojoInitializer<? super F> factoryInitializer) {
-			this.lazyFactory = new LazyPojo<>(factoryFactory, factoryInitializer);
-			this.beanClass = beanClass;
+		public FactoryAdapter(Class<T> beanClass, IBeanDescriptor<F> factoryType, IPojoInitializer<? super F> factoryInitializer) {
+			Provider<F> factoryFactory = new PojoFactory<>(factoryType, IPropertyResolver.empty());
+			this.lazyFactory = new LazyPojo<>(factoryFactory, factoryType, factoryInitializer);
 		}
 
 
 		@Override
-		public T newInstance() {
-			return lazyFactory.getInstance().newInstance();
-		}
-
-		@Override
-		public Class<T> getType() {
-			//type of the bean, not of the factory
-			return beanClass;
+		public T get() {
+			return lazyFactory.getInstance().get();
 		}
 
 
 		@Override
-		public void init(ILazyPojo<?> lazyPojo, T instance) {
+		public void init(Provider<?> factory, T instance) {
 			//nothing to do, we want to initialize pojoFactory, not the instance created by the factory
 			//factoryInitializer was invoked by lazyFactory.getInstance() call
 		}
 		
 		@Override
-		public void destroy(ILazyPojo<?> lazyPojo, T instance) {
+		public void destroy(Provider<?> factory, T instance) {
 			//delegate the destruction to the factoryInitializer
 			//the factory is not re-used but re-created for each object
 			lazyFactory.freeInstance();

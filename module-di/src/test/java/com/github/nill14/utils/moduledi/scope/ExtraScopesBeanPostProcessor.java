@@ -11,11 +11,11 @@ import com.github.nill14.utils.init.impl.ServiceRegistry;
 
 public class ExtraScopesBeanPostProcessor implements BeanDefinitionRegistryPostProcessor {
 
-	private final ServiceRegistry serviceRegistry;
+	private final IServiceRegistry serviceRegistry;
 	private final IPropertyResolver resolver;
 
 	public ExtraScopesBeanPostProcessor(IServiceRegistry serviceRegistry) {
-		this.serviceRegistry = (ServiceRegistry) serviceRegistry;
+		this.serviceRegistry = serviceRegistry;
 		resolver = this.serviceRegistry.toResolver();
 	}
 	

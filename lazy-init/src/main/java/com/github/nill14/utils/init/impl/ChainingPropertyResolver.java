@@ -1,35 +1,31 @@
 package com.github.nill14.utils.init.impl;
 
-import java.util.Deque;
-
+import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
-import com.github.nill14.utils.init.api.IType;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Queues;
+import com.google.common.collect.ImmutableList;
 
 @SuppressWarnings("serial")
 public class ChainingPropertyResolver implements IPropertyResolver {
 	
-	private final Deque<IPropertyResolver> items = Queues.newLinkedBlockingDeque();
+	private final ImmutableList<IPropertyResolver> items;
 	
-	
-	public final ChainingPropertyResolver pushResolver(IPropertyResolver resolver) {
-		Preconditions.checkNotNull(resolver);
-		items.push(resolver);
-		return this;
+	public ChainingPropertyResolver(IPropertyResolver... resolvers) {
+		items = ImmutableList.copyOf(resolvers);
 	}
 	
-	public ChainingPropertyResolver() {
+	public ChainingPropertyResolver(ImmutableList<IPropertyResolver> resolvers) {
+		items = resolvers;
 	}
-
-	public ChainingPropertyResolver(IPropertyResolver defaultResolver) {
-		pushResolver(defaultResolver);
+	
+	public ChainingPropertyResolver with(IPropertyResolver extraResolver) {
+		ImmutableList.Builder<IPropertyResolver> builder = ImmutableList.builder();
+		return new ChainingPropertyResolver(builder.add(extraResolver).addAll(items).build());
 	}
+	
 	
 	@Override
-	public Object resolve(Object pojo, IType type) {
-		IPropertyResolver[] array = items.stream().toArray(IPropertyResolver[]::new);
-		for (IPropertyResolver resolver : array) {
+	public Object resolve(Object pojo, IParameterType type) {
+		for (IPropertyResolver resolver : items) {
 			Object result = resolver.resolve(pojo, type);
 			if (result != null) {
 				return result;
@@ -37,5 +33,4 @@ public class ChainingPropertyResolver implements IPropertyResolver {
 		}
 		return null;
 	}
-
 }

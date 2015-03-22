@@ -1,24 +1,16 @@
 package com.github.nill14.utils.init;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
-import com.github.nill14.utils.init.api.IPojoFactory;
-
-public class GreeterFactory implements IPojoFactory<IGreeter> {
-
-	private static final long serialVersionUID = -1178927738327191060L;
+public class GreeterFactory implements Provider<IGreeter> {
 
 	@Inject
 	private String greeting;
 	
 	@Override
-	public IGreeter newInstance() {
+	public IGreeter get() {
 		return new Greeter(greeting);
-	}
-
-	@Override
-	public Class<IGreeter> getType() {
-		return IGreeter.class;
 	}
 
 	public String getGreeting() {

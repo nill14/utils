@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IPropertyResolver;
-import com.github.nill14.utils.init.meta.Wire;
 
 public class WireTest {
 
@@ -40,13 +39,11 @@ public class WireTest {
 	
 	public static class Mango {
 		@Inject
-		@Wire
 		Onion onion;
 	}
 	
 	public static class Onion {
 		@Inject
-		@Wire
 		Strawberry strawberry;
 	}
 	

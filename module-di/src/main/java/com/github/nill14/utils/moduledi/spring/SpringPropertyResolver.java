@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.inject.Named;
+
 import org.springframework.context.ApplicationContext;
 
+import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
 import com.google.common.collect.Maps;
@@ -21,7 +24,28 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 		this.context = context;
 	}
 
-
+	@Override
+	protected Object doResolveQualifiers(Object pojo, IParameterType type, Class<?> clazz) {
+		Object result = null;
+		
+		for (Annotation qualifier : type.getQualifiers()) {
+			Object query = null;
+			if (Named.class.equals(qualifier.annotationType())) {
+				String name = ((Named) qualifier).value();
+				query = findByName(pojo, name, clazz);
+			} else {
+				query = findByQualifier(pojo, clazz, qualifier);
+			}
+			
+			if (result != null && !result.equals(query)) {
+				return null;
+			} else {
+				result = query;
+			}
+		}
+		
+		return result;
+	}
 
 	@Override
 	protected Object findByQualifier(Object pojo, Class<?> type, Annotation qualifier) {

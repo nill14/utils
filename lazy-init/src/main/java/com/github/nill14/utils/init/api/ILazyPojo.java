@@ -9,10 +9,14 @@ public interface ILazyPojo<T> extends Serializable {
 	T getInstance();
 	
 	boolean freeInstance();
-	
+
+	@Deprecated
 	Class<? extends T> getInstanceType();
+	//TODO consider getRawType, getGenericType
+	
 	
 	Future<T> init(ExecutorService executor);
 	
 	Future<Boolean> destroy(ExecutorService executor);
+
 }

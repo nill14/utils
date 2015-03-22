@@ -1,8 +1,8 @@
 package com.github.nill14.utils.init.impl;
 
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
 
 import java.io.PrintStream;
 
@@ -10,14 +10,14 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
-import com.github.nill14.utils.init.api.IType;
+import com.github.nill14.utils.init.api.IParameterType;
+import com.github.nill14.utils.init.api.IServiceRegistry;
 import com.github.nill14.utils.init.meta.EventBusSubscriber;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -28,11 +28,11 @@ public class EventBusTest {
 	private IBeanInjector beanInjector;
 	private EventBus eventBus;
 	private PrintStream printStream;
-	private ServiceRegistry serviceRegistry;
+	private IServiceRegistry serviceRegistry;
 	
 	@Before
 	public void prepare() {
-		serviceRegistry = new ServiceRegistry();
+		serviceRegistry = IServiceRegistry.newRegistry();
 		serviceRegistry.addSingleton(eventBus = new EventBus());
 		serviceRegistry.addSingleton(printStream = spy(System.out));
 		beanInjector = serviceRegistry.toBeanInjector();
@@ -50,7 +50,7 @@ public class EventBusTest {
 	@Test
 	public void testExtended() {
 		assertNotNull(serviceRegistry.getOptionalService(EventBus.class));
-		assertNotNull(serviceRegistry.toResolver().resolve(null, IType.fromClass(EventBus.class)));
+		assertNotNull(serviceRegistry.toResolver().resolve(null, IParameterType.of(EventBus.class)));
 		
 		beanInjector.wire(EventBusSubscriberExtended.class);
 		

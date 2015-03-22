@@ -25,7 +25,7 @@ public class ServiceBuilder implements IServiceBuilder {
 	}
 	
 	@Override
-	public IServiceBuilder buildServices(IServiceRegistry serviceRegistry) {
+	public IServiceBuilder registerServices(IServiceRegistry serviceRegistry) {
 		
 		beans.forEach((serviceBean, service) -> 
 			serviceRegistry.addService(serviceBean, context));
@@ -36,13 +36,13 @@ public class ServiceBuilder implements IServiceBuilder {
 	@Override
 	public IServiceBuilder buildDependencies(IDependencyDescriptorBuilder<Class<?>> dependencyBuilder) {
 		
-		beans.keySet().stream()
-			.flatMap(bean -> new PojoInjectionDescriptor(bean).getMandatoryDependencies().stream())
-			.forEach(cls -> dependencyBuilder.uses(cls));
-		
-		beans.keySet().stream()
-			.flatMap(bean -> new PojoInjectionDescriptor(bean).getOptionalDependencies().stream())
-			.forEach(cls -> dependencyBuilder.usesOptionally(cls));
+//		beans.keySet().stream()
+//			.flatMap(bean -> new PojoInjectionDescriptor(bean).getMandatoryDependencies().stream())
+//			.forEach(cls -> dependencyBuilder.uses(cls));
+//		
+//		beans.keySet().stream()
+//			.flatMap(bean -> new PojoInjectionDescriptor(bean).getOptionalDependencies().stream())
+//			.forEach(cls -> dependencyBuilder.usesOptionally(cls));
 		
 		beans.values().stream().forEach(iface -> dependencyBuilder.provides(iface));
 		

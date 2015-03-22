@@ -1,6 +1,5 @@
 package com.github.nill14.utils.init.impl;
 
-import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,7 +11,6 @@ import javax.inject.Inject;
 import org.mockito.Mockito;
 
 import com.github.nill14.utils.init.api.ILazyPojo;
-import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceContext;
@@ -45,16 +43,15 @@ public class ShowCase {
 		// Complex example
 		IPropertyResolver resolver = Mockito.mock(IPropertyResolver.class);
 		ExecutorService executor = Executors.newCachedThreadPool();
-		IPojoInitializer<Object> initializer = AnnotationPojoInitializer.withResolver(resolver);
-		IPojoFactory<Calc> pojoFactory = PojoFactory.create(Calc.class);
-		ILazyPojo<ICalc> calcPojo = new LazyPojo<>(pojoFactory, initializer);
+		IPojoInitializer<Object> initializer = IPojoInitializer.standard();
+		ILazyPojo<Calc> calcPojo = LazyPojo.forClass(Calc.class, resolver, initializer);
 		calcPojo.init(executor); //eagerly start asynchronous initialization
 		ICalc calc = LazyJdkProxy.newProxy(ICalc.class, calcPojo);
 		calc.add(5, 3); //invokes the initialized instance or blocks until it is ready.
 	}
 	
 	void test() {
-		IServiceRegistry registry = new ServiceRegistry();
+		IServiceRegistry registry = IServiceRegistry.newRegistry();
 		registry.addService("seedService", SeedService.class, IServiceContext.global());
 		registry.addService("diceService", DiceService.class, IServiceContext.global());
 		registry.getService(IDiceService.class).rollDice();
