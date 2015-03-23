@@ -125,8 +125,8 @@ public class AnnotationInvocationHandler<T extends Annotation> implements
 		}
 	}
 
-	private static final Method equalsMethod = getMethod(Annotation.class, "equals", Object.class);
-	private static final Method hashCodeMethod = getMethod(Annotation.class, "hashCode");
-	private static final Method toStringMethod = getMethod(Annotation.class, "toString");
+	private static final Method equalsMethod = getMethod(Object.class, "equals", Object.class);
+	private static final Method hashCodeMethod = getMethod(Object.class, "hashCode");
+	private static final Method toStringMethod = getMethod(Object.class, "toString");
 	private static final Method annotationTypeMethod = getMethod(Annotation.class, "annotationType");
 }
