@@ -56,8 +56,8 @@ public class QualifiedProviderTest {
 	public void testMangoBeanAnnotatedType() throws NoSuchFieldException, SecurityException {
 		QualifiedProvider<Mango> mangoProvider = beanInjector.wire(new TypeToken<QualifiedProvider<Mango>>() {});
 		
-		assertThat(mangoProvider.getQualified(Synchronous.class), CoreMatchers.instanceOf(MangoSync.class));
 		assertThat(mangoProvider.getQualified(Asynchronous.class), CoreMatchers.instanceOf(MangoAsync.class));
+		assertThat(mangoProvider.getQualified(Synchronous.class), CoreMatchers.instanceOf(MangoSync.class));
 	}
 
 	@Test
@@ -111,6 +111,7 @@ public class QualifiedProviderTest {
 		String value();
 	}
 	
+	@Synchronous
 	public static class MangoSync extends Mango {
 		
 	}

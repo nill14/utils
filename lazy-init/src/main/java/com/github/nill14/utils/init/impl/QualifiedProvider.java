@@ -7,7 +7,6 @@ import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IQualifiedProvider;
 import com.google.common.reflect.TypeToken;
-import com.google.inject.internal.Annotations;
 
 @SuppressWarnings("unchecked")
 public class QualifiedProvider<T> implements IQualifiedProvider<T> {
@@ -19,50 +18,54 @@ public class QualifiedProvider<T> implements IQualifiedProvider<T> {
 		this.typeToken = typeToken;
 		this.resolver = resolver;
 	}
+	
 
-	@Override
-	public T getNamed(String named) {
-		IParameterType type = ParameterTypeBuilder.builder(typeToken).withName(named).build();
+	private T resolveOrThrow(IParameterType type) {
 		T object = (T) resolver.resolve(null, type);
 		if (object != null) {
 			return object;
 		} else {
 			throw new RuntimeException("Cannot resolve " + type);
 		}
+	}
+	
+	private Optional<T> resolveOptional(IParameterType type) {
+		return Optional.ofNullable((T) resolver.resolve(null, type));
+	}
+
+	@Override
+	public T getNamed(String named) {
+		IParameterType type = ParameterTypeBuilder.builder(typeToken).withName(named).build();
+		return resolveOrThrow(type);
 	}
 
 	@Override
 	public Optional<T> getOptionalNamed(String named) {
 		IParameterType type = ParameterTypeBuilder.builder(typeToken).withName(named).build();
-		return Optional.ofNullable((T) resolver.resolve(null, type));
+		return resolveOptional(type);
 	}
 
 	@Override
 	public T getQualified(Class<? extends Annotation> annotationType) {
-		Annotation annotation = Annotations.generateAnnotation(annotationType);
-		return getQualified(annotation);
+		IParameterType type = ParameterTypeBuilder.builder(typeToken).withAnnotationType(annotationType).build();
+		return resolveOrThrow(type);
 	}
 
 	@Override
 	public Optional<T> getOptionalQualified(Class<? extends Annotation> annotationType) {
-		Annotation annotation = Annotations.generateAnnotation(annotationType);
-		return getOptionalQualified(annotation);
+		IParameterType type = ParameterTypeBuilder.builder(typeToken).withAnnotationType(annotationType).build();
+		return resolveOptional(type);
 	}
 
 	@Override
 	public T getQualified(Annotation annotation) {
 		IParameterType type = ParameterTypeBuilder.builder(typeToken).withAnnotation(annotation).build();
-		T object = (T) resolver.resolve(null, type);
-		if (object != null) {
-			return object;
-		} else {
-			throw new RuntimeException("Cannot resolve " + type);
-		}
+		return resolveOrThrow(type);
 	}
 
 	@Override
 	public Optional<T> getOptionalQualified(Annotation annotation) {
 		IParameterType type = ParameterTypeBuilder.builder(typeToken).withAnnotation(annotation).build();
-		return Optional.ofNullable((T) resolver.resolve(null, type));
+		return resolveOptional(type);
 	}
 }

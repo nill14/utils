@@ -13,6 +13,7 @@ import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
 import com.github.nill14.utils.init.impl.LazyPojo;
+import com.github.nill14.utils.init.meta.Annotations;
 import com.google.inject.Binder;
 import com.google.inject.Binding;
 import com.google.inject.Guice;
@@ -20,7 +21,6 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
 
 public class GuiceServiceRegistry implements IServiceRegistry {
 
@@ -86,7 +86,7 @@ public class GuiceServiceRegistry implements IServiceRegistry {
 	public <T> void addSingleton(String name, T serviceBean) {
 		Class<T> clazz = getClass(serviceBean);
 		
-		b.bind(clazz).annotatedWith(Names.named(name)).toInstance(serviceBean);
+		b.bind(clazz).annotatedWith(Annotations.named(name)).toInstance(serviceBean);
 //		b.bind(clazz).toInstance(serviceBean);
 	}
 
@@ -97,13 +97,13 @@ public class GuiceServiceRegistry implements IServiceRegistry {
 
 	@Override
 	public <S, T extends S> void addService(String name, Class<T> serviceBean, IServiceContext context) {
-		b.bind(serviceBean).annotatedWith(Names.named(name));
+		b.bind(serviceBean).annotatedWith(Annotations.named(name));
 	}
 
 	@Override
 	public <S, F extends Provider<? extends S>> void addServiceFactory(Class<S> iface, String name,
 			Class<F> factoryBean, IServiceContext context) {
-		b.bind(iface).annotatedWith(Names.named(name)).toProvider(toProvider(iface, factoryBean));
+		b.bind(iface).annotatedWith(Annotations.named(name)).toProvider(toProvider(iface, factoryBean));
 	}
 
 	@Override
@@ -127,12 +127,12 @@ public class GuiceServiceRegistry implements IServiceRegistry {
 
 	@Override
 	public <S> S getService(Class<S> iface, String name) {
-		return injector.getInstance(Key.get(iface, Names.named(name)));
+		return injector.getInstance(Key.get(iface, Annotations.named(name)));
 	}
 
 	@Override
 	public <S> Optional<S> getOptionalService(Class<S> iface, String name) {
-		Binding<S> binding = injector.getBinding(Key.get(iface, Names.named(name)));
+		Binding<S> binding = injector.getBinding(Key.get(iface, Annotations.named(name)));
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -7,9 +7,9 @@ import java.util.List;
 
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.inject.ParameterTypeInjectionDescriptor;
+import com.github.nill14.utils.init.meta.Annotations;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
-import com.google.inject.name.Names;
 
 @SuppressWarnings("serial")
 public class ParameterTypeBuilder {
@@ -45,6 +45,11 @@ public class ParameterTypeBuilder {
 		annotations.add(annotation);
 		return this;
 	}
+	
+	public ParameterTypeBuilder withAnnotationType(Class<? extends Annotation> annotationType) {
+		annotations.add(Annotations.annotation(annotationType));
+		return this;
+	}
 
 	public ParameterTypeBuilder scanAnnotations() {
 		annotations.addAll(Arrays.asList(typeToken.getRawType().getAnnotations()));
@@ -52,7 +57,7 @@ public class ParameterTypeBuilder {
 	}
 	
 	public ParameterTypeBuilder withName(String name) {
-		annotations.add(Names.named(name));
+		annotations.add(Annotations.named(name));
 		return this;
 	}
 	

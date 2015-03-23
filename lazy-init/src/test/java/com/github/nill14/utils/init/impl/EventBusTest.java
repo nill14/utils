@@ -12,6 +12,7 @@ import javax.inject.Inject;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,7 @@ public class EventBusTest {
 		beanInjector.wire(EventBusSubscriberClassic.class);
 		
 		eventBus.post(new SampleEvent());
-		verify(printStream).printf(anyString(), anyVararg());
+		verify(printStream).printf(anyString(), Mockito.anyVararg());
 	}
 	
 	@Test
@@ -55,7 +56,7 @@ public class EventBusTest {
 		beanInjector.wire(EventBusSubscriberExtended.class);
 		
 		eventBus.post(new SampleEvent());
-		verify(printStream, atLeastOnce()).printf(anyString(), anyVararg());
+		verify(printStream, atLeastOnce()).printf(anyString(), Mockito.anyVararg());
 	}
 	
 	public static class SampleEvent {
