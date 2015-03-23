@@ -4,10 +4,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
-import javax.inject.Named;
 
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.meta.AnnotationScanner;
@@ -31,11 +31,18 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 		this.type = type;
 		typeToken = TypeToken.of(type);
 
-		this.qualifiers = ImmutableMap.copyOf(AnnotationScanner.findAnnotations(annotations, javax.inject.Qualifier.class));
+		Map<Class<? extends Annotation>, Annotation> qualifiers = AnnotationScanner.findAnnotations(annotations, javax.inject.Qualifier.class);
+		Map<Class<? extends Annotation>, Annotation> bindingAnnotations = AnnotationScanner.findAnnotations(annotations, com.google.inject.BindingAnnotation.class);
+		ImmutableMap.Builder<Class<?>, Annotation> builder = ImmutableMap.builder();
+		this.qualifiers = builder.putAll(qualifiers).putAll(bindingAnnotations).build();
 		this.annotations = ImmutableMap.copyOf(AnnotationScanner.indexAnnotations(annotations));
 		
-		Named named = (Named) this.annotations.get(javax.inject.Named.class);
-		this.named = Optional.ofNullable(named).map(n -> n.value());
+		javax.inject.Named named = (javax.inject.Named ) this.annotations.get(javax.inject.Named.class);
+		com.google.inject.name.Named named2 = (com.google.inject.name.Named) this.annotations.get(com.google.inject.name.Named.class);
+		//see Names.named(String)
+		Optional<String> name = Optional.ofNullable(named).map(n -> n.value());
+		Optional<String> name2 = Optional.ofNullable(named2).map(n -> n.value());
+		this.named = name.isPresent() ? name : name2;
 		
 		Nullable nullable = (Nullable) this.annotations.get(javax.annotation.Nullable.class);
 		Inject googleInject = (Inject) this.annotations.get(com.google.inject.Inject.class);

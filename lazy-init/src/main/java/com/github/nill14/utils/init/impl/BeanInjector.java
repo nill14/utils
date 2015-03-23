@@ -1,15 +1,12 @@
 package com.github.nill14.utils.init.impl;
 
-import javax.inject.Provider;
-
-import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
-import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.google.common.reflect.TypeToken;
 
+@SuppressWarnings("unchecked")
 public class BeanInjector implements IBeanInjector {
 	
 	private final IPropertyResolver resolver;
@@ -36,21 +33,19 @@ public class BeanInjector implements IBeanInjector {
 	
 	@Override
 	public <T> T wire(Class<T> beanClass) {
-		return wire(TypeToken.of(beanClass));
+		IParameterType type = ParameterTypeBuilder.builder(beanClass).build();
+		return (T) resolver.resolve(null, type);
 	}
 
 	@Override
 	public <T> T wire(TypeToken<T> typeToken) {
-		IBeanDescriptor<T> typeDescriptor = new PojoInjectionDescriptor<>(typeToken);
-		Provider<T> factory = new PojoFactory<>(typeDescriptor, resolver);
-		return new LazyPojo<>(factory, typeDescriptor, initializer).getInstance();
+		IParameterType type = ParameterTypeBuilder.builder(typeToken).build();
+		return (T) resolver.resolve(null, type);
 	}
 	
 	@Override
 	public <T> T wire(IParameterType type) {
-		IBeanDescriptor<T> typeDescriptor = new PojoInjectionDescriptor<T>(type);
-		Provider<T> factory = new PojoFactory<>(typeDescriptor, resolver);
-		return new LazyPojo<>(factory, typeDescriptor, initializer).getInstance();
+		return (T) resolver.resolve(null, type);
 	}
 	
 }
