@@ -2,22 +2,15 @@ package com.github.nill14.utils.init.api;
 
 import java.io.Serializable;
 
-import javax.inject.Provider;
+import com.google.common.reflect.TypeToken;
 
-/**
- * 
- *
- * @deprecated Use {@link Provider} directly
- */
-@Deprecated
-public interface IPojoFactory<T> extends Serializable, Provider<T> {
+public interface IPojoFactory<T> extends Serializable {
 	
 	T newInstance();
 	
-	Class<T> getType();
+	TypeToken<T> getType();
 	
-	@Override
-	default T get() {
-		return newInstance();
-	}
+	IPropertyResolver getResolver();
+	
+	IBeanDescriptor<T> getDescriptor();
 }

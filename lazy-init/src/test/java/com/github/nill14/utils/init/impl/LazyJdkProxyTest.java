@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.github.nill14.utils.init.Calculator;
 import com.github.nill14.utils.init.ICalculator;
 import com.github.nill14.utils.init.api.ILazyPojo;
+import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 
@@ -27,19 +28,19 @@ public class LazyJdkProxyTest {
 
 	private static final IPojoInitializer<ICalculator> initializer = new IPojoInitializer<ICalculator>() {
 		@Override
-		public void init(Provider<?> factory, ICalculator instance) {
+		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, ICalculator instance) {
 			instances.incrementAndGet();
 		}
-		
+
 		@Override
-		public void destroy(Provider<?> factory, ICalculator instance) {
+		public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, ICalculator instance) {
 			instances.decrementAndGet();
 		}
 	};
 	
 	@BeforeClass
 	public static void setUp() {
-		lazyObject = LazyPojo.forClass(Calculator.class, IPropertyResolver.empty(), initializer);
+		lazyObject = LazyPojo.forBean(Calculator.class, IPropertyResolver.empty(), initializer);
 		calcProxy = LazyJdkProxy.newProxy(ICalculator.class, lazyObject);
 	}
 	

@@ -80,7 +80,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	private <T> ILazyPojo<T> newProxy(ILazyPojo<?> lazyPojo, Class<T> serviceBean) {
 //		Object proxy = LazyJdkProxy.newProxy(lazyPojo);
 //		Object proxy = LazyJavassistProxy.newProxy(lazyPojo);
-//		return serviceBean.cast(proxy);
+//		return (ILazyPojo<T>) LazyPojo.forSingleton(proxy, IPropertyResolver.empty());
 		return (ILazyPojo<T>) lazyPojo;
 	}
 	
@@ -89,7 +89,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		
 		IPojoInitializer<Object> initializer = getInitializer(context);
 		IPropertyResolver resolver = getResolver(context);
-		ILazyPojo<T> lazyPojo = LazyPojo.forClass(serviceBean, resolver, initializer);
+		ILazyPojo<T> lazyPojo = LazyPojo.forBean(serviceBean, resolver, initializer);
 		
 		ILazyPojo<T> proxy = newProxy(lazyPojo, serviceBean);
 		IBeanDescriptor<T> pd = new PojoInjectionDescriptor<>(serviceBean);
@@ -110,7 +110,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		
 		IPojoInitializer<Object> initializer = getInitializer(context);
 		IPropertyResolver resolver = getResolver(context);
-		ILazyPojo<S> lazyPojo = LazyPojo.forFactory(iface, factoryBean, resolver, initializer);
+		ILazyPojo<S> lazyPojo = LazyPojo.forProvider(factoryBean, resolver, initializer);
 		ILazyPojo<F> proxy = newProxy(lazyPojo, factoryBean);
 		
 		IBeanDescriptor<S> pd = new PojoInjectionDescriptor<>(iface);
@@ -191,7 +191,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> void addSingleton(String name, T serviceBean) {
-		ILazyPojo<T> pojo = LazyPojo.forSingleton(serviceBean);
+		ILazyPojo<T> pojo = LazyPojo.forSingleton(serviceBean, IPropertyResolver.empty());
 		IBeanDescriptor<T> pd = new PojoInjectionDescriptor<T>((Class<T>) serviceBean.getClass());
 		pd.getDeclaredTypes().forEach((type) -> addElement(type, name, pojo, pd.getDeclaredQualifiers()));
 		beans.put(name, pojo);

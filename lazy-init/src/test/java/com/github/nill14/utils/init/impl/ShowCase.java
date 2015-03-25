@@ -37,14 +37,14 @@ public class ShowCase {
 		lazyProxy.add(5, 3); //lazy initialization
 
 		//LazyPojo example
-		ILazyPojo<Calc> lazyPojo = LazyPojo.forClass(Calc.class);
+		ILazyPojo<Calc> lazyPojo = LazyPojo.forBean(Calc.class);
 		lazyPojo.getInstance().add(5, 3);  //lazy initialization
 		
 		// Complex example
 		IPropertyResolver resolver = Mockito.mock(IPropertyResolver.class);
 		ExecutorService executor = Executors.newCachedThreadPool();
 		IPojoInitializer<Object> initializer = IPojoInitializer.standard();
-		ILazyPojo<Calc> calcPojo = LazyPojo.forClass(Calc.class, resolver, initializer);
+		ILazyPojo<Calc> calcPojo = LazyPojo.forBean(Calc.class, resolver, initializer);
 		calcPojo.init(executor); //eagerly start asynchronous initialization
 		ICalc calc = LazyJdkProxy.newProxy(ICalc.class, calcPojo);
 		calc.add(5, 3); //invokes the initialized instance or blocks until it is ready.

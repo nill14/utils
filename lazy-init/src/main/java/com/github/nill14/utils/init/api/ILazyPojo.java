@@ -4,16 +4,17 @@ import java.io.Serializable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-public interface ILazyPojo<T> extends Serializable {
+import javax.inject.Provider;
+
+import com.google.common.reflect.TypeToken;
+
+public interface ILazyPojo<T> extends Serializable, Provider<T> {
 
 	T getInstance();
 	
 	boolean freeInstance();
 
-	@Deprecated
-	Class<? extends T> getInstanceType();
-	//TODO consider getRawType, getGenericType
-	
+	TypeToken<T> getType();
 	
 	Future<T> init(ExecutorService executor);
 	

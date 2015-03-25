@@ -213,4 +213,9 @@ public class PojoInjectionDescriptor<T> implements Serializable, IBeanDescriptor
     		return new PojoInjectionDescriptor<>(token);
     	}
     }
+
+	@Override
+	public TypeToken<T> getToken() {
+		return typeToken;
+	}
 }

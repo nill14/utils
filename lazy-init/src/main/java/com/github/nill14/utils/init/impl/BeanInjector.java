@@ -2,6 +2,7 @@ package com.github.nill14.utils.init.impl;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
+import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.google.common.reflect.TypeToken;
@@ -23,29 +24,40 @@ public class BeanInjector implements IBeanInjector {
 	}
 	
 	public void wire(Object bean) {
-		initializer.init(null, bean);
+		IPojoFactory<Object> pojoFactory = PojoProviderFactory.singleton(bean, resolver);
+		initializer.init(null, pojoFactory, bean);
 	}
 
 	@Override
 	public void injectMembers(Object bean) {
-		initializer.init(null, bean);
+		IPojoFactory<Object> pojoFactory = PojoProviderFactory.singleton(bean, resolver);
+		initializer.init(null, pojoFactory, bean);
 	}
 	
 	@Override
 	public <T> T wire(Class<T> beanClass) {
 		IParameterType type = ParameterTypeBuilder.builder(beanClass).build();
-		return (T) resolver.resolve(null, type);
+		return resolve(type);
+	}
+
+	private <T> T resolve(IParameterType type) {
+		T bean = (T) resolver.resolve(null, type);
+		if (bean == null) {
+			throw new RuntimeException(String.format(
+					"Injection of bean %s failed!", type));
+		}
+		return bean;
 	}
 
 	@Override
 	public <T> T wire(TypeToken<T> typeToken) {
 		IParameterType type = ParameterTypeBuilder.builder(typeToken).build();
-		return (T) resolver.resolve(null, type);
+		return resolve(type);
 	}
 	
 	@Override
 	public <T> T wire(IParameterType type) {
-		return (T) resolver.resolve(null, type);
+		return resolve(type);
 	}
 	
 }

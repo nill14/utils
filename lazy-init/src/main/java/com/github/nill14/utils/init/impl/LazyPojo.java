@@ -12,55 +12,68 @@ import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.ILazyPojo;
+import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
-import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
+import com.google.common.reflect.TypeToken;
 
 @SuppressWarnings("serial")
-public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
+public final class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 
-	@SuppressWarnings("unchecked")
+	
 	public static <T> ILazyPojo<T> forSingleton(T singleton) {
-		IBeanDescriptor<T> pd = new PojoInjectionDescriptor<>((Class<T>) singleton.getClass());
-		return new LazyPojo<T>(() -> singleton, pd, IPojoInitializer.empty());
+		return forSingleton(singleton, IPropertyResolver.empty());
 	}
 	
-	public static <T> ILazyPojo<T> forClass(Class<T> beanClass) {
-		return forClass(beanClass, IPropertyResolver.empty(), IPojoInitializer.empty());
+	public static <T> ILazyPojo<T> forSingleton(T singleton, IPropertyResolver resolver) {
+		IPojoFactory<T> pojoFactory = PojoProviderFactory.singleton(singleton, resolver);
+		return new LazyPojo<T>(pojoFactory, IPojoInitializer.empty());
 	}
 	
-	public static <T, F extends Provider<? extends T>> ILazyPojo<T> forFactory(Class<T> beanClass, Class<F> factoryClass) {
-		return forFactory(beanClass, factoryClass, IPropertyResolver.empty(), IPojoInitializer.empty());
+	public static <T> ILazyPojo<T> forBean(Class<T> beanClass) {
+		return forBean(beanClass, IPropertyResolver.empty(), IPojoInitializer.empty());
 	}
 	
-	public static <T> ILazyPojo<T> forClass(Class<T> beanClass, IPropertyResolver resolver, IPojoInitializer<? super T> initializer) {
-		IBeanDescriptor<T> pd = new PojoInjectionDescriptor<>(beanClass);
-		Provider<T> factory = new PojoFactory<>(pd, resolver);
-		return new LazyPojo<>(factory, pd, initializer);
-	}
-
-	public static <T, F extends Provider<? extends T>> ILazyPojo<T> forFactory(Class<T> beanClass,
-			Class<F> factoryClass, IPropertyResolver resolver, IPojoInitializer<? super F> factoryInitializer) {
-	IBeanDescriptor<T> pd = new PojoInjectionDescriptor<>(beanClass);
-		IBeanDescriptor<F> pdFactory = new PojoInjectionDescriptor<>(factoryClass);
-		FactoryAdapter<T, F> factoryAdapter = new FactoryAdapter<T, F>(beanClass, pdFactory, factoryInitializer);
-		return new LazyPojo<>(factoryAdapter, pd, factoryAdapter);
+	public static <T> ILazyPojo<T> forBean(Class<T> beanClass, IPropertyResolver resolver, IPojoInitializer<? super T> initializer) {
+		IPojoFactory<T> factory = PojoInjectionFactory.create(beanClass, resolver);
+		return new LazyPojo<>(factory, initializer);
 	}
 	
-	private final Provider<T> factory;
-	private final IBeanDescriptor<T> pojoType;
+	public static <T, F extends Provider<? extends T>> ILazyPojo<T> forProvider(Class<F> providerClass) {
+		return forProvider(providerClass, IPropertyResolver.empty(), IPojoInitializer.empty());
+	}
+	
+	public static <T, F extends Provider<? extends T>> ILazyPojo<T> forProvider(
+			Class<F> providerClass, IPropertyResolver resolver, IPojoInitializer<? super F> factoryInitializer) {
+		TypeToken<T> typeToken = PojoProviderFactory.getProviderReturnTypeToken(providerClass);
+		IPojoFactory<F> pojoFactory = PojoInjectionFactory.create(providerClass, resolver);
+		FactoryAdapter<T, F> factoryAdapter = new FactoryAdapter<T, F>(pojoFactory, typeToken, factoryInitializer);
+		return new LazyPojo<>(factoryAdapter, factoryAdapter);
+	}
+	
+	public static <T> ILazyPojo<T> forProvider(
+			Provider<T> provider, IPropertyResolver resolver, IPojoInitializer<? super T> initializer) {
+		IPojoFactory<T> pojoFactory = PojoProviderFactory.create(provider, resolver);
+		return new LazyPojo<>(pojoFactory, initializer);
+	}
+	
+	public static <T> ILazyPojo<T> forFactory(
+			IPojoFactory<T> pojoFactory, IPojoInitializer<? super T> initializer) {
+		return new LazyPojo<>(pojoFactory, initializer);
+	}
+	
+	private final IPojoFactory<T> factory;
 	private final IPojoInitializer<? super T> initializer;
 	private volatile transient T instance;
 
-	public LazyPojo(Provider<T> factory, IBeanDescriptor<T> pojoType, IPojoInitializer<? super T> initializer) {
+	public LazyPojo(IPojoFactory<T> factory, IPojoInitializer<? super T> initializer) {
 		this.factory = factory;
-		this.pojoType = pojoType;
 		this.initializer = initializer;
 	}
 	
 	@Override
-	public Class<? extends T> getInstanceType() {
-		return pojoType.getRawType();
+	public TypeToken<T> getType() {
+		return factory.getType();
 	}
 
 	@Override
@@ -77,8 +90,8 @@ public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 				instance = this.instance;
 				if (instance == null) {
 					
-					instance = factory.get();
-					initializer.init(factory, instance);
+					instance = factory.newInstance();
+					initializer.init(this, factory, instance);
 					this.instance = instance;
 				}
 			}
@@ -97,7 +110,7 @@ public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 				if (instance != null) {
 					
 					this.instance = null;
-					initializer.destroy(factory, instance);
+					initializer.destroy(this, factory, instance);
 					released = true;
 				}
 			}
@@ -139,12 +152,13 @@ public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
 		Object obj = stream.readObject();
 		synchronized (this) {
 			if (obj != null) {
-				this.instance = getInstanceType().cast(obj);
+				this.instance = (T) obj;
 			}
 		}
 	}
@@ -153,37 +167,56 @@ public class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 	public String toString() {
 		return String.format("%s(%s)@%s", 
 				getClass().getSimpleName(), 
-				pojoType.toString(), 
+				factory.getType().toString(), 
 				Integer.toHexString(System.identityHashCode(this)));
 	}
 	
-	public static class FactoryAdapter<T, F extends Provider<? extends T>> implements Provider<T>, IPojoInitializer<T> {
+	public static class FactoryAdapter<T, F extends Provider<? extends T>> implements IPojoFactory<T>, IPojoInitializer<T> {
 		
 		private final ILazyPojo<F> lazyFactory;
+		private final TypeToken<T> typeToken;
+		private final IPojoFactory<F> pojoFactory;
 
-		public FactoryAdapter(Class<T> beanClass, IBeanDescriptor<F> factoryType, IPojoInitializer<? super F> factoryInitializer) {
-			Provider<F> factoryFactory = new PojoFactory<>(factoryType, IPropertyResolver.empty());
-			this.lazyFactory = new LazyPojo<>(factoryFactory, factoryType, factoryInitializer);
+		public FactoryAdapter(IPojoFactory<F> pojoFactory, TypeToken<T> typeToken, IPojoInitializer<? super F> factoryInitializer) {
+			this.pojoFactory = pojoFactory;
+			this.typeToken = typeToken;
+			this.lazyFactory = new LazyPojo<F>(pojoFactory, factoryInitializer);
 		}
 
-
 		@Override
-		public T get() {
+		public T newInstance() {
 			return lazyFactory.getInstance().get();
 		}
 
-
 		@Override
-		public void init(Provider<?> factory, T instance) {
-			//nothing to do, we want to initialize pojoFactory, not the instance created by the factory
-			//factoryInitializer was invoked by lazyFactory.getInstance() call
+		public TypeToken<T> getType() {
+			return typeToken;
 		}
 		
 		@Override
-		public void destroy(Provider<?> factory, T instance) {
+		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, T instance) {
+			//nothing to do, we want to initialize pojoFactory, not the instance created by the factory
+			//factoryInitializer was invoked by lazyFactory.getInstance() call
+			
+			//FIXME inject also pojo, not only pojo factory
+		}
+		
+		@Override
+		public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, T instance) {
 			//delegate the destruction to the factoryInitializer
 			//the factory is not re-used but re-created for each object
 			lazyFactory.freeInstance();
+		}
+		
+		@Override
+		public IPropertyResolver getResolver() {
+			return pojoFactory.getResolver();
+		}
+		
+		@Override
+		public IBeanDescriptor<T> getDescriptor() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}

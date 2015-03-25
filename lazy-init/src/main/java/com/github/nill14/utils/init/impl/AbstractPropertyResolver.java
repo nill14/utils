@@ -7,6 +7,7 @@ import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IParameterType;
+import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
@@ -14,6 +15,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.reflect.TypeToken;
 
 @SuppressWarnings("serial")
 public abstract class AbstractPropertyResolver implements IPropertyResolver {
@@ -50,12 +52,11 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		//Wire mode is implicit now
 //		if (type.getAnnotation(Wire.class).isPresent()) {
 //		try {
-		IBeanDescriptor<?> typeDescriptor = new PojoInjectionDescriptor<>(type);
+		IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
 		if (typeDescriptor.canBeInstantiated()) {
-			@SuppressWarnings({ "rawtypes" })
-			Provider factory = new PojoFactory(typeDescriptor, this);
+			IPojoFactory<Object> factory = PojoInjectionFactory.create(typeDescriptor, this);
 			IPojoInitializer<Object> initializer = IPojoInitializer.standard();
-			return new LazyPojo<>(factory, typeDescriptor, initializer).getInstance();
+			return LazyPojo.forFactory(factory, initializer).getInstance();
 		}
 //		} catch (RuntimeException e) {
 //			if (!type.isOptionalDependency()) {

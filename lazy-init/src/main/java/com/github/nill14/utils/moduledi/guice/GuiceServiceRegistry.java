@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
+import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
@@ -147,7 +148,7 @@ public class GuiceServiceRegistry implements IServiceRegistry {
 	
 	private <S, F extends Provider<? extends S>> Provider<S> toProvider(Class<S> iface,	Class<F> factoryClass) {
 		//TODO injection for bean
-		return () -> LazyPojo.forFactory(iface, factoryClass).getInstance();
+		return () -> LazyPojo.forProvider(factoryClass, toResolver(), IPojoInitializer.standard()).getInstance();
 	}
 
 	@Override

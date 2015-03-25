@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Set;
 
 import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
@@ -12,7 +11,7 @@ import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
 
 import com.github.nill14.utils.init.api.ILazyPojo;
-import com.google.common.collect.Sets;
+import com.google.common.reflect.TypeToken;
 
 public class LazyJavassistProxy implements MethodHandler, MethodFilter, Serializable {
 
@@ -27,14 +26,15 @@ public class LazyJavassistProxy implements MethodHandler, MethodFilter, Serializ
 	}
 	
 	public static Object newProxy(Class<?> beanClass) {
-		ILazyPojo<?> lazyPojo = LazyPojo.forClass(beanClass);
+		ILazyPojo<?> lazyPojo = LazyPojo.forBean(beanClass);
 		return newProxy(lazyPojo);
 	}
 	
-	public static Object newProxy(ILazyPojo<?> lazyPojo) {
+	public static <T> Object newProxy(ILazyPojo<T> lazyPojo) {
 		LazyJavassistProxy methodHandler = new LazyJavassistProxy(lazyPojo);
-		Class<?> clazz = lazyPojo.getInstanceType();
-		Class<?>[] ifaces = getImplementedInterfaces(clazz);
+		TypeToken<T> token = lazyPojo.getType();
+		Class<?>[] ifaces = token.getTypes().interfaces().rawTypes().stream().toArray(Class[]::new);
+		Class<?> clazz = token.getRawType();
 
 		ProxyFactory f = new ProxyFactory();
 		if (!clazz.isInterface()) {
@@ -52,18 +52,6 @@ public class LazyJavassistProxy implements MethodHandler, MethodFilter, Serializ
 		} 
 	}
 
-    private  static Class<?>[] getImplementedInterfaces(Class<?> clazz) {
-        Set<Class<?>> interfaces = Sets.newHashSet();
-        if (clazz.isInterface()) {
-        	interfaces.add(clazz);
-        }
-        
-        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
-            interfaces.addAll(Arrays.<Class<?>>asList(c.getInterfaces()));
-        }
-        return interfaces.stream().toArray(Class[]::new);
-    }
-	
 	private final ILazyPojo<?> delegate;
 
 	private LazyJavassistProxy(ILazyPojo<?> delegate) {

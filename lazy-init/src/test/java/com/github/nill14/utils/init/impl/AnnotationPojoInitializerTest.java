@@ -40,7 +40,7 @@ public class AnnotationPojoInitializerTest {
 		resolver = registry.toResolver();
 		
 		IPojoInitializer<Object> initializer = IPojoInitializer.standard();
-		lazyPojo = LazyPojo.forClass(TimeService.class, resolver, initializer);
+		lazyPojo = LazyPojo.forBean(TimeService.class, resolver, initializer);
 		timeService = LazyJdkProxy.newProxy(ITimeService.class, lazyPojo);
 	}
 	
@@ -52,7 +52,7 @@ public class AnnotationPojoInitializerTest {
 	@Test
 	public void testIntegration() {
 		IPojoInitializer<Object> initializer = IPojoInitializer.standard();
-		ILazyPojo<TimeService> lazyPojo = LazyPojo.forClass(TimeService.class, resolver, initializer);
+		ILazyPojo<TimeService> lazyPojo = LazyPojo.forBean(TimeService.class, resolver, initializer);
 		ITimeService timeService = LazyJdkProxy.newProxy(ITimeService.class, lazyPojo);
 		LocalDateTime now = timeService.getNow();
 		log.info("testIntegration: {}", now);

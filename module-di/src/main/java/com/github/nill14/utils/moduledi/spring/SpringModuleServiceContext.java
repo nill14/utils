@@ -4,11 +4,11 @@ import java.io.InputStream;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.inject.Provider;
-
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IParameterType;
+import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceContext;
@@ -82,7 +82,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 	private final IPojoInitializer<Object> applicationContextInitializer = new IPojoInitializer<Object>() {
 		
 		@Override
-		public void init(Provider<?> factory, Object instance) {
+		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
 			if (ctxStarted.compareAndSet(false, true)) {
 				initApplicationContext(registry);
 				if (ctx != null) {
@@ -92,7 +92,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 		}
 		
 		@Override
-		public void destroy(Provider<?> factory, Object instance) {
+		public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
 			// nothing to do
 		}
 	};

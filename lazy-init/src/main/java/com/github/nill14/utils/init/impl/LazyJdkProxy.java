@@ -5,11 +5,9 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
-import java.util.Set;
 
 import com.github.nill14.utils.init.api.ILazyPojo;
-import com.google.common.collect.Sets;
+import com.google.common.reflect.TypeToken;
 
 public class LazyJdkProxy implements InvocationHandler, Serializable {
 
@@ -26,16 +24,16 @@ public class LazyJdkProxy implements InvocationHandler, Serializable {
 		return iface.cast(newProxy(lazyPojo));
 	}
 	
-	public static Object newProxy(Class<?> beanClass) {
-		ILazyPojo<?> lazyPojo = LazyPojo.forClass(beanClass);
+	public static <T> Object newProxy(Class<T> beanClass) {
+		ILazyPojo<?> lazyPojo = LazyPojo.forBean(beanClass);
 		return newProxy(lazyPojo);
 	}
 	
-	public static Object newProxy(ILazyPojo<?> lazyPojo) {
+	public static <T> Object newProxy(ILazyPojo<T> lazyPojo) {
 		LazyJdkProxy invocationHandler = new LazyJdkProxy(lazyPojo);
-		Class<?> clazz = lazyPojo.getInstanceType();
-		ClassLoader cl = clazz.getClassLoader();
-		Class<?>[] ifaces = getImplementedInterfaces(clazz);
+		TypeToken<T> token = lazyPojo.getType();
+		ClassLoader cl = token.getRawType().getClassLoader();
+		Class<?>[] ifaces = token.getTypes().interfaces().rawTypes().stream().toArray(Class[]::new);
 		return Proxy.newProxyInstance(cl, ifaces, invocationHandler);
 	}
 
@@ -47,22 +45,10 @@ public class LazyJdkProxy implements InvocationHandler, Serializable {
 	 * @param implementedInterfaces
 	 * @return Proxy
 	 */
-	public static Object newProxy(ILazyPojo<?> lazyPojo, ClassLoader classLoader, Class<?>[] implementedInterfaces) {
+	public static <T> Object newProxy(ILazyPojo<T> lazyPojo, ClassLoader classLoader, Class<? super T>[] implementedInterfaces) {
 		LazyJdkProxy invocationHandler = new LazyJdkProxy(lazyPojo);
 		return Proxy.newProxyInstance(classLoader, implementedInterfaces, invocationHandler);
 	}
-	
-    private static Class<?>[] getImplementedInterfaces(Class<?> clazz) {
-        Set<Class<?>> interfaces = Sets.newHashSet();
-        if (clazz.isInterface()) {
-        	interfaces.add(clazz);
-        }
-        
-        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
-            interfaces.addAll(Arrays.<Class<?>>asList(c.getInterfaces()));
-        }
-        return interfaces.stream().toArray(Class[]::new);
-    }
 	
 	private final ILazyPojo<?> delegate;
 
@@ -81,7 +67,7 @@ public class LazyJdkProxy implements InvocationHandler, Serializable {
 			
 		} else if (objectToStringMethod.equals(method)) {
 			String hex = Integer.toHexString(System.identityHashCode(proxy));
-			String className = delegate.getInstanceType().getName();
+			String className = delegate.getType().getRawType().getName();
 			return String.format("%s@%s (Proxy)", className, hex);
 		}
 		

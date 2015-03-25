@@ -5,6 +5,8 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.reflect.TypeToken;
+
 public interface IBeanDescriptor<T> {
 
 	List<? extends IMemberDescriptor> getFieldDescriptors();
@@ -20,6 +22,8 @@ public interface IBeanDescriptor<T> {
 	@Deprecated
 	Set<Annotation> getDeclaredQualifiers();
 
+	TypeToken<T> getToken();
+	
 	Class<T> getRawType();
 	
 	Type getGenericType();

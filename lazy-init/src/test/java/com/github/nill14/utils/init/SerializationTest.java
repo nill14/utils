@@ -85,7 +85,7 @@ public class SerializationTest {
 	public void testComplex() throws IOException, ClassNotFoundException {
 		IPropertyResolver resolver = Mockito.mock(IPropertyResolver.class);
 		IPojoInitializer<Object> initializer = IPojoInitializer.standard();
-		ILazyPojo<Calculator> calcPojo = LazyPojo.forClass(Calculator.class, resolver, initializer);
+		ILazyPojo<Calculator> calcPojo = LazyPojo.forBean(Calculator.class, resolver, initializer);
 		ICalculator calc = LazyJdkProxy.newProxy(ICalculator.class, calcPojo);
 		calc.add(5, 3); //lazy Calc initialization
 		

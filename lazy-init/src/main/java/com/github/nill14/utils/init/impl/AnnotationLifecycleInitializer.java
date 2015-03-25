@@ -9,20 +9,21 @@ import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.inject.Provider;
 
+import com.github.nill14.utils.init.api.ILazyPojo;
+import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 
 @SuppressWarnings("serial")
 public class AnnotationLifecycleInitializer implements IPojoInitializer<Object> {
 
 	@Override
-	public void init(Provider<?> factory, Object instance) {
+	public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
 		doPostConstruct(instance);
 	}
 
 	@Override
-	public void destroy(Provider<?> factory, Object instance) {
+	public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
 		doPreDestroy(instance);
 		
 	}
