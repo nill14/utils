@@ -12,7 +12,7 @@ import com.github.nill14.utils.init.meta.EventBusSubscriber;
 import com.google.common.eventbus.EventBus;
 
 @SuppressWarnings("serial")
-public class EventBusPojoInitializer implements IPojoInitializer<Object> {
+public class EventBusPojoInitializer implements IPojoInitializer {
 
 	private static final Logger log = LoggerFactory.getLogger(EventBusPojoInitializer.class);
 	

@@ -32,20 +32,28 @@ public class LazyPojoTest {
 	private static AtomicInteger instances = new AtomicInteger();
 	private static ILazyPojo<IGreeter> lazyPojo;
 
-	private static IPojoInitializer<GreeterFactory> factoryInitializer = new IPojoInitializer<GreeterFactory>() {
+	private static IPojoInitializer factoryInitializer = new IPojoInitializer() {
 		
 		@Override
-		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, GreeterFactory instance) {
-			assertThat(instance.getGreeting(), not(GREETING));
-			instances.incrementAndGet();
-			instance.setGreeting(GREETING);
+		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
+			//instance could be also IGreeter
+			if (instance instanceof GreeterFactory) {
+				GreeterFactory factory = (GreeterFactory) instance;
+				assertThat(factory.getGreeting(), not(GREETING));
+				instances.incrementAndGet();
+				factory.setGreeting(GREETING);
+			}
 		}
 		
 		@Override
-		public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, GreeterFactory instance) {
-			assertThat(instance.getGreeting(), is(GREETING));
-			instances.decrementAndGet();
-			instance.setGreeting(DESTROYED);
+		public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
+			//instance could be also IGreeter
+			if (instance instanceof GreeterFactory) {
+				GreeterFactory factory = (GreeterFactory) instance;
+				assertThat(factory.getGreeting(), is(GREETING));
+				instances.decrementAndGet();
+				factory.setGreeting(DESTROYED);
+			}
 		}
 	};
 	

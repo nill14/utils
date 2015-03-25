@@ -15,7 +15,7 @@ import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 
 @SuppressWarnings("serial")
-public class AnnotationLifecycleInitializer implements IPojoInitializer<Object> {
+public class AnnotationLifecycleInitializer implements IPojoInitializer {
 
 	@Override
 	public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {

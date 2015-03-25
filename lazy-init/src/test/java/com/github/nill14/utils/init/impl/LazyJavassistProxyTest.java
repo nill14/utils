@@ -24,15 +24,15 @@ public class LazyJavassistProxyTest {
 	private static ILazyPojo<Calculator> lazyObject;
 	private static AtomicInteger instances = new AtomicInteger();
 
-	private static final IPojoInitializer<ICalculator> initializer = new IPojoInitializer<ICalculator>() {
+	private static final IPojoInitializer initializer = new IPojoInitializer() {
 
 		@Override
-		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, ICalculator instance) {
+		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
 			instances.incrementAndGet();
 		}
 
 		@Override
-		public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, ICalculator instance) {
+		public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
 			instances.decrementAndGet();
 		}
 	};

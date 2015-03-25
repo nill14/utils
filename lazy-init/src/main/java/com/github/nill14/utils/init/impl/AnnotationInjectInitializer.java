@@ -10,7 +10,7 @@ import com.github.nill14.utils.init.inject.FieldInjectionDescriptor;
 import com.github.nill14.utils.init.inject.ParameterTypeInjectionDescriptor;
 
 @SuppressWarnings("serial")
-public class AnnotationInjectInitializer implements IPojoInitializer<Object> {
+public class AnnotationInjectInitializer implements IPojoInitializer {
 
 	@Override
 	public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {

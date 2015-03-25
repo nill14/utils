@@ -6,7 +6,7 @@ import com.github.nill14.utils.init.impl.GlobalServiceContext;
 
 public interface IServiceContext {
 
-	Optional<IPojoInitializer<Object>> getInitializer();
+	Optional<IPojoInitializer> getInitializer();
 	
 	Optional<IPropertyResolver> getCustomResolver();
 	

@@ -34,7 +34,7 @@ public final class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 		return forBean(beanClass, IPropertyResolver.empty(), IPojoInitializer.empty());
 	}
 	
-	public static <T> ILazyPojo<T> forBean(Class<T> beanClass, IPropertyResolver resolver, IPojoInitializer<? super T> initializer) {
+	public static <T> ILazyPojo<T> forBean(Class<T> beanClass, IPropertyResolver resolver, IPojoInitializer initializer) {
 		IPojoFactory<T> factory = PojoInjectionFactory.create(beanClass, resolver);
 		return new LazyPojo<>(factory, initializer);
 	}
@@ -44,7 +44,7 @@ public final class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 	}
 	
 	public static <T, F extends Provider<? extends T>> ILazyPojo<T> forProvider(
-			Class<F> providerClass, IPropertyResolver resolver, IPojoInitializer<? super F> factoryInitializer) {
+			Class<F> providerClass, IPropertyResolver resolver, IPojoInitializer factoryInitializer) {
 		TypeToken<T> typeToken = PojoProviderFactory.getProviderReturnTypeToken(providerClass);
 		IPojoFactory<F> pojoFactory = PojoInjectionFactory.create(providerClass, resolver);
 		FactoryAdapter<T, F> factoryAdapter = new FactoryAdapter<T, F>(pojoFactory, typeToken, factoryInitializer);
@@ -52,21 +52,21 @@ public final class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 	}
 	
 	public static <T> ILazyPojo<T> forProvider(
-			Provider<T> provider, IPropertyResolver resolver, IPojoInitializer<? super T> initializer) {
+			Provider<T> provider, IPropertyResolver resolver, IPojoInitializer initializer) {
 		IPojoFactory<T> pojoFactory = PojoProviderFactory.create(provider, resolver);
 		return new LazyPojo<>(pojoFactory, initializer);
 	}
 	
 	public static <T> ILazyPojo<T> forFactory(
-			IPojoFactory<T> pojoFactory, IPojoInitializer<? super T> initializer) {
+			IPojoFactory<T> pojoFactory, IPojoInitializer initializer) {
 		return new LazyPojo<>(pojoFactory, initializer);
 	}
 	
 	private final IPojoFactory<T> factory;
-	private final IPojoInitializer<? super T> initializer;
+	private final IPojoInitializer initializer;
 	private volatile transient T instance;
 
-	public LazyPojo(IPojoFactory<T> factory, IPojoInitializer<? super T> initializer) {
+	public LazyPojo(IPojoFactory<T> factory, IPojoInitializer initializer) {
 		this.factory = factory;
 		this.initializer = initializer;
 	}
@@ -171,15 +171,17 @@ public final class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 				Integer.toHexString(System.identityHashCode(this)));
 	}
 	
-	public static class FactoryAdapter<T, F extends Provider<? extends T>> implements IPojoFactory<T>, IPojoInitializer<T> {
+	public static class FactoryAdapter<T, F extends Provider<? extends T>> implements IPojoFactory<T>, IPojoInitializer {
 		
 		private final ILazyPojo<F> lazyFactory;
 		private final TypeToken<T> typeToken;
 		private final IPojoFactory<F> pojoFactory;
+		private final IPojoInitializer pojoInitializer;
 
-		public FactoryAdapter(IPojoFactory<F> pojoFactory, TypeToken<T> typeToken, IPojoInitializer<? super F> factoryInitializer) {
+		public FactoryAdapter(IPojoFactory<F> pojoFactory, TypeToken<T> typeToken, IPojoInitializer factoryInitializer) {
 			this.pojoFactory = pojoFactory;
 			this.typeToken = typeToken;
+			this.pojoInitializer = factoryInitializer;
 			this.lazyFactory = new LazyPojo<F>(pojoFactory, factoryInitializer);
 		}
 
@@ -194,18 +196,22 @@ public final class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 		}
 		
 		@Override
-		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, T instance) {
-			//nothing to do, we want to initialize pojoFactory, not the instance created by the factory
-			//factoryInitializer was invoked by lazyFactory.getInstance() call
-			
-			//FIXME inject also pojo, not only pojo factory
+		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
+			//factoryInitializer was already invoked by lazyFactory.getInstance() call
+			//now we inject the object returned from lazyFactory.getInstance().get()
+			//since we are both the factory and initializer we get the chance to do init as well as
+			// we want to inject also pojo properties (if any), not only factory properties
+			pojoInitializer.init(lazyPojo, pojoFactory, instance);
 		}
 		
 		@Override
-		public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, T instance) {
+		public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
 			//delegate the destruction to the factoryInitializer
 			//the factory is not re-used but re-created for each object
 			lazyFactory.freeInstance();
+
+			//cleanup on the pojo 
+			pojoInitializer.destroy(lazyPojo, pojoFactory, instance);
 		}
 		
 		@Override

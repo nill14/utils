@@ -45,7 +45,7 @@ public class GuiceModuleServiceContext implements IServiceContext {
 	}
 	
 	@Override
-	public Optional<IPojoInitializer<Object>> getInitializer() {
+	public Optional<IPojoInitializer> getInitializer() {
 		return Optional.of(contextInitializer);
 	}
 	
@@ -63,7 +63,7 @@ public class GuiceModuleServiceContext implements IServiceContext {
 		
 	};
 
-	private final IPojoInitializer<Object> contextInitializer = new IPojoInitializer<Object>() {
+	private final IPojoInitializer contextInitializer = new IPojoInitializer() {
 		
 		@Override
 		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {

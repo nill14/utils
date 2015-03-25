@@ -11,14 +11,14 @@ import com.google.common.reflect.TypeToken;
 public class BeanInjector implements IBeanInjector {
 	
 	private final IPropertyResolver resolver;
-	private final IPojoInitializer<Object> initializer;
+	private final IPojoInitializer initializer;
 
 	public BeanInjector(IPropertyResolver resolver) {
 		this.resolver = resolver;
 		this.initializer = IPojoInitializer.standard();
 	}
 
-	public BeanInjector(IPropertyResolver resolver, IPojoInitializer<Object> initializer) {
+	public BeanInjector(IPropertyResolver resolver, IPojoInitializer initializer) {
 		this.resolver = resolver;
 		this.initializer = initializer;
 	}

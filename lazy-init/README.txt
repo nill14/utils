@@ -16,7 +16,7 @@ lazyPojo.getInstance().add(5, 3); //blocks until the Calc initialization is fini
 // Complex example
 //==========================
 IPropertyResolver resolver = Mockito.mock(IPropertyResolver.class);
-IPojoInitializer<Object> initializer = AnnotationPojoInitializer.withResolver(resolver);
+IPojoInitializer initializer = AnnotationPojoInitializer.withResolver(resolver);
 IPojoFactory<Calc> pojoFactory = PojoFactory.create(Calc.class);
 ILazyPojo<ICalc> calcPojo = new LazyPojo<>(pojoFactory, initializer);
 ICalc calc = LazyJdkProxy.newProxy(ICalc.class, calcPojo);

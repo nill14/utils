@@ -17,7 +17,7 @@ public class GlobalServiceContext implements IServiceContext {
 	}
 
 	@Override
-	public Optional<IPojoInitializer<Object>> getInitializer() {
+	public Optional<IPojoInitializer> getInitializer() {
 		return Optional.empty();
 	}
 

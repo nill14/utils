@@ -8,24 +8,23 @@ import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 
-public final class EmptyPojoInitializer<T> implements IPojoInitializer<T> {
+public final class EmptyPojoInitializer implements IPojoInitializer {
 
 	private static final long serialVersionUID = 2837451571146010916L;
 	
-	private static final EmptyPojoInitializer<?> instance = new EmptyPojoInitializer<>();
-	@SuppressWarnings("unchecked")
-	public static final <T> IPojoInitializer<T> getInstance() {
-		return (IPojoInitializer<T>) instance;
+	private static final EmptyPojoInitializer instance = new EmptyPojoInitializer();
+	public static final  IPojoInitializer getInstance() {
+		return instance;
 	}
 	
 	private EmptyPojoInitializer() {
 	}
 	
 	@Override
-	public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, T instance) { }
+	public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) { }
 
 	@Override
-	public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, T instance) { }
+	public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) { }
 
 	private void writeObject(ObjectOutputStream stream) throws IOException { }
 

@@ -18,7 +18,6 @@ import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceRegistry;
-import com.github.nill14.utils.moduledi.guice.GuiceServiceRegistry;
 
 public class AnnotationPojoInitializerTest {
 
@@ -39,7 +38,7 @@ public class AnnotationPojoInitializerTest {
 		registry.addSingleton(spy);
 		resolver = registry.toResolver();
 		
-		IPojoInitializer<Object> initializer = IPojoInitializer.standard();
+		IPojoInitializer initializer = IPojoInitializer.standard();
 		lazyPojo = LazyPojo.forBean(TimeService.class, resolver, initializer);
 		timeService = LazyJdkProxy.newProxy(ITimeService.class, lazyPojo);
 	}
@@ -51,7 +50,7 @@ public class AnnotationPojoInitializerTest {
 	
 	@Test
 	public void testIntegration() {
-		IPojoInitializer<Object> initializer = IPojoInitializer.standard();
+		IPojoInitializer initializer = IPojoInitializer.standard();
 		ILazyPojo<TimeService> lazyPojo = LazyPojo.forBean(TimeService.class, resolver, initializer);
 		ITimeService timeService = LazyJdkProxy.newProxy(ITimeService.class, lazyPojo);
 		LocalDateTime now = timeService.getNow();

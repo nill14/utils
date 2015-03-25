@@ -7,17 +7,17 @@ import javax.annotation.Nullable;
 import com.github.nill14.utils.init.impl.ChainingPojoInitializer;
 import com.github.nill14.utils.init.impl.EmptyPojoInitializer;
 
-public interface IPojoInitializer<T> extends Serializable {
+public interface IPojoInitializer extends Serializable {
 
-	void init(@Nullable ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, T instance);
+	void init(@Nullable ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance);
 	
-	void destroy(@Nullable ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, T instance);
+	void destroy(@Nullable ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance);
 	
-	static <T> IPojoInitializer<T> empty() {
+	static <T> IPojoInitializer empty() {
 		return EmptyPojoInitializer.getInstance();
 	}
 	
-	static IPojoInitializer<Object> standard() {
+	static IPojoInitializer standard() {
 		return ChainingPojoInitializer.defaultInitializer();
 	}
 }

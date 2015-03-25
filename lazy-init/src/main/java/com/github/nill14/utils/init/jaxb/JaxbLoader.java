@@ -46,7 +46,7 @@ public class JaxbLoader {
         IServiceContext jaxbServiceContext = new IServiceContext() {
         	
         	@Override
-        	public Optional<IPojoInitializer<Object>> getInitializer() {
+        	public Optional<IPojoInitializer> getInitializer() {
         		return Optional.empty();
         	}
         	

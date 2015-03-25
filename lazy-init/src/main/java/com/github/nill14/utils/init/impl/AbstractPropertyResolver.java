@@ -55,7 +55,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
 		if (typeDescriptor.canBeInstantiated()) {
 			IPojoFactory<Object> factory = PojoInjectionFactory.create(typeDescriptor, this);
-			IPojoInitializer<Object> initializer = IPojoInitializer.standard();
+			IPojoInitializer initializer = IPojoInitializer.standard();
 			return LazyPojo.forFactory(factory, initializer).getInstance();
 		}
 //		} catch (RuntimeException e) {

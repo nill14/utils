@@ -38,7 +38,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 	}
 	
 	@Override
-	public Optional<IPojoInitializer<Object>> getInitializer() {
+	public Optional<IPojoInitializer> getInitializer() {
 		return Optional.of(applicationContextInitializer);
 	}
 	
@@ -79,7 +79,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 		
 	};
 
-	private final IPojoInitializer<Object> applicationContextInitializer = new IPojoInitializer<Object>() {
+	private final IPojoInitializer applicationContextInitializer = new IPojoInitializer() {
 		
 		@Override
 		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {

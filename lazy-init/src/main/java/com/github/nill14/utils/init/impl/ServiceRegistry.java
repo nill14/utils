@@ -38,7 +38,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	private final ConcurrentHashMap<Class<?>, Map<Annotation, ILazyPojo<?>>> qualifiers = new ConcurrentHashMap<>();
 	
 	private final IPropertyResolver resolver = new ServiceRegistryPropertyResolver();
-	private final ChainingPojoInitializer<Object> pojoInitializer = ChainingPojoInitializer.defaultInitializer();
+	private final ChainingPojoInitializer pojoInitializer = ChainingPojoInitializer.defaultInitializer();
 	
 	public ServiceRegistry() {
 	}
@@ -58,8 +58,8 @@ public class ServiceRegistry implements IServiceRegistry {
 		addService(generateGlobalName(serviceBean), serviceBean, context);
 	}
 	
-	private <T> IPojoInitializer<Object> getInitializer(IServiceContext context) {
-		Optional<IPojoInitializer<Object>> contextInitializer = context.getInitializer();
+	private <T> IPojoInitializer getInitializer(IServiceContext context) {
+		Optional<IPojoInitializer> contextInitializer = context.getInitializer();
 		if (contextInitializer.isPresent()) {
 			return pojoInitializer.with(contextInitializer.get());
 		} else {
@@ -87,7 +87,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	@Override
 	public <S, T extends S> void addService(String name, Class<T> serviceBean, IServiceContext context) {
 		
-		IPojoInitializer<Object> initializer = getInitializer(context);
+		IPojoInitializer initializer = getInitializer(context);
 		IPropertyResolver resolver = getResolver(context);
 		ILazyPojo<T> lazyPojo = LazyPojo.forBean(serviceBean, resolver, initializer);
 		
@@ -108,7 +108,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	public <S, F extends Provider<? extends S>> void addServiceFactory(
 			Class<S> iface, String name, Class<F> factoryBean, IServiceContext context) {
 		
-		IPojoInitializer<Object> initializer = getInitializer(context);
+		IPojoInitializer initializer = getInitializer(context);
 		IPropertyResolver resolver = getResolver(context);
 		ILazyPojo<S> lazyPojo = LazyPojo.forProvider(factoryBean, resolver, initializer);
 		ILazyPojo<F> proxy = newProxy(lazyPojo, factoryBean);
