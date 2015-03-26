@@ -8,28 +8,18 @@ import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
 
-public final class PojoInjectionFactory<T> implements IPojoFactory<T> {
-	
-
-	public static <T> IPojoFactory<T> create(Class<T> beanClass, IPropertyResolver resolver) {
-		return create(TypeToken.of(beanClass), resolver);
-	}
-	
-	public static <T> IPojoFactory<T> create(TypeToken<T> typeToken, IPropertyResolver resolver) {
-		PojoInjectionDescriptor<T> descriptor = new PojoInjectionDescriptor<>(typeToken);
-		return new PojoInjectionFactory<>(typeToken, descriptor, resolver);
-	}
-	
-	public static <T> IPojoFactory<T> create(IBeanDescriptor<T> descriptor, IPropertyResolver resolver) {
-		return new PojoInjectionFactory<>(descriptor.getToken(), descriptor, resolver);
-	}
+public class PojoInjectionFactory<T> implements IPojoFactory<T> {
 	
 	private final IBeanDescriptor<T> beanDescriptor;
 	private final IPropertyResolver resolver;
-	private final TypeToken<T> typeToken;
 	
-	private PojoInjectionFactory(TypeToken<T> typeToken, IBeanDescriptor<T> beanDescriptor, IPropertyResolver resolver) {
-		this.typeToken = typeToken;
+	public PojoInjectionFactory(TypeToken<T> typeToken, IPropertyResolver resolver) {
+		this.beanDescriptor = new PojoInjectionDescriptor<>(typeToken);
+		this.resolver = resolver;
+		Preconditions.checkArgument(beanDescriptor.getConstructorDescriptors().size() > 0);
+	}
+	
+	public PojoInjectionFactory(IBeanDescriptor<T> beanDescriptor, IPropertyResolver resolver) {
 		this.beanDescriptor = beanDescriptor;
 		this.resolver = resolver;
 		Preconditions.checkArgument(beanDescriptor.getConstructorDescriptors().size() > 0);
@@ -48,7 +38,7 @@ public final class PojoInjectionFactory<T> implements IPojoFactory<T> {
 
 	@Override
 	public TypeToken<T> getType() {
-		return typeToken;
+		return beanDescriptor.getToken();
 	}
 	
 	@Override

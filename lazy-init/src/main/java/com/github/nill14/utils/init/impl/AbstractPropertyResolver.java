@@ -3,8 +3,6 @@ package com.github.nill14.utils.init.impl;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 
-import javax.inject.Provider;
-
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
@@ -15,7 +13,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.reflect.TypeToken;
 
 @SuppressWarnings("serial")
 public abstract class AbstractPropertyResolver implements IPropertyResolver {
@@ -54,7 +51,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 //		try {
 		IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
 		if (typeDescriptor.canBeInstantiated()) {
-			IPojoFactory<Object> factory = PojoInjectionFactory.create(typeDescriptor, this);
+			IPojoFactory<Object> factory = new PojoInjectionFactory<>(typeDescriptor, this);
 			IPojoInitializer initializer = IPojoInitializer.standard();
 			return LazyPojo.forFactory(factory, initializer).getInstance();
 		}
@@ -81,7 +78,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			}
 		
 		} else { // find by type
-			Object result = findByType(pojo, clazz);
+			Object result = findByType(pojo, type, clazz);
 			if (result != null) {
 				return result;
 			}
@@ -131,7 +128,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	
 	
 	protected abstract Object findByName(Object pojo, String name, Class<?> type);
-	protected abstract Object findByType(Object pojo, Class<?> type);
+	protected abstract Object findByType(Object pojo, IParameterType type, Class<?> clazz);
 	protected abstract Collection<?> findAllByType(Object pojo, Class<?> type);
 
 	protected abstract Object findByQualifier(Object pojo, Class<?> type, Annotation qualifier);

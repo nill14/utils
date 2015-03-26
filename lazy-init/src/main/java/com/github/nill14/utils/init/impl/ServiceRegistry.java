@@ -16,6 +16,7 @@ import javax.inject.Provider;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.ILazyPojo;
+import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceContext;
@@ -253,8 +254,8 @@ public class ServiceRegistry implements IServiceRegistry {
 		}
 
 		@Override
-		protected Object findByType(Object pojo, Class<?> type) {
-			return getOptionalService(type).orElse(null);
+		protected Object findByType(Object pojo, IParameterType type, Class<?> clazz) {
+			return getOptionalService(clazz).orElse(null);
 		}
 
 		@Override

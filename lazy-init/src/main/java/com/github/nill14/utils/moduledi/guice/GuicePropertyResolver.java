@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
@@ -23,8 +24,8 @@ public class GuicePropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Override
-	protected Object findByType(Object pojo, Class<?> type) {
-		return injector.getInstance(type);
+	protected Object findByType(Object pojo, IParameterType type, Class<?> clazz) {
+		return injector.getInstance(clazz);
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Iterator;
 
+import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 
 @SuppressWarnings("serial")
@@ -26,7 +27,7 @@ public final class EmptyPropertyResolver extends AbstractPropertyResolver implem
 
 
 	@Override
-	protected Object findByType(Object pojo, Class<?> type) {
+	protected Object findByType(Object pojo, IParameterType type, Class<?> clazz) {
 		return null;
 	}
 
