@@ -14,6 +14,8 @@ public interface IParameterType {
 
 	Type getGenericType();
 	
+	TypeToken<?> getToken();
+
 	boolean isParametrized();
 
 	Type[] getParameterTypes();
@@ -47,6 +49,7 @@ public interface IParameterType {
 	static IParameterTypeBuilder builder(TypeToken<?> typeToken) {
 		return ParameterTypeBuilder.builder(typeToken);
 	}
+
 	
 	//TODO consider boolean isCollection and TypeToken getDependencyType
 	

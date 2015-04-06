@@ -85,6 +85,11 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 	}
 	
 	@Override
+	public TypeToken<?> getToken() {
+		return typeToken;
+	}
+	
+	@Override
 	public Optional<String> getNamed() {
 		return named;
 	}

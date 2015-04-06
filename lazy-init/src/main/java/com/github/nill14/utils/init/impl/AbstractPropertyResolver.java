@@ -4,27 +4,28 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
+import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
+import com.github.nill14.utils.init.api.IQualifiedProvider;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import com.github.nill14.utils.init.impl.LazyPojo;
 
 @SuppressWarnings("serial")
 public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	
-
-
-	@SuppressWarnings("unchecked")
 	@Override
 	public Object resolve(Object pojo, IParameterType type) {
+		Class<?> rawType = type.getRawType();
 		
-		if (type.isParametrized()) { 
-			Class<?> rawType = type.getRawType();
+		boolean isCollection = isCollection(type);
+		if (isCollection || type.isOptional()) { 
 			Class<?> paramClass = type.getFirstParamClass();
 
 			if (java.util.Optional.class.isAssignableFrom(rawType)) {
@@ -38,47 +39,45 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			if (Iterable.class.isAssignableFrom(rawType)) {
 				return doResolveCollection(pojo, rawType, paramClass);
 			}
-		
 		} 
 	
-		Object result = doResolve(pojo, type, type.getRawType());
+		Object result = doResolve(pojo, type, rawType);
 		if (result != null) {
 			return result;
 		}
 
-		//Wire mode is implicit now
-//		if (type.getAnnotation(Wire.class).isPresent()) {
-//		try {
 		IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
 		if (typeDescriptor.canBeInstantiated()) {
 			IPojoFactory<Object> factory = new PojoInjectionFactory<>(typeDescriptor, this);
 			IPojoInitializer initializer = IPojoInitializer.standard();
 			return LazyPojo.forFactory(factory, initializer).getInstance();
 		}
-//		} catch (RuntimeException e) {
-//			if (!type.isOptionalDependency()) {
-//				throw e;
-//			}
-//		}
-//		}
 		
 		return null;
 	}
 	
-	protected Object doResolve(Object pojo, IParameterType type, Class<?> clazz) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected Object doResolve(Object pojo, IParameterType type, Class<?> rawType) {
+		if (IBeanInjector.class.equals(rawType)) {
+			return new BeanInjector(this);
+		
+		} else if (IQualifiedProvider.class.equals(rawType)) {
+			return new QualifiedProvider(type.getToken(), this);
+		}
+		
 		Collection<Annotation> qualifiers = type.getQualifiers();
 		if (!qualifiers.isEmpty()) {
-			return doResolveQualifiers(pojo, type, clazz);
+			return doResolveQualifiers(pojo, type, rawType);
 		}
 		
 		if (type.getNamed().isPresent()) { // find by name
-			Object result = findByName(pojo, type.getNamed().get(), clazz);
+			Object result = findByName(pojo, type.getNamed().get(), rawType);
 			if (result != null) {
 				return result;
 			}
 		
 		} else { // find by type
-			Object result = findByType(pojo, type, clazz);
+			Object result = findByType(pojo, type, rawType);
 			if (result != null) {
 				return result;
 			}
@@ -108,13 +107,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		Object result = null;
 		
 		for (Annotation qualifier : type.getQualifiers()) {
-			Object query = null;
-//			if (Named.class.equals(qualifier.annotationType())) {
-//				String name = ((Named) qualifier).value();
-//				query = findByName(pojo, name, clazz);
-//			} else {
-				query = findByQualifier(pojo, clazz, qualifier);
-//			}
+			Object query = findByQualifier(pojo, clazz, qualifier);
 			
 			if (result != null && !result.equals(query)) {
 				return null;
@@ -132,5 +125,9 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	protected abstract Collection<?> findAllByType(Object pojo, Class<?> type);
 
 	protected abstract Object findByQualifier(Object pojo, Class<?> type, Annotation qualifier);
+	
+	protected boolean isCollection(IParameterType type) {
+		return Iterable.class.isAssignableFrom(type.getRawType());
+	}
 	
 }
