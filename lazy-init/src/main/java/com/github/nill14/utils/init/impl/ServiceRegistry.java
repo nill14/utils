@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Qualifier;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
@@ -21,11 +22,15 @@ import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
+import com.github.nill14.utils.init.binding.impl.BindingImpl;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
+import com.github.nill14.utils.init.meta.AnnotationScanner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.reflect.TypeToken;
 
 /**
  * 
@@ -44,7 +49,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	public ServiceRegistry() {
 	}
 	
-	private String generateGlobalName(Class<?> type) {
+	private String generateGlobalName(Class<?> type) { //TODO make sure the generated name doesn't conflict
 		Named named = type.getAnnotation(Named.class);
 		if (named != null) {
 			return type.getTypeName() + "$" + named.value();
@@ -94,7 +99,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		
 		ILazyPojo<T> proxy = newProxy(lazyPojo, serviceBean);
 		IBeanDescriptor<T> pd = new PojoInjectionDescriptor<>(serviceBean);
-		pd.getDeclaredTypes().forEach((type) -> addElement(type, name, proxy, pd.getDeclaredQualifiers()));
+		pd.getDeclaredTypes().forEach((type) -> addElement(type, name, proxy, getTypeQualifiers(pd.getRawType())));
 		Object old = beans.put(name, proxy);
 		Preconditions.checkArgument(old == null, "Duplicate bean " + old);
 	}
@@ -115,7 +120,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		ILazyPojo<F> proxy = newProxy(lazyPojo, factoryBean);
 		
 		IBeanDescriptor<S> pd = new PojoInjectionDescriptor<>(iface);
-		pd.getDeclaredTypes().forEach((type) -> addElement(type, name, proxy, pd.getDeclaredQualifiers()));
+		pd.getDeclaredTypes().forEach((type) -> addElement(type, name, proxy, getTypeQualifiers(pd.getRawType())));
 		
 		beans.put(name, proxy);
 	}
@@ -194,8 +199,16 @@ public class ServiceRegistry implements IServiceRegistry {
 	public <T> void addSingleton(String name, T serviceBean) {
 		ILazyPojo<T> pojo = LazyPojo.forSingleton(serviceBean, IPropertyResolver.empty());
 		IBeanDescriptor<T> pd = new PojoInjectionDescriptor<T>((Class<T>) serviceBean.getClass());
-		pd.getDeclaredTypes().forEach((type) -> addElement(type, name, pojo, pd.getDeclaredQualifiers()));
+		pd.getDeclaredTypes().forEach((type) -> addElement(type, name, pojo, getTypeQualifiers(pd.getRawType())));
 		beans.put(name, pojo);
+	}
+	
+
+	public void addBinding(TypeToken<?> keyToken, Set<Annotation> qualifiers, ILazyPojo<?> lazyPojo) {
+		String globalName = generateGlobalName(lazyPojo.getType().getRawType());
+		addElement(keyToken.getRawType(), globalName, lazyPojo, qualifiers);
+		Object old = beans.put(globalName, lazyPojo);
+		Preconditions.checkArgument(old == null, "Duplicate bean " + old);
 	}
 	
 	public Collection<Class<?>> getBeans() {
@@ -265,7 +278,10 @@ public class ServiceRegistry implements IServiceRegistry {
 
 	};
 	
-	
+	private Set<Annotation> getTypeQualifiers(Class<?> clazz) {
+		return ImmutableSet.copyOf(AnnotationScanner.findAnnotations(clazz.getAnnotations(), Qualifier.class).values());
+	}
+
 	
 
 }

@@ -20,4 +20,9 @@ public enum ReflectionUtils {
 	public static <T> TypeToken<T> getProviderReturnTypeToken(Provider<? extends T> provider) {
 		return getProviderReturnTypeToken((Class<? extends Provider<? extends T>>) provider.getClass());
 	}
+	
+	@SuppressWarnings({ "unchecked" })
+	public static <T> TypeToken<T> getProviderReturnTypeToken(TypeToken<? extends Provider<? extends T>> providerType) {
+		return getProviderReturnTypeToken((Class<? extends Provider<? extends T>>)providerType.getRawType());
+	}
 }

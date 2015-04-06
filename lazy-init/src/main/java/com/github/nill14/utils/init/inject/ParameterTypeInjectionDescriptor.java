@@ -32,9 +32,9 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 		typeToken = TypeToken.of(type);
 
 		Map<Class<? extends Annotation>, Annotation> qualifiers = AnnotationScanner.findAnnotations(annotations, javax.inject.Qualifier.class);
-		Map<Class<? extends Annotation>, Annotation> bindingAnnotations = AnnotationScanner.findAnnotations(annotations, com.google.inject.BindingAnnotation.class);
+//		Map<Class<? extends Annotation>, Annotation> bindingAnnotations = AnnotationScanner.findAnnotations(annotations, com.google.inject.BindingAnnotation.class);
 		ImmutableMap.Builder<Class<?>, Annotation> builder = ImmutableMap.builder();
-		this.qualifiers = builder.putAll(qualifiers).putAll(bindingAnnotations).build();
+		this.qualifiers = builder.putAll(qualifiers)/*.putAll(bindingAnnotations)*/.build();
 		this.annotations = ImmutableMap.copyOf(AnnotationScanner.indexAnnotations(annotations));
 		
 		javax.inject.Named named = (javax.inject.Named ) this.annotations.get(javax.inject.Named.class);
@@ -61,12 +61,7 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 	public Class<?> getFirstParamClass() {
 		if (type instanceof ParameterizedType) {
 			Type argType = ((ParameterizedType) type).getActualTypeArguments()[0];
-			if (argType instanceof ParameterizedType) {
-				return Class.class.cast(((ParameterizedType) argType).getRawType());
-			} else {
-				return Class.class.cast(argType);
-			}
-			
+			return TypeToken.of(argType).getRawType();
 		}
 		throw new IllegalStateException();
 	}
@@ -86,11 +81,7 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 
 	@Override
 	public Class<?> getRawType() {
-		if (type instanceof ParameterizedType) {
-			return Class.class.cast(((ParameterizedType) type).getRawType());
-		} else {
-			return Class.class.cast(type);
-		}
+		return typeToken.getRawType();
 	}
 	
 	@Override

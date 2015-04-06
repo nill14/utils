@@ -16,7 +16,7 @@ public class PojoInjectionFactory<T> implements IPojoFactory<T> {
 	public PojoInjectionFactory(TypeToken<T> typeToken, IPropertyResolver resolver) {
 		this.beanDescriptor = new PojoInjectionDescriptor<>(typeToken);
 		this.resolver = resolver;
-		Preconditions.checkArgument(beanDescriptor.getConstructorDescriptors().size() > 0);
+//		Preconditions.checkArgument(beanDescriptor.getConstructorDescriptors().size() > 0);
 	}
 	
 	public PojoInjectionFactory(IBeanDescriptor<T> beanDescriptor, IPropertyResolver resolver) {

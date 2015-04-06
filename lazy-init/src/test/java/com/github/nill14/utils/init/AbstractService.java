@@ -3,9 +3,9 @@ package com.github.nill14.utils.init;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 
 public class AbstractService {
 	

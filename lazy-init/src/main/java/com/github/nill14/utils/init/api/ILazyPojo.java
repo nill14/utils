@@ -8,7 +8,7 @@ import javax.inject.Provider;
 
 import com.google.common.reflect.TypeToken;
 
-public interface ILazyPojo<T> extends Serializable, Provider<T> {
+public interface ILazyPojo<T> extends Serializable {
 
 	T getInstance();
 	
@@ -19,5 +19,7 @@ public interface ILazyPojo<T> extends Serializable, Provider<T> {
 	Future<T> init(ExecutorService executor);
 	
 	Future<Boolean> destroy(ExecutorService executor);
+	
+	Provider<T> toProvider();
 
 }

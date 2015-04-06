@@ -14,11 +14,10 @@ import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
-import com.github.nill14.utils.init.inject.ReflectionUtils;
 import com.google.common.reflect.TypeToken;
 
 @SuppressWarnings("serial")
-public final class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
+public final class LazyPojo<T> implements ILazyPojo<T> {
 
 	
 	public static <T> ILazyPojo<T> forSingleton(T singleton) {
@@ -45,9 +44,9 @@ public final class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 	
 	public static <T, F extends Provider<? extends T>> ILazyPojo<T> forProvider(
 			Class<F> providerClass, IPropertyResolver resolver, IPojoInitializer factoryInitializer) {
-		TypeToken<T> typeToken = ReflectionUtils.getProviderReturnTypeToken(providerClass);
-		IPojoFactory<F> pojoFactory = new PojoInjectionFactory<>(TypeToken.of(providerClass), resolver);
-		PojoFactoryAdapter<T, F> factoryAdapter = new PojoFactoryAdapter<T, F>(pojoFactory, typeToken, factoryInitializer);
+		
+		TypeToken<F> providerType = TypeToken.of(providerClass);
+		PojoFactoryAdapter<T, F> factoryAdapter = new PojoFactoryAdapter<T, F>(providerType, resolver, factoryInitializer);
 		return new LazyPojo<>(factoryAdapter, factoryAdapter);
 	}
 	
@@ -76,11 +75,6 @@ public final class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 		return factory.getType();
 	}
 
-	@Override
-	public T get() {
-		return getInstance();
-	}
-	
 	@Override
 	public T getInstance() {
 		T instance = this.instance;
@@ -171,6 +165,18 @@ public final class LazyPojo<T> implements ILazyPojo<T>, Provider<T> {
 				Integer.toHexString(System.identityHashCode(this)));
 	}
 	
+	@Override
+	public Provider<T> toProvider() {
+		return provider;
+	}
 
+	
+	private transient Provider<T> provider = new Provider<T>() {
+
+		@Override
+		public T get() {
+			return getInstance();
+		}
+	};
 
 }

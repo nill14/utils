@@ -1,8 +1,8 @@
 package com.github.nill14.utils.init.impl;
 
-import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
+import static org.testng.Assert.*;
 
 import java.io.PrintStream;
 
@@ -10,11 +10,11 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
@@ -31,7 +31,7 @@ public class EventBusTest {
 	private PrintStream printStream;
 	private IServiceRegistry serviceRegistry;
 	
-	@Before
+	@BeforeMethod
 	public void prepare() {
 		serviceRegistry = IServiceRegistry.newRegistry();
 		serviceRegistry.addSingleton(eventBus = new EventBus());

@@ -1,6 +1,7 @@
 package com.github.nill14.utils.init.impl;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.testng.Assert.*;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -11,10 +12,10 @@ import javax.inject.Named;
 import javax.inject.Qualifier;
 
 import org.hamcrest.CoreMatchers;
-import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IServiceContext;
@@ -27,7 +28,7 @@ public class QualifiedProviderTest {
 	private static final Logger log = LoggerFactory.getLogger(QualifiersTest.class);
 	private IBeanInjector beanInjector;
 	
-	@Before
+	@BeforeMethod
 	public void prepare() {
 		IServiceRegistry serviceRegistry = IServiceRegistry.newRegistry();
 		serviceRegistry.addService(MangoSync.class, IServiceContext.global());
@@ -67,7 +68,7 @@ public class QualifiedProviderTest {
 		assertThat(mangoProvider.getNamed("helloMango"), CoreMatchers.instanceOf(MangoHello.class));
 	}
 
-	@Test(expected = RuntimeException.class)
+	@Test(expectedExceptions = RuntimeException.class)
 	public void testMangoBeanFail() {
 		QualifiedProvider<Mango> mangoProvider = beanInjector.wire(new TypeToken<QualifiedProvider<Mango>>() {});
 		

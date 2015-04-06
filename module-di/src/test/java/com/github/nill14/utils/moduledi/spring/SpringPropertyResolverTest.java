@@ -1,7 +1,7 @@
 package com.github.nill14.utils.moduledi.spring;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static org.testng.Assert.*;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -12,11 +12,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Qualifier;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -26,7 +27,7 @@ public class SpringPropertyResolverTest {
 	private ApplicationContext context;
 	private MangoHello helloMango;
 	
-	@Before
+	@BeforeMethod
 	public void prepare() {
 		context = mock(ApplicationContext.class);
 		
@@ -46,7 +47,7 @@ public class SpringPropertyResolverTest {
 		AnotherNamed annotation = field.getAnnotation(AnotherNamed.class);
 		
 		Object result = resolver.findByQualifier("pojo", Mango.class, annotation);
-		assertEquals(helloMango, result);
+		Assert.assertEquals(helloMango, result);
 	}
 	
 	@Test

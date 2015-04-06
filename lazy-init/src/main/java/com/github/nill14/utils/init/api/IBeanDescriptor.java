@@ -1,6 +1,5 @@
 package com.github.nill14.utils.init.api;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
@@ -18,9 +17,6 @@ public interface IBeanDescriptor<T> {
 	Set<Class<? super T>> getInterfaces();
 
 	Set<Class<? super T>> getDeclaredTypes();
-
-	@Deprecated
-	Set<Annotation> getDeclaredQualifiers();
 
 	TypeToken<T> getToken();
 	

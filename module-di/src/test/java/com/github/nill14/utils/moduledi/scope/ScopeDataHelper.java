@@ -16,7 +16,6 @@
 
 package com.github.nill14.utils.moduledi.scope;
 
-import org.springframework.beans.factory.config.Scope;
 import org.springframework.core.NamedInheritableThreadLocal;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.util.ClassUtils;

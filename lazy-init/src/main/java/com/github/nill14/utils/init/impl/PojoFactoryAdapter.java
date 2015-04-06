@@ -8,6 +8,7 @@ import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
+import com.github.nill14.utils.init.inject.ReflectionUtils;
 import com.google.common.reflect.TypeToken;
 
 public class PojoFactoryAdapter<T, F extends Provider<? extends T>> implements IPojoFactory<T>, IPojoInitializer {
@@ -19,9 +20,17 @@ public class PojoFactoryAdapter<T, F extends Provider<? extends T>> implements I
 	private final IPojoInitializer pojoInitializer;
 
     /** Cache the beanDescriptor */
-    private IBeanDescriptor<T> beanDescriptor; 
+    private IBeanDescriptor<T> beanDescriptor;
+
+	public PojoFactoryAdapter(TypeToken<F> providerType, IPropertyResolver resolver, IPojoInitializer initializer) {
+		this.typeToken = ReflectionUtils.getProviderReturnTypeToken(providerType);
+		this.pojoFactory = new PojoInjectionFactory<>(providerType, resolver);
+		this.pojoInitializer = initializer;
+		this.lazyFactory = new LazyPojo<F>(pojoFactory, initializer);
+	}
     
-	public PojoFactoryAdapter(IPojoFactory<F> pojoFactory, TypeToken<T> typeToken, IPojoInitializer factoryInitializer) {
+	@SuppressWarnings("unused")
+	private PojoFactoryAdapter(IPojoFactory<F> pojoFactory, TypeToken<T> typeToken, IPojoInitializer factoryInitializer) {
 		this.pojoFactory = pojoFactory;
 		this.typeToken = typeToken;
 		this.pojoInitializer = factoryInitializer;
@@ -36,6 +45,10 @@ public class PojoFactoryAdapter<T, F extends Provider<? extends T>> implements I
 	@Override
 	public TypeToken<T> getType() {
 		return typeToken;
+	}
+	
+	public TypeToken<F> getFactoryType() {
+		return pojoFactory.getType();
 	}
 	
 	@Override

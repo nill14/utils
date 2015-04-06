@@ -1,5 +1,8 @@
 package com.github.nill14.utils.init.impl;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -8,16 +11,16 @@ import com.google.common.collect.ImmutableList;
 @SuppressWarnings("serial")
 public class ChainingPojoInitializer implements IPojoInitializer {
 	
-	private final ImmutableList<IPojoInitializer> items;
+	private final CopyOnWriteArrayList<IPojoInitializer> items;
 	
 	
 	@SafeVarargs
 	public ChainingPojoInitializer(IPojoInitializer... initializers) {
-		items = ImmutableList.copyOf(initializers);
+		items = new CopyOnWriteArrayList<IPojoInitializer>(initializers);
 	}
 
-	public ChainingPojoInitializer(ImmutableList<IPojoInitializer> initializers) {
-		items = initializers;
+	public ChainingPojoInitializer(List<IPojoInitializer> initializers) {
+		items = new CopyOnWriteArrayList<IPojoInitializer>(initializers);
 	}
 	
 	public static ChainingPojoInitializer defaultInitializer() {
@@ -36,6 +39,19 @@ public class ChainingPojoInitializer implements IPojoInitializer {
 		ImmutableList.Builder<IPojoInitializer> builder = ImmutableList.builder();
 		ImmutableList<IPojoInitializer> initializers = builder.add(extraInitializer).addAll(items).build();
 		return new ChainingPojoInitializer(initializers);
+	}
+	
+	/**
+	 * 
+	 * @param extraInitializer The first initializer to execute
+	 * @return
+	 */
+	public void insert(IPojoInitializer extraInitializer) {
+		items.add(0, extraInitializer);
+	}
+	
+	public void remove(IPojoInitializer extraInitializer) {
+		items.remove(extraInitializer);
 	}
 	
 	@Override

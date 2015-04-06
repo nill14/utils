@@ -1,12 +1,12 @@
 package com.github.nill14.utils.init.impl;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
 
 import javax.inject.Inject;
 
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.Test;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IPropertyResolver;

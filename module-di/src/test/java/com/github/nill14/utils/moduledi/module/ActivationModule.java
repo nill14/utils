@@ -2,7 +2,7 @@ package com.github.nill14.utils.moduledi.module;
 
 import java.util.Optional;
 
-import org.junit.Assert;
+import org.testng.Assert;
 
 import com.github.nill14.parsers.dependency.IDependencyDescriptorBuilder;
 import com.github.nill14.utils.init.api.IServiceRegistry;

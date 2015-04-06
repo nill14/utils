@@ -13,7 +13,6 @@ import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.impl.PojoFactoryAdapter;
 import com.github.nill14.utils.init.impl.PojoInjectionFactory;
-import com.github.nill14.utils.init.inject.ReflectionUtils;
 import com.google.common.reflect.TypeToken;
 
 public /*non-final on purpose*/ class LazyPojoFactory<F> implements IPojoFactory<F> {
@@ -49,10 +48,8 @@ public /*non-final on purpose*/ class LazyPojoFactory<F> implements IPojoFactory
 	//class type F is here G - factory
 	@SuppressWarnings("unchecked")
 	protected <T, G extends Provider<T>> LazyPojoFactory(TypeToken<G> factoryType, Class<G> factoryClass) {
+		PojoFactoryAdapter<T, G> factoryAdapter = new PojoFactoryAdapter<T, G>(factoryType, delegatingResolver, delegatingInitializer);
 		this.factoryToken = (TypeToken<F>) factoryType;
-		TypeToken<T> typeToken = ReflectionUtils.getProviderReturnTypeToken(factoryClass);
-		IPojoFactory<G> pojoFactory = new PojoInjectionFactory<>(factoryType, delegatingResolver);
-		PojoFactoryAdapter<T, G> factoryAdapter = new PojoFactoryAdapter<T, G>(pojoFactory, typeToken, delegatingInitializer);
 		this.delegate = (IPojoFactory<F>) factoryAdapter;
 		this.doubleFactory = true;
 	}

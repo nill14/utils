@@ -1,16 +1,16 @@
 package com.github.nill14.utils.init.impl;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static org.testng.Assert.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.github.nill14.utils.init.ITimeService;
 import com.github.nill14.utils.init.TimeService;
@@ -27,7 +27,7 @@ public class AnnotationPojoInitializerTest {
 	private TimeService spy;
 	private IPropertyResolver resolver;
 	
-	@Before
+	@BeforeMethod
 	public void init() {
 		new TimeService();
 		spy = mock(TimeService.class);
@@ -43,7 +43,7 @@ public class AnnotationPojoInitializerTest {
 		timeService = LazyJdkProxy.newProxy(ITimeService.class, lazyPojo);
 	}
 	
-	@After
+	@AfterMethod
 	public void destroy() {
 		lazyPojo.freeInstance();
 	}

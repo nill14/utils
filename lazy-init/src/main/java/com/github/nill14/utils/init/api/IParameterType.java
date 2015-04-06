@@ -39,6 +39,15 @@ public interface IParameterType {
 	static IParameterType of(TypeToken<?> typeToken) {
 		return ParameterTypeBuilder.builder(typeToken).build();
 	}
+	
+	static IParameterTypeBuilder builder(Class<?> clazz) {
+		return ParameterTypeBuilder.builder(clazz);
+	}
+	
+	static IParameterTypeBuilder builder(TypeToken<?> typeToken) {
+		return ParameterTypeBuilder.builder(typeToken);
+	}
+	
 	//TODO consider boolean isCollection and TypeToken getDependencyType
 	
 }

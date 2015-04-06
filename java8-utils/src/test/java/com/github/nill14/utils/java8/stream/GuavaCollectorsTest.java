@@ -1,11 +1,11 @@
 package com.github.nill14.utils.java8.stream;
 
-import static org.junit.Assert.*;
-
 import java.util.stream.IntStream;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.*;
 import java.util.stream.Stream;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;

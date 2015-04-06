@@ -7,7 +7,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceRegistry;
-import com.github.nill14.utils.init.impl.ServiceRegistry;
 
 public class ExtraScopesBeanPostProcessor implements BeanDefinitionRegistryPostProcessor {
 

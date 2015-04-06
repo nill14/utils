@@ -25,7 +25,7 @@ public class QualifiedProvider<T> implements IQualifiedProvider<T> {
 		if (object != null) {
 			return object;
 		} else {
-			throw new RuntimeException("Cannot resolve " + type);
+			throw new RuntimeException("Cannot resolve " + type.getQualifiers());
 		}
 	}
 	
@@ -35,37 +35,37 @@ public class QualifiedProvider<T> implements IQualifiedProvider<T> {
 
 	@Override
 	public T getNamed(String named) {
-		IParameterType type = ParameterTypeBuilder.builder(typeToken).withName(named).build();
+		IParameterType type = IParameterType.builder(typeToken).named(named).build();
 		return resolveOrThrow(type);
 	}
 
 	@Override
 	public Optional<T> getOptionalNamed(String named) {
-		IParameterType type = ParameterTypeBuilder.builder(typeToken).withName(named).build();
+		IParameterType type = IParameterType.builder(typeToken).named(named).build();
 		return resolveOptional(type);
 	}
 
 	@Override
 	public T getQualified(Class<? extends Annotation> annotationType) {
-		IParameterType type = ParameterTypeBuilder.builder(typeToken).withAnnotationType(annotationType).build();
+		IParameterType type = IParameterType.builder(typeToken).annotatedWith(annotationType).build();
 		return resolveOrThrow(type);
 	}
 
 	@Override
 	public Optional<T> getOptionalQualified(Class<? extends Annotation> annotationType) {
-		IParameterType type = ParameterTypeBuilder.builder(typeToken).withAnnotationType(annotationType).build();
+		IParameterType type = IParameterType.builder(typeToken).annotatedWith(annotationType).build();
 		return resolveOptional(type);
 	}
 
 	@Override
 	public T getQualified(Annotation annotation) {
-		IParameterType type = ParameterTypeBuilder.builder(typeToken).withAnnotation(annotation).build();
+		IParameterType type = IParameterType.builder(typeToken).annotatedWith(annotation).build();
 		return resolveOrThrow(type);
 	}
 
 	@Override
 	public Optional<T> getOptionalQualified(Annotation annotation) {
-		IParameterType type = ParameterTypeBuilder.builder(typeToken).withAnnotation(annotation).build();
+		IParameterType type = IParameterType.builder(typeToken).annotatedWith(annotation).build();
 		return resolveOptional(type);
 	}
 }

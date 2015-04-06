@@ -1,6 +1,6 @@
 package com.github.nill14.utils.init.impl;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 public class ParameterizedTypeTest {
 

@@ -1,16 +1,13 @@
 package com.github.nill14.utils.init.impl;
-
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.inject.Provider;
-
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.github.nill14.utils.init.Calculator;
 import com.github.nill14.utils.init.ICalculator;
@@ -44,7 +41,7 @@ public class LazyJdkProxyTest {
 		calcProxy = LazyJdkProxy.newProxy(ICalculator.class, lazyObject);
 	}
 	
-	@Before
+	@BeforeMethod
 	public void init() {
 		lazyObject.freeInstance();
 		assertEquals(0, instances.get());

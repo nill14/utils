@@ -1,14 +1,11 @@
 package com.github.nill14.utils.init.jaxb;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.bind.JAXBException;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import com.github.nill14.utils.init.ICalculator;
 import com.github.nill14.utils.init.IGreeter;

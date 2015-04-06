@@ -96,12 +96,6 @@ public class PojoInjectionDescriptor<T> implements Serializable, IBeanDescriptor
 		return typeToken.getTypes().rawTypes();
 	}
 	
-	@Override
-	@Deprecated
-	public Set<Annotation> getDeclaredQualifiers() {
-		return ImmutableSet.copyOf(AnnotationScanner.findAnnotations(typeToken.getRawType().getAnnotations(), Qualifier.class).values());
-	}
-	
 	private Stream<Method> nonStaticMethods(Stream<Class<?>> declaredClasses) {
 		return declaredClasses
 			.flatMap(c -> Stream.of(c.getDeclaredMethods()))

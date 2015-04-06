@@ -82,6 +82,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.github.nill14.parsers</groupId>
+			<artifactId>dependency-graph</artifactId>
+		</dependency>
+	
+		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
@@ -115,10 +120,17 @@
 		</dependency>
 
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
 			<scope>test</scope>
-		</dependency>
+		</dependency>	
+
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+			<scope>test</scope>
+		</dependency>		
+
 
 		<dependency>
 			<groupId>org.mockito</groupId>

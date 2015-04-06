@@ -28,6 +28,14 @@ public class PojoProviderFactory<T> implements IPojoFactory<T> {
     /** Cache the beanDescriptor */
     private IBeanDescriptor<T> beanDescriptor; 
 
+    /**
+     * 
+     * WARNING: do not use closure as provider: () -> (Type) instance
+     * The {@link #getType()} will return always Object!!!
+     * 
+     * @param provider
+     * @param resolver
+     */
 	public PojoProviderFactory(Provider<T> provider, IPropertyResolver resolver) {
 		this.typeToken = ReflectionUtils.getProviderReturnTypeToken(provider);
 		this.resolver = resolver;
@@ -36,6 +44,13 @@ public class PojoProviderFactory<T> implements IPojoFactory<T> {
 	
 	protected PojoProviderFactory(TypeToken<T> typeToken, Provider<T> provider, IPropertyResolver resolver) {
 		this.typeToken = typeToken;
+		this.resolver = resolver;
+		this.provider = provider;
+	}
+	
+	protected PojoProviderFactory(IBeanDescriptor<T> beanDescriptor, Provider<T> provider, IPropertyResolver resolver) {
+		this.typeToken = beanDescriptor.getToken();
+		this.beanDescriptor = beanDescriptor;
 		this.resolver = resolver;
 		this.provider = provider;
 	}

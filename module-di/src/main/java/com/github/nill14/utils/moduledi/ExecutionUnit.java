@@ -6,6 +6,7 @@ import com.github.nill14.parsers.dependency.impl.DependencyDescriptor;
 import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
 import com.github.nill14.utils.moduledi.spring.SpringModuleServiceContext;
+import com.github.nill14.utils.moduledi.IModule;
 
 public class ExecutionUnit {
 

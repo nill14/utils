@@ -1,6 +1,6 @@
 package com.github.nill14.utils.java8.stream;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
 
 import java.util.Iterator;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 public class StreamUtilsTest {
 

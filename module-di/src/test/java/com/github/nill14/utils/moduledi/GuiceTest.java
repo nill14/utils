@@ -1,6 +1,6 @@
 package com.github.nill14.utils.moduledi;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import com.github.nill14.utils.moduledi.module.BreadModule;
 import com.github.nill14.utils.moduledi.module.DeliveryModule;
