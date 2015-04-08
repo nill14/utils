@@ -44,7 +44,6 @@ public class ChainingPojoInitializer implements IPojoInitializer {
 	/**
 	 * 
 	 * @param extraInitializer The first initializer to execute
-	 * @return
 	 */
 	public void insert(IPojoInitializer extraInitializer) {
 		items.add(0, extraInitializer);

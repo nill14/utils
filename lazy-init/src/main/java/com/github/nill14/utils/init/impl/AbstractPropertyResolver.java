@@ -15,7 +15,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
-import com.github.nill14.utils.init.impl.LazyPojo;
 
 @SuppressWarnings("serial")
 public abstract class AbstractPropertyResolver implements IPropertyResolver {
@@ -26,7 +25,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		
 		boolean isCollection = isCollection(type);
 		if (isCollection || type.isOptional()) { 
-			Class<?> paramClass = type.getFirstParamClass();
+			Class<?> paramClass = type.getFirstParamToken().getRawType();
 
 			if (java.util.Optional.class.isAssignableFrom(rawType)) {
 				return java.util.Optional.ofNullable(doResolve(pojo, type, paramClass));
@@ -62,7 +61,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			return new BeanInjector(this);
 		
 		} else if (IQualifiedProvider.class.equals(rawType)) {
-			return new QualifiedProvider(type.getToken(), this);
+			return new QualifiedProvider(type.getFirstParamToken(), this);
 		}
 		
 		Collection<Annotation> qualifiers = type.getQualifiers();

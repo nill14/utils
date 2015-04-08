@@ -58,10 +58,10 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 	}
 
 	@Override
-	public Class<?> getFirstParamClass() {
+	public TypeToken<?> getFirstParamToken() {
 		if (type instanceof ParameterizedType) {
 			Type argType = ((ParameterizedType) type).getActualTypeArguments()[0];
-			return TypeToken.of(argType).getRawType();
+			return TypeToken.of(argType);
 		}
 		throw new IllegalStateException();
 	}

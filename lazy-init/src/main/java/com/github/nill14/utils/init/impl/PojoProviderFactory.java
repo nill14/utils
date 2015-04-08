@@ -30,7 +30,7 @@ public class PojoProviderFactory<T> implements IPojoFactory<T> {
 
     /**
      * 
-     * WARNING: do not use closure as provider: () -> (Type) instance
+     * WARNING: do not use closure as provider: () -&gt; (Type) instance
      * The {@link #getType()} will return always Object!!!
      * 
      * @param provider

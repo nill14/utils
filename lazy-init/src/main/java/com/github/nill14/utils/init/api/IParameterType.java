@@ -20,7 +20,7 @@ public interface IParameterType {
 
 	Type[] getParameterTypes();
 	
-	Class<?> getFirstParamClass();
+	TypeToken<?> getFirstParamToken();
 	
 	Collection<Annotation> getQualifiers();
 	
