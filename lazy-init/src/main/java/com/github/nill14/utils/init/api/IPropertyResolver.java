@@ -12,7 +12,7 @@ public interface IPropertyResolver extends Serializable {
 	 * @param type The property type descriptor.
 	 * @return The resolved property or null if property could not be resolved.
 	 */
-	Object resolve(Object pojo, IParameterType type);
+	Object resolve(Object pojo, IParameterType<?> type);
 	
 	
 	static IPropertyResolver empty() {

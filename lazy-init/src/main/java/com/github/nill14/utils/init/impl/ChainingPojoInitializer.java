@@ -49,6 +49,10 @@ public class ChainingPojoInitializer implements IPojoInitializer {
 		items.add(0, extraInitializer);
 	}
 	
+	public void append(IPojoInitializer extraInitializer) {
+		items.add(extraInitializer);
+	}
+	
 	public void remove(IPojoInitializer extraInitializer) {
 		items.remove(extraInitializer);
 	}

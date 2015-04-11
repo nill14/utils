@@ -17,7 +17,7 @@ import com.google.common.collect.ImmutableMap;
 public class MethodInjectionDescriptor implements IMemberDescriptor {
 
 	private final Method method;
-	private final ImmutableList<IParameterType> parameterTypes;
+	private final ImmutableList<IParameterType<?>> parameterTypes;
 	private final ImmutableMap<Class<? extends Annotation>, Annotation> annotations;
 	private final boolean optionalInject;
 
@@ -27,10 +27,10 @@ public class MethodInjectionDescriptor implements IMemberDescriptor {
 		
 		Annotation[][] paramAnnotations = method.getParameterAnnotations();
 		Type[] paramTypes = method.getGenericParameterTypes();
-		Builder<IParameterType> builder = ImmutableList.builder();
+		Builder<IParameterType<?>> builder = ImmutableList.builder();
 		
 		for (int i = 0; i < method.getParameterCount(); i++) {
-			ParameterTypeInjectionDescriptor td = new ParameterTypeInjectionDescriptor(paramTypes[i], paramAnnotations[i]);
+			ParameterTypeInjectionDescriptor<?> td = new ParameterTypeInjectionDescriptor<>(paramTypes[i], paramAnnotations[i]);
 			builder.add(td);
 			optionalInject |= td.isNullable();
 		}
@@ -52,7 +52,7 @@ public class MethodInjectionDescriptor implements IMemberDescriptor {
 	}
 
 	@Override
-	public Collection<IParameterType> getParameterTypes() {
+	public Collection<IParameterType<?>> getParameterTypes() {
 		return parameterTypes;
 	}
 

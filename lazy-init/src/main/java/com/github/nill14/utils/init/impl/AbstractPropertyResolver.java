@@ -3,6 +3,8 @@ package com.github.nill14.utils.init.impl;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 
+import javax.inject.Provider;
+
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
@@ -20,29 +22,40 @@ import com.google.common.collect.ImmutableSortedSet;
 public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	
 	@Override
-	public Object resolve(Object pojo, IParameterType type) {
+	public Object resolve(Object pojo, IParameterType<?> type) {
 		Class<?> rawType = type.getRawType();
 		
+		
+		boolean isProvider = isProvider(type);
 		boolean isCollection = isCollection(type);
-		if (isCollection || type.isOptional()) { 
+		if (isCollection || isProvider || type.isOptional()) { 
 			Class<?> paramClass = type.getFirstParamToken().getRawType();
 
 			if (java.util.Optional.class.isAssignableFrom(rawType)) {
-				return java.util.Optional.ofNullable(doResolve(pojo, type, paramClass));
+				return java.util.Optional.ofNullable(doResolve(pojo, type, paramClass)).map(Provider::get);
 			}
 			
 			if (com.google.common.base.Optional.class.isAssignableFrom(rawType)) {
-				return com.google.common.base.Optional.fromNullable(doResolve(pojo, type, paramClass));
+				Provider<?> opt = doResolve(pojo, type, paramClass);
+				if (opt != null) {
+					return com.google.common.base.Optional.of(opt.get());
+				} else {
+					return com.google.common.base.Optional.absent();
+				}
 			}
 			
+			if (isProvider) {
+				return doResolve(pojo, IParameterType.of(type.getFirstParamToken()), paramClass);
+			}
+
 			if (Iterable.class.isAssignableFrom(rawType)) {
 				return doResolveCollection(pojo, rawType, paramClass);
 			}
 		} 
 	
-		Object result = doResolve(pojo, type, rawType);
+		Provider<?> result = doResolve(pojo, type, rawType);
 		if (result != null) {
-			return result;
+			return result.get();
 		}
 
 		IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
@@ -56,13 +69,14 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected Object doResolve(Object pojo, IParameterType type, Class<?> rawType) {
+	protected Provider<?> doResolve(Object pojo, IParameterType type, Class<?> rawType) {
 		if (IBeanInjector.class.equals(rawType)) {
-			return new BeanInjector(this);
+			return new BeanInjector(this).toProvider();
 		
 		} else if (IQualifiedProvider.class.equals(rawType)) {
-			return new QualifiedProvider(type.getFirstParamToken(), this);
-		}
+			return new QualifiedProvider(type.getFirstParamToken(), this).toProvider();
+		
+		} 
 		
 		Collection<Annotation> qualifiers = type.getQualifiers();
 		if (!qualifiers.isEmpty()) {
@@ -70,13 +84,13 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		}
 		
 		if (type.getNamed().isPresent()) { // find by name
-			Object result = findByName(pojo, type.getNamed().get(), rawType);
+			Provider<?> result = findByName(pojo, (String) type.getNamed().get(), rawType);
 			if (result != null) {
 				return result;
 			}
 		
 		} else { // find by type
-			Object result = findByType(pojo, type, rawType);
+			Provider<?> result = findByType(pojo, type, rawType);
 			if (result != null) {
 				return result;
 			}
@@ -102,11 +116,11 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		}
 	}
 	
-	protected Object doResolveQualifiers(Object pojo, IParameterType type, Class<?> clazz) {
-		Object result = null;
+	protected Provider<?> doResolveQualifiers(Object pojo, IParameterType<?> type, Class<?> clazz) {
+		Provider<?> result = null;
 		
 		for (Annotation qualifier : type.getQualifiers()) {
-			Object query = findByQualifier(pojo, clazz, qualifier);
+			Provider<?> query = findByQualifier(pojo, clazz, qualifier);
 			
 			if (result != null && !result.equals(query)) {
 				return null;
@@ -119,14 +133,48 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	}
 	
 	
-	protected abstract Object findByName(Object pojo, String name, Class<?> type);
-	protected abstract Object findByType(Object pojo, IParameterType type, Class<?> clazz);
+	protected abstract Provider<?> findByName(Object pojo, String name, Class<?> type);
+	protected abstract Provider<?> findByType(Object pojo, IParameterType<?> type, Class<?> clazz);
 	protected abstract Collection<?> findAllByType(Object pojo, Class<?> type);
 
-	protected abstract Object findByQualifier(Object pojo, Class<?> type, Annotation qualifier);
+	protected abstract Provider<?> findByQualifier(Object pojo, Class<?> type, Annotation qualifier);
 	
-	protected boolean isCollection(IParameterType type) {
+	protected boolean isCollection(IParameterType<?> type) {
 		return Iterable.class.isAssignableFrom(type.getRawType());
 	}
+
+	protected boolean isProvider(IParameterType<?> type) {
+		return Provider.class.isAssignableFrom(type.getRawType());
+	}
 	
+	protected Provider<?> provider(Object bean) {
+		return new StaticProvider<>(bean);
+	}
+	
+	private static class StaticProvider<T> implements Provider<T> {
+		private final T bean;
+
+		public StaticProvider(T bean) {
+			Preconditions.checkNotNull(bean);
+			this.bean = bean;
+		}
+		@Override
+		public T get() {
+			return bean;
+		}
+		
+		@SuppressWarnings("rawtypes")
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof StaticProvider) {
+				return bean.equals(((StaticProvider) obj).get());
+			}
+			return super.equals(obj);
+		}
+		
+		@Override
+		public int hashCode() {
+			return bean.hashCode();
+		}
+	}
 }

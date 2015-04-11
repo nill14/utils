@@ -23,6 +23,9 @@ public class ChainingPropertyResolver implements IPropertyResolver {
 		items.add(0, extraResolver);
 	}
 
+	public void append(IPropertyResolver extraResolver) {
+		items.add(extraResolver);
+	}
 	
 	public void remove(IPropertyResolver extraResolver) {
 		items.remove(extraResolver);
@@ -40,7 +43,7 @@ public class ChainingPropertyResolver implements IPropertyResolver {
 	}
 	
 	@Override
-	public Object resolve(Object pojo, IParameterType type) {
+	public Object resolve(Object pojo, IParameterType<?> type) {
 		for (IPropertyResolver resolver : items) {
 			Object result = resolver.resolve(pojo, type);
 			if (result != null) {

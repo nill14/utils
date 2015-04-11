@@ -15,10 +15,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 
-public class ParameterTypeInjectionDescriptor implements IParameterType {
+public class ParameterTypeInjectionDescriptor<T> implements IParameterType<T> {
 	
 	private final Type type;
-	private final TypeToken<?> typeToken;
+	private final TypeToken<T> typeToken;
 	private final Optional<String> named;
 
 	//There are multiple annotations in Java8 but they are always packed in another annotation
@@ -27,9 +27,10 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 	private final boolean optional;
 	private final boolean nullable;
 	
+	@SuppressWarnings("unchecked")
 	public ParameterTypeInjectionDescriptor(Type type, Annotation[] annotations) {
 		this.type = type;
-		typeToken = TypeToken.of(type);
+		typeToken = (TypeToken<T>) TypeToken.of(type);
 
 		Map<Class<? extends Annotation>, Annotation> qualifiers = AnnotationScanner.findAnnotations(annotations, javax.inject.Qualifier.class);
 //		Map<Class<? extends Annotation>, Annotation> bindingAnnotations = AnnotationScanner.findAnnotations(annotations, com.google.inject.BindingAnnotation.class);
@@ -85,7 +86,7 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 	}
 	
 	@Override
-	public TypeToken<?> getToken() {
+	public TypeToken<T> getToken() {
 		return typeToken;
 	}
 	

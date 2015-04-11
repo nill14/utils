@@ -11,7 +11,7 @@ public interface IMemberDescriptor {
 	
 	Collection<Annotation> getAnnotations();
 	
-	Collection<IParameterType> getParameterTypes();
+	Collection<IParameterType<?>> getParameterTypes();
 
 	Object invoke(Object receiver, Object... args) throws InvocationTargetException, ReflectiveOperationException;
 	

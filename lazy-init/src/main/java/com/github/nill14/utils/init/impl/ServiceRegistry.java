@@ -22,14 +22,13 @@ import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
-import com.github.nill14.utils.init.binding.impl.BindingImpl;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.github.nill14.utils.init.meta.AnnotationScanner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 
 /**
@@ -147,9 +146,9 @@ public class ServiceRegistry implements IServiceRegistry {
 	
 	@Override
 	public <S> Optional<S> getOptionalService(Class<S> iface, String name) {
-		Object bean = beans.get(name);
-		if (bean != null && iface.isAssignableFrom(bean.getClass())) {
-			return Optional.of(iface.cast(bean));
+		ILazyPojo<?> bean = beans.get(name);
+		if (bean != null && iface.isAssignableFrom(bean.getType().getRawType())) {
+			return Optional.of(iface.cast(bean.getInstance()));
 		}
 		return Optional.empty();
 	}
@@ -252,23 +251,30 @@ public class ServiceRegistry implements IServiceRegistry {
 	private class ServiceRegistryPropertyResolver extends AbstractPropertyResolver {
 
 		@Override
-		protected Object findByQualifier(Object pojo, Class<?> type, Annotation qualifier) {
+		protected Provider<?> findByQualifier(Object pojo, Class<?> type, Annotation qualifier) {
 			ILazyPojo<?> lazyPojo = qualifiers.getOrDefault(type, Collections.emptyMap()).get(qualifier);
 			if (lazyPojo != null) {
-				return lazyPojo.getInstance();
+				return lazyPojo.toProvider();
 			} else {
 				return null;
 			}
 		}
 		
 		@Override
-		protected Object findByName(Object pojo, String name, Class<?> type) {
-			return getOptionalService(type, name).orElse(null);
+		protected Provider<?> findByName(Object pojo, String name, Class<?> type) {
+			ILazyPojo<?> bean = beans.get(name);
+			if (bean != null && type.isAssignableFrom(bean.getType().getRawType())) {
+				return bean.toProvider();
+			}
+			return null;
 		}
 
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
-		protected Object findByType(Object pojo, IParameterType type, Class<?> clazz) {
-			return getOptionalService(clazz).orElse(null);
+		protected Provider<?> findByType(Object pojo, IParameterType<?> type, Class<?> clazz) {
+			Map<String, ILazyPojo<?>> serviceMap = getServiceMap((Class) clazz);
+			Optional<ILazyPojo<?>> first = serviceMap.values().stream().findFirst();
+			return first.map(ILazyPojo::toProvider).orElse(null);
 		}
 
 		@Override

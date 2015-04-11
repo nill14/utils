@@ -24,6 +24,7 @@ public class LazyJavassistProxyTest {
 	private static ILazyPojo<Calculator> lazyObject;
 	private static AtomicInteger instances = new AtomicInteger();
 
+	@SuppressWarnings("serial")
 	private static final IPojoInitializer initializer = new IPojoInitializer() {
 
 		@Override

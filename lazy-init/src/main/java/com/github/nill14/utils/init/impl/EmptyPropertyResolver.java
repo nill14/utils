@@ -2,7 +2,8 @@ package com.github.nill14.utils.init.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
-import java.util.Iterator;
+
+import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -21,13 +22,13 @@ public final class EmptyPropertyResolver extends AbstractPropertyResolver implem
 	}
 	
 	@Override
-	protected Object findByName(Object pojo, String name, Class<?> type) {
+	protected Provider<?> findByName(Object pojo, String name, Class<?> type) {
 		return null;
 	}
 
 
 	@Override
-	protected Object findByType(Object pojo, IParameterType type, Class<?> clazz) {
+	protected Provider<?> findByType(Object pojo, IParameterType<?> type, Class<?> clazz) {
 		return null;
 	}
 
@@ -39,7 +40,7 @@ public final class EmptyPropertyResolver extends AbstractPropertyResolver implem
 
 
 	@Override
-	protected Object findByQualifier(Object pojo, Class<?> type, Annotation qualifier) {
+	protected Provider<?> findByQualifier(Object pojo, Class<?> type, Annotation qualifier) {
 		return null;
 	}
 

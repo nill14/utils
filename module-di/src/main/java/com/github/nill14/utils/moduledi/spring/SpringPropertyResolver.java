@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.springframework.context.ApplicationContext;
 
@@ -25,11 +26,11 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Object doResolveQualifiers(Object pojo, IParameterType type, Class<?> clazz) {
-		Object result = null;
+	protected Provider<?> doResolveQualifiers(Object pojo, IParameterType<?> type, Class<?> clazz) {
+		Provider<?> result = null;
 		
 		for (Annotation qualifier : type.getQualifiers()) {
-			Object query = null;
+			Provider<?> query = null;
 			if (Named.class.equals(qualifier.annotationType())) {
 				String name = ((Named) qualifier).value();
 				query = findByName(pojo, name, clazz);
@@ -48,7 +49,7 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Object findByQualifier(Object pojo, Class<?> type, Annotation qualifier) {
+	protected Provider<?> findByQualifier(Object pojo, Class<?> type, Annotation qualifier) {
 		
 		Class<? extends Annotation> annotationClass = qualifier.annotationType();
 		Map<String, Object> beansWithAnnotation = context.getBeansWithAnnotation(annotationClass);
@@ -64,7 +65,7 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 			return null;
 		
 		} else if (result.size() == 1) {
-			return result.get(0);
+			return provider(result.get(0));
 			
 		} else {
 			throw new IllegalStateException("Expected one result, got "+ result);
@@ -74,18 +75,18 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	
 
 	@Override
-	protected Object findByName(Object pojo, String name, Class<?> type) {
+	protected Provider<?> findByName(Object pojo, String name, Class<?> type) {
 		if (context.isTypeMatch(name, type)) {
-			return context.getBean(name, type);
+			return provider(context.getBean(name, type));
 		}
 		return null;
 	}
 
 	@Override
-	protected Object findByType(Object pojo, IParameterType type, Class<?> clazz) {
+	protected Provider<?> findByType(Object pojo, IParameterType<?> type, Class<?> clazz) {
 		String[] names = context.getBeanNamesForType(clazz);
 		if (names.length > 0) {
-			return context.getBean(names[0], clazz);
+			return provider(context.getBean(names[0], clazz));
 		}
 		return null;
 	}

@@ -14,7 +14,7 @@ import com.github.nill14.utils.init.meta.Annotations;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 
-public class ParameterTypeBuilder implements IParameterTypeBuilder {
+public class ParameterTypeBuilder<T> implements IParameterTypeBuilder<T> {
 
 //	static {
 		//see https://code.google.com/p/guava-libraries/wiki/ReflectionExplained
@@ -24,83 +24,83 @@ public class ParameterTypeBuilder implements IParameterTypeBuilder {
 //		builder(new TypeToken<Optional<List<String>>>() {});
 //	}
 	
-	public static <T> IParameterTypeBuilder builder(Class<T> clazz) {
-		return new ParameterTypeBuilder(clazz);
+	public static <T> IParameterTypeBuilder<T> builder(Class<T> clazz) {
+		return new ParameterTypeBuilder<>(clazz);
 	}
 	
-	public static <T> IParameterTypeBuilder builder(TypeToken<T> typeToken) {
-		return new ParameterTypeBuilder(typeToken);
+	public static <T> IParameterTypeBuilder<T> builder(TypeToken<T> typeToken) {
+		return new ParameterTypeBuilder<>(typeToken);
 	}
 	
 	private final TypeToken<?> typeToken;
 	private final ImmutableMap.Builder<Class<? extends Annotation>, Annotation> annotations = ImmutableMap.builder();
 
-	private ParameterTypeBuilder(Class<?> clazz) {
+	private ParameterTypeBuilder(Class<T> clazz) {
 		typeToken = TypeToken.of(clazz);
 	}
 	
-	private ParameterTypeBuilder(TypeToken<?> typeToken) {
+	private ParameterTypeBuilder(TypeToken<T> typeToken) {
 		this.typeToken = typeToken;
 	}
 	
 	@Override
 	@Deprecated
-	public ParameterTypeBuilder withAnnotation(Annotation annotation) {
+	public ParameterTypeBuilder<T> withAnnotation(Annotation annotation) {
 		annotations.put(annotation.annotationType(), annotation);
 		return this;
 	}
 	
 	@Override
-	public ParameterTypeBuilder annotatedWith(Class<? extends Annotation> annotationType) {
+	public ParameterTypeBuilder<T> annotatedWith(Class<? extends Annotation> annotationType) {
 		annotations.put(annotationType, Annotations.annotation(annotationType));
 		return this;
 	}
 
 	@Override
-	public ParameterTypeBuilder annotatedWith(Annotation annotation) {
+	public ParameterTypeBuilder<T> annotatedWith(Annotation annotation) {
 		annotations.put(annotation.annotationType(), annotation);
 		return this;
 	}
 	
 	@Override
 	@Deprecated
-	public ParameterTypeBuilder withAnnotationType(Class<? extends Annotation> annotationType) {
+	public ParameterTypeBuilder<T> withAnnotationType(Class<? extends Annotation> annotationType) {
 		annotations.put(annotationType, Annotations.annotation(annotationType));
 		return this;
 	}
 
 	@Override
-	public ParameterTypeBuilder scanAnnotations() {
+	public ParameterTypeBuilder<T> scanAnnotations() {
 		Annotation[] annotations = typeToken.getRawType().getAnnotations();
 		this.annotations.putAll(AnnotationScanner.indexAnnotations(annotations));
 		return this;
 	}
 
 	@Override
-	public ParameterTypeBuilder scanQualifiers() {
+	public ParameterTypeBuilder<T> scanQualifiers() {
 		Annotation[] annotations = typeToken.getRawType().getAnnotations();
 		this.annotations.putAll(AnnotationScanner.findAnnotations(annotations, Qualifier.class));
 		return this;
 	}
 	
 	@Override
-	public ParameterTypeBuilder named(String name) {
+	public ParameterTypeBuilder<T> named(String name) {
 		annotations.put(Named.class, Annotations.named(name));
 		return this;
 	}
 	
 	@Override
 	@Deprecated
-	public ParameterTypeBuilder withName(String name) {
+	public ParameterTypeBuilder<T> withName(String name) {
 		annotations.put(Named.class, Annotations.named(name));
 		return this;
 	}
 	
 	@Override
-	public IParameterType build() {
+	public IParameterType<T> build() {
 		Annotation[] annotations = this.annotations.build().values().stream().toArray(Annotation[]::new);
 		Type type = typeToken.getType();
-		return new ParameterTypeInjectionDescriptor(type, annotations);
+		return new ParameterTypeInjectionDescriptor<>(type, annotations);
 	}
 
 }

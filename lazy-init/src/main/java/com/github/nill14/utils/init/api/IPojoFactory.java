@@ -8,9 +8,13 @@ public interface IPojoFactory<T> extends Serializable {
 	
 	T newInstance();
 	
+//	void destroyInstance(T instance);
+	
 	TypeToken<T> getType();
 	
 	IPropertyResolver getResolver();
+	
+//	IPojoInitializer getInitializer();
 	
 	IBeanDescriptor<T> getDescriptor();
 }

@@ -54,7 +54,7 @@ public class GuiceModuleServiceContext implements IServiceContext {
 	private final IPropertyResolver contextResolver = new IPropertyResolver() {
 
 		@Override
-		public Object resolve(Object pojo, IParameterType type) {
+		public Object resolve(Object pojo, IParameterType<?> type) {
 			if (propertyResolver != null) {
 				return propertyResolver.resolve(pojo, type);
 			}

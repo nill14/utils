@@ -6,7 +6,6 @@ import java.util.Map;
 import com.github.nill14.parsers.dependency.IDependencyDescriptorBuilder;
 import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
-import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.google.common.collect.Maps;
 
 public class ServiceBuilder implements IServiceBuilder {

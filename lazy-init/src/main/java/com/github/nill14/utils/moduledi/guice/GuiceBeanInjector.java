@@ -32,8 +32,10 @@ public class GuiceBeanInjector implements IBeanInjector {
 	}
 	
 	@Override
-	public <T> T wire(IParameterType type) {
-		return (T) wire(TypeToken.of(type.getGenericType()));
+	public <T> T wire(IParameterType<T> type) {
+		return wire(type.getToken());
 	}
+
+
 
 }

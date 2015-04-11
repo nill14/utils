@@ -8,13 +8,13 @@ import java.util.Optional;
 import com.github.nill14.utils.init.impl.ParameterTypeBuilder;
 import com.google.common.reflect.TypeToken;
 
-public interface IParameterType {
+public interface IParameterType<T> {
 
 	Class<?> getRawType();
 
 	Type getGenericType();
 	
-	TypeToken<?> getToken();
+	TypeToken<T> getToken();
 
 	boolean isParametrized();
 
@@ -34,19 +34,19 @@ public interface IParameterType {
 
 	Optional<String> getNamed();
 
-	static IParameterType of(Class<?> clazz) {
+	static <T> IParameterType<T> of(Class<T> clazz) {
 		return ParameterTypeBuilder.builder(clazz).build();
 	}
 
-	static IParameterType of(TypeToken<?> typeToken) {
+	static <T> IParameterType<T> of(TypeToken<T> typeToken) {
 		return ParameterTypeBuilder.builder(typeToken).build();
 	}
 	
-	static IParameterTypeBuilder builder(Class<?> clazz) {
+	static <T> IParameterTypeBuilder<T> builder(Class<T> clazz) {
 		return ParameterTypeBuilder.builder(clazz);
 	}
 	
-	static IParameterTypeBuilder builder(TypeToken<?> typeToken) {
+	static <T> IParameterTypeBuilder<T> builder(TypeToken<T> typeToken) {
 		return ParameterTypeBuilder.builder(typeToken);
 	}
 

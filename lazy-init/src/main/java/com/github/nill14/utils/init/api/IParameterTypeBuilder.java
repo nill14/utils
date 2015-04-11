@@ -2,28 +2,28 @@ package com.github.nill14.utils.init.api;
 
 import java.lang.annotation.Annotation;
 
-public interface IParameterTypeBuilder {
+public interface IParameterTypeBuilder<T> {
 
 	@Deprecated
-	IParameterTypeBuilder withAnnotation(Annotation annotation);
+	IParameterTypeBuilder<T> withAnnotation(Annotation annotation);
 
-	IParameterTypeBuilder annotatedWith(Class<? extends Annotation> annotationType);
+	IParameterTypeBuilder<T> annotatedWith(Class<? extends Annotation> annotationType);
 
-	IParameterTypeBuilder annotatedWith(Annotation annotation);
-
-	@Deprecated
-	IParameterTypeBuilder withAnnotationType(Class<? extends Annotation> annotationType);
-
-	IParameterTypeBuilder scanAnnotations();
-
-	IParameterTypeBuilder scanQualifiers();
-
-	IParameterTypeBuilder named(String name);
+	IParameterTypeBuilder<T> annotatedWith(Annotation annotation);
 
 	@Deprecated
-	IParameterTypeBuilder withName(String name);
+	IParameterTypeBuilder<T> withAnnotationType(Class<? extends Annotation> annotationType);
 
-	IParameterType build();
+	IParameterTypeBuilder<T> scanAnnotations();
+
+	IParameterTypeBuilder<T> scanQualifiers();
+
+	IParameterTypeBuilder<T> named(String name);
+
+	@Deprecated
+	IParameterTypeBuilder<T> withName(String name);
+
+	IParameterType<T> build();
 
 
 }

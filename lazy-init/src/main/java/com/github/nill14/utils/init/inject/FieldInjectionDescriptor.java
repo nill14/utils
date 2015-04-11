@@ -18,12 +18,12 @@ public class FieldInjectionDescriptor implements IMemberDescriptor {
 	
 	private final Field field;
 	private final ImmutableMap<Class<?>, Annotation> annotations;
-	private final ParameterTypeInjectionDescriptor parameterType;
+	private final ParameterTypeInjectionDescriptor<?> parameterType;
 
 	public FieldInjectionDescriptor(Field f) {
 		field = f;
 		annotations = ImmutableMap.copyOf(AnnotationScanner.indexAnnotations(f.getAnnotations()));
-		parameterType = new ParameterTypeInjectionDescriptor(field.getGenericType(), field.getAnnotations());
+		parameterType = new ParameterTypeInjectionDescriptor<>(field.getGenericType(), field.getAnnotations());
 	}
 	
 	@Override
@@ -42,11 +42,11 @@ public class FieldInjectionDescriptor implements IMemberDescriptor {
 	}
 
 	@Override
-	public Collection<IParameterType> getParameterTypes() {
+	public Collection<IParameterType<?>> getParameterTypes() {
 		return ImmutableList.of(parameterType);
 	}
 	
-	public ParameterTypeInjectionDescriptor getParameterType() {
+	public ParameterTypeInjectionDescriptor<?> getParameterType() {
 		return parameterType;
 	}
 

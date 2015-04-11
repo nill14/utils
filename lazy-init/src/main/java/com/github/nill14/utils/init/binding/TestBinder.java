@@ -56,15 +56,22 @@ public final class TestBinder implements Binder {
 		return this;
 	}
 	
+	/**
+	 * 
+	 * E.g. something like Mockito#mock(type#getRawType()) for tests when no binding is found
+	 */
+	public TestBinder withFallbackResolver(IPropertyResolver resolver) {
+		this.resolver.append(resolver);
+		return this;
+	}
+	
 	
 	public ServiceRegistry getRegistry() {
 		return serviceRegistry;
 	}
 	
 	public IBeanInjector toBeanInjector() {
-		configurationLocker.set(true);
-		ImmutableList<BindingImpl<?>> bindings = ImmutableList.copyOf(
-				elements.stream().map(Element::getValue).iterator());
+		ImmutableList<BindingImpl<?>> bindings = freezeBindings();
 		
 		
 		LazyPojoBindingTargetVisitor bindingTargetVisitor = new LazyPojoBindingTargetVisitor(
@@ -82,4 +89,12 @@ public final class TestBinder implements Binder {
 		
 		return serviceRegistry.toBeanInjector();
 	}
+
+	public ImmutableList<BindingImpl<?>> freezeBindings() {
+		configurationLocker.set(true);
+		ImmutableList<BindingImpl<?>> bindings = ImmutableList.copyOf(
+				elements.stream().map(Element::getValue).iterator());
+		return bindings;
+	}
+	
 }
