@@ -256,7 +256,7 @@ public class ServiceRegistry implements IServiceRegistry {
 			if (lazyPojo != null) {
 				return lazyPojo.toProvider();
 			} else {
-				return null;
+				return IPropertyResolver.nullProvider();
 			}
 		}
 		
@@ -266,7 +266,7 @@ public class ServiceRegistry implements IServiceRegistry {
 			if (bean != null && type.isAssignableFrom(bean.getType().getRawType())) {
 				return bean.toProvider();
 			}
-			return null;
+			return IPropertyResolver.nullProvider();
 		}
 
 		@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -274,7 +274,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		protected Provider<?> findByType(Object pojo, IParameterType<?> type, Class<?> clazz) {
 			Map<String, ILazyPojo<?>> serviceMap = getServiceMap((Class) clazz);
 			Optional<ILazyPojo<?>> first = serviceMap.values().stream().findFirst();
-			return first.map(ILazyPojo::toProvider).orElse(null);
+			return first.map(ILazyPojo::toProvider).orElse(IPropertyResolver.nullProvider());
 		}
 
 		@Override

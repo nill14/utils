@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.inject.Provider;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
@@ -54,11 +56,11 @@ public class GuiceModuleServiceContext implements IServiceContext {
 	private final IPropertyResolver contextResolver = new IPropertyResolver() {
 
 		@Override
-		public Object resolve(Object pojo, IParameterType<?> type) {
+		public Provider<?> resolve(Object pojo, IParameterType<?> type) {
 			if (propertyResolver != null) {
 				return propertyResolver.resolve(pojo, type);
 			}
-			return null;
+			return IPropertyResolver.nullProvider();
 		}
 		
 	};

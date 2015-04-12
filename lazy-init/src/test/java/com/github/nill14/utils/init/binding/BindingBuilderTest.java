@@ -19,7 +19,7 @@ public class BindingBuilderTest {
 		TestBinder b = new TestBinder();
 //		b.bind(ICalculator.class).to(Calculator.class);
 		b.bind(TypeToken.of(ICalculator.class)).annotatedWith(Synchronous.class).toProvider(Calculator::new);
-		b.bind(TypeToken.of(ICalculator.class));//.in(Synchronous.class);
+		b.bind(Calculator.class);//.in(Synchronous.class);
 		
 		IBeanInjector beanInjector = b.toBeanInjector();
 		Object object = beanInjector.wire(

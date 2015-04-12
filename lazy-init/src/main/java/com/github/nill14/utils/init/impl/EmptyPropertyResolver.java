@@ -2,6 +2,7 @@ package com.github.nill14.utils.init.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.Collections;
 
 import javax.inject.Provider;
 
@@ -23,25 +24,25 @@ public final class EmptyPropertyResolver extends AbstractPropertyResolver implem
 	
 	@Override
 	protected Provider<?> findByName(Object pojo, String name, Class<?> type) {
-		return null;
+		return nullProvider();
 	}
 
 
 	@Override
 	protected Provider<?> findByType(Object pojo, IParameterType<?> type, Class<?> clazz) {
-		return null;
+		return nullProvider();
 	}
 
 
 	@Override
 	protected Collection<?> findAllByType(Object pojo, Class<?> type) {
-		return null;
+		return Collections.emptyList();
 	}
 
 
 	@Override
 	protected Provider<?> findByQualifier(Object pojo, Class<?> type, Annotation qualifier) {
-		return null;
+		return nullProvider();
 	}
 
 

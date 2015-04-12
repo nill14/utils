@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.inject.Provider;
+
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.github.nill14.utils.init.api.ILazyPojo;
@@ -69,7 +71,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 	private final IPropertyResolver applicationContextResolver = new IPropertyResolver() {
 
 		@Override
-		public Object resolve(Object pojo, IParameterType<?> type) {
+		public Provider<?> resolve(Object pojo, IParameterType<?> type) {
 			if (springPropertyResolver == null) {
 				//TODO this might be eventually the case when calling resolver from PojoFactory
 				throw new IllegalStateException("Wrong order, first must be called initializer");

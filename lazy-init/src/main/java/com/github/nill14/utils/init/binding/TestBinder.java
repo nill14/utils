@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -58,7 +59,16 @@ public final class TestBinder implements Binder {
 	
 	/**
 	 * 
-	 * E.g. something like Mockito#mock(type#getRawType()) for tests when no binding is found
+	 * Example using MockitoFallBackResolver:
+	 * 
+	 * 
+	 * <pre>
+public Object resolve(Object pojo, IParameterType<?> type) {
+	return import org.mockito.Mockito.mock(type.getRawType(), Mockito.RETURNS_DEEP_STUBS);
+}
+	 * 
+	 * </pre
+	 * 
 	 */
 	public TestBinder withFallbackResolver(IPropertyResolver resolver) {
 		this.resolver.append(resolver);

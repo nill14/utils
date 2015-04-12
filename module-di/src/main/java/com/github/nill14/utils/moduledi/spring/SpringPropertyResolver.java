@@ -27,10 +27,10 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 
 	@Override
 	protected Provider<?> doResolveQualifiers(Object pojo, IParameterType<?> type, Class<?> clazz) {
-		Provider<?> result = null;
+		Provider<?> result = IPropertyResolver.nullProvider();
 		
 		for (Annotation qualifier : type.getQualifiers()) {
-			Provider<?> query = null;
+			Provider<?> query = IPropertyResolver.nullProvider();
 			if (Named.class.equals(qualifier.annotationType())) {
 				String name = ((Named) qualifier).value();
 				query = findByName(pojo, name, clazz);
@@ -38,8 +38,8 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 				query = findByQualifier(pojo, clazz, qualifier);
 			}
 			
-			if (result != null && !result.equals(query)) {
-				return null;
+			if (result != IPropertyResolver.nullProvider() && !result.equals(query)) {
+				return IPropertyResolver.nullProvider();
 			} else {
 				result = query;
 			}
@@ -62,7 +62,7 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 				.collect(Collectors.toList());
 		
 		if (result.isEmpty()) {
-			return null;
+			return IPropertyResolver.nullProvider();
 		
 		} else if (result.size() == 1) {
 			return provider(result.get(0));
@@ -79,7 +79,7 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 		if (context.isTypeMatch(name, type)) {
 			return provider(context.getBean(name, type));
 		}
-		return null;
+		return IPropertyResolver.nullProvider();
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 		if (names.length > 0) {
 			return provider(context.getBean(names[0], clazz));
 		}
-		return null;
+		return IPropertyResolver.nullProvider();
 	}
 
 	@Override

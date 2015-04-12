@@ -36,7 +36,7 @@ public class PojoInjectionFactory<T> implements IPojoFactory<T> {
 		Object[] args = createArgs(injectionDescriptor.getParameterTypes());
 		
 		try {
-			return (T) injectionDescriptor.invoke(args);
+			return (T) injectionDescriptor.invoke(null, args);
 		} catch (ReflectiveOperationException e) {
 			throw new RuntimeException(injectionDescriptor.toString(), e);
 		}
@@ -50,7 +50,7 @@ public class PojoInjectionFactory<T> implements IPojoFactory<T> {
 		Object[] args = new Object[types.size()];
 		int i = 0;
 		for (IParameterType<?> type : types) {
-			Object arg = resolver.resolve(null, type);
+			Object arg = resolver.resolve(null, type).get();
 			if (arg == null && !type.isNullable()) {
 				throw new RuntimeException(String.format("Cannot resolve property %s", type.getToken()));
 			}

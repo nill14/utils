@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -22,16 +21,20 @@ import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 
+@SuppressWarnings("serial")
+@Test(invocationCount = 10)
 public class LazyPojoTest {
 	
 	private static final String DESTROYED = "destroyed";
 	private static final String GREETING = "Hello World!";
 	private static final Logger log = LoggerFactory.getLogger(LazyPojoTest.class);
-	private static ExecutorService executor = Executors.newCachedThreadPool();
-	private static AtomicInteger instances = new AtomicInteger();
-	private static ILazyPojo<IGreeter> lazyPojo;
+	private final ExecutorService executor = Executors.newCachedThreadPool();
+	private ILazyPojo<IGreeter> lazyPojo;
+	private AtomicInteger instances;
 
-	private static IPojoInitializer factoryInitializer = new IPojoInitializer() {
+	private IPojoInitializer factoryInitializer; 
+			
+	class CountingPojoInitializer implements IPojoInitializer {
 		
 		@Override
 		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
@@ -56,14 +59,11 @@ public class LazyPojoTest {
 		}
 	};
 	
-	@BeforeClass
-	public static void setUp() {
-		lazyPojo = LazyPojo.forProvider(GreeterFactory.class, IPropertyResolver.empty(), factoryInitializer);
-	}
-	
 	@BeforeMethod
 	public void init() {
-		lazyPojo.freeInstance();
+		instances = new AtomicInteger();
+		factoryInitializer = new CountingPojoInitializer();
+		lazyPojo = LazyPojo.forProvider(GreeterFactory.class, IPropertyResolver.empty(), factoryInitializer);
 		assertEquals(0, instances.get());
 	}
 
@@ -88,9 +88,9 @@ public class LazyPojoTest {
 		lazyPojo.init(executor).get().toString();
 		boolean destroyed = lazyPojo.destroy(executor).get();
 		assertTrue(destroyed);
-		assertEquals(0, instances.get());
+		assertEquals(instances.get(), 0);
 		assertEquals(GREETING, lazyPojo.getInstance().sayGreeting());
-		assertEquals(1, instances.get());
+		assertEquals(instances.get(), 1);
 	}
 	
 	@Test

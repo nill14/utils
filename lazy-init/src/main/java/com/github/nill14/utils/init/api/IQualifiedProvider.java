@@ -3,13 +3,12 @@ package com.github.nill14.utils.init.api;
 import java.lang.annotation.Annotation;
 import java.util.Optional;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
+import com.github.nill14.utils.init.meta.Annotations;
 
 public interface IQualifiedProvider<T> {
 
   /**
-   * @see Names#named(String)
+   * @see Annotations#named(String)
    *
    * Returns from registry the object of given type and qualified with name.
    * If object is not found, an exception is thrown.
@@ -17,14 +16,14 @@ public interface IQualifiedProvider<T> {
   T getNamed(String named);
 
   /**
-   * @see Names#named(String)
+   * @see Annotations#named(String)
    *
    * Returns from registry the object of given type and qualified with name.
    */
   Optional<T> getOptionalNamed(String named);
 
   /**
-   * @see Key#get(Class, Class)
+   * @see Annotations#annotation(Class)
    *
    * Returns from registry the object of given type and qualified with the annotation.
    * If object is not found, an exception is thrown.
@@ -33,7 +32,7 @@ public interface IQualifiedProvider<T> {
   T getQualified(Class<? extends Annotation> annotationType);
 
   /**
-   * @see Key#get(Class, Class)
+   * @see Annotations#annotation(Class)
    *
    * Returns from registry the object of given type and qualified with the annotation.
    * Generates an Annotation for the annotation class. Requires that the annotation is all optionals.
