@@ -1,12 +1,11 @@
 package com.github.nill14.utils.init.api;
 
 import com.google.common.reflect.TypeToken;
-import com.google.inject.Injector;
 
 /**
  * 
  * Similar as AutowireCapableBeanFactory.autowireBeanProperties(existingBean, autowireMode, dependencyCheck);
- * or {@link Injector#injectMembers(Object)}
+ * or {@link com.google.inject.Injector#injectMembers(Object)}
  *
  */
 public interface IBeanInjector {

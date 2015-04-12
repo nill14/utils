@@ -25,4 +25,14 @@ public enum ReflectionUtils {
 	public static <T> TypeToken<T> getProviderReturnTypeToken(TypeToken<? extends Provider<? extends T>> providerType) {
 		return getProviderReturnTypeToken((Class<? extends Provider<? extends T>>)providerType.getRawType());
 	}
+	
+	public static boolean isClassPresent(String name) {
+		try {
+			Class.forName(name);
+			return true;
+		} catch(ClassNotFoundException e) {
+			return false;
+		}
+		
+	}
 }

@@ -13,9 +13,12 @@ import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.meta.AnnotationScanner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
-import com.google.inject.Inject;
 
 public class ParameterTypeInjectionDescriptor<T> implements IParameterType<T> {
+	
+	
+	private static final boolean isGuiceInjectPresent = ReflectionUtils.isClassPresent("com.google.inject.Inject");
+	private static final boolean isGuiceNamedPresent = ReflectionUtils.isClassPresent("com.google.inject.name.Named");
 	
 	private final Type type;
 	private final TypeToken<T> typeToken;
@@ -39,20 +42,21 @@ public class ParameterTypeInjectionDescriptor<T> implements IParameterType<T> {
 		this.annotations = ImmutableMap.copyOf(AnnotationScanner.indexAnnotations(annotations));
 		
 		javax.inject.Named named = (javax.inject.Named ) this.annotations.get(javax.inject.Named.class);
-		com.google.inject.name.Named named2 = (com.google.inject.name.Named) this.annotations.get(com.google.inject.name.Named.class);
 		//see Names.named(String)
 		Optional<String> name = Optional.ofNullable(named).map(n -> n.value());
-		Optional<String> name2 = Optional.ofNullable(named2).map(n -> n.value());
+		Optional<String> name2 = isGuiceNamedPresent ? OptionalGuiceDependency.getNamed(this.annotations): Optional.empty();
 		this.named = name.isPresent() ? name : name2;
 		
 		Nullable nullable = (Nullable) this.annotations.get(javax.annotation.Nullable.class);
-		Inject googleInject = (Inject) this.annotations.get(com.google.inject.Inject.class);
-		this.nullable = nullable != null || googleInject != null && googleInject.optional();
+		
+		Optional<Boolean> googleInject = isGuiceInjectPresent ? 
+				OptionalGuiceDependency.isOptionalInject(this.annotations) : null;
+		this.nullable = nullable != null || googleInject != null && googleInject.get() == true;
 		
 		optional = java.util.Optional.class.isAssignableFrom(typeToken.getRawType())
 				|| com.google.common.base.Optional.class.isAssignableFrom(typeToken.getRawType());
 	}
-
+	
 	@Override
 	public boolean isParametrized() {
 		return typeToken.getType() instanceof ParameterizedType;
@@ -125,5 +129,21 @@ public class ParameterTypeInjectionDescriptor<T> implements IParameterType<T> {
 	@Override
 	public boolean isNullable() {
 		return nullable;
+	}
+	
+	private static final class OptionalGuiceDependency {
+		
+		public static Optional<String> getNamed(ImmutableMap<Class<?>, Annotation> annotations) {
+			com.google.inject.name.Named named = (com.google.inject.name.Named) annotations.get(com.google.inject.name.Named.class);
+			return Optional.ofNullable(named).map(com.google.inject.name.Named::value);
+		}
+		
+		public static Optional<Boolean> isOptionalInject(ImmutableMap<Class<?>, Annotation> annotations) {
+			com.google.inject.Inject inject = (com.google.inject.Inject) annotations.get(com.google.inject.Inject.class);
+			if (inject != null) {
+				return Optional.of(inject.optional());
+			}
+			return null;
+		}
 	}
 }
