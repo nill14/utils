@@ -46,7 +46,7 @@ public class SpringPropertyResolverTest {
 		Field field = MangoBean.class.getDeclaredField("helloMango");
 		AnotherNamed annotation = field.getAnnotation(AnotherNamed.class);
 		
-		Object result = resolver.findByQualifier("pojo", Mango.class, annotation).get();
+		Object result = resolver.findByQualifier(Mango.class, annotation);
 		Assert.assertEquals(helloMango, result);
 	}
 	
@@ -58,7 +58,7 @@ public class SpringPropertyResolverTest {
 		Field field = MangoBean.class.getDeclaredField("missingMango");
 		AnotherNamed annotation = field.getAnnotation(AnotherNamed.class);
 		
-		Object result = resolver.findByQualifier("pojo", Mango.class, annotation).get();
+		Object result = resolver.findByQualifier(Mango.class, annotation);
 		assertEquals(result, null);
 	}
 	

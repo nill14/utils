@@ -20,10 +20,10 @@ public class FieldInjectionDescriptor implements IMemberDescriptor {
 	private final ImmutableMap<Class<?>, Annotation> annotations;
 	private final ParameterTypeInjectionDescriptor<?> parameterType;
 
-	public FieldInjectionDescriptor(Field f) {
+	public FieldInjectionDescriptor(Field f, Class<?> declaringClass) {
 		field = f;
 		annotations = ImmutableMap.copyOf(AnnotationScanner.indexAnnotations(f.getAnnotations()));
-		parameterType = new ParameterTypeInjectionDescriptor<>(field.getGenericType(), field.getAnnotations());
+		parameterType = new ParameterTypeInjectionDescriptor<>(field.getGenericType(), field.getAnnotations(), declaringClass);
 	}
 	
 	@Override

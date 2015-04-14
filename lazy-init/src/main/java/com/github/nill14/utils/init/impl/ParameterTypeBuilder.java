@@ -100,7 +100,7 @@ public class ParameterTypeBuilder<T> implements IParameterTypeBuilder<T> {
 	public IParameterType<T> build() {
 		Annotation[] annotations = this.annotations.build().values().stream().toArray(Annotation[]::new);
 		Type type = typeToken.getType();
-		return new ParameterTypeInjectionDescriptor<>(type, annotations);
+		return new ParameterTypeInjectionDescriptor<>(type, annotations, null);
 	}
 
 }

@@ -4,8 +4,6 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import javax.inject.Provider;
-
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
 import com.google.inject.Injector;
@@ -20,18 +18,19 @@ public class GuicePropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Override
-	protected Provider<?> findByName(Object pojo, String name, Class<?> type) {
+	protected Object findByName(String name, Class<?> type) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	protected Provider<?> findByType(Object pojo, IParameterType<?> type, Class<?> clazz) {
+	protected Object findByType(IParameterType<?> type) {
+		Class<?> clazz = type.getRawType();
 		return injector.getProvider(clazz);
 	}
 
 	@Override
-	protected Collection<?> findAllByType(Object pojo, Class<?> type) {
+	protected Collection<?> findAllByType(Class<?> type) {
 		TypeLiteral<Object> literal = (TypeLiteral<Object>) TypeLiteral.get(type);
 		return injector.findBindingsByType(literal).stream()
 				.map(b -> b.getProvider().get())
@@ -39,7 +38,7 @@ public class GuicePropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Override
-	protected Provider<?> findByQualifier(Object pojo, Class<?> type, Annotation qualifier) {
+	protected Object findByQualifier(Class<?> type, Annotation qualifier) {
 		// TODO Auto-generated method stub
 		return null;
 	}

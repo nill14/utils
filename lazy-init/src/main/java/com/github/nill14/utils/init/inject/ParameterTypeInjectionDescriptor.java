@@ -29,9 +29,11 @@ public class ParameterTypeInjectionDescriptor<T> implements IParameterType<T> {
 	private final ImmutableMap<Class<?>, Annotation> annotations;
 	private final boolean optional;
 	private final boolean nullable;
+	private final Class<?> declaringClass;
 	
 	@SuppressWarnings("unchecked")
-	public ParameterTypeInjectionDescriptor(Type type, Annotation[] annotations) {
+	public ParameterTypeInjectionDescriptor(Type type, Annotation[] annotations, @Nullable Class<?> declaringClass) {
+		this.declaringClass = declaringClass;
 		this.type = type;
 		typeToken = (TypeToken<T>) TypeToken.of(type);
 
@@ -62,6 +64,11 @@ public class ParameterTypeInjectionDescriptor<T> implements IParameterType<T> {
 		return typeToken.getType() instanceof ParameterizedType;
 	}
 
+	@Override
+	public Class<?> getDeclaringClass() {
+		return declaringClass;
+	}
+	
 	@Override
 	public TypeToken<?> getFirstParamToken() {
 		if (type instanceof ParameterizedType) {

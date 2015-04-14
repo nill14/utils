@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -13,14 +12,10 @@ import java.lang.reflect.Type;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import javax.inject.Qualifier;
-
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IParameterType;
-import com.github.nill14.utils.init.meta.AnnotationScanner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 
 
@@ -52,10 +47,10 @@ public class PojoInjectionDescriptor<T> implements Serializable, IBeanDescriptor
 		interfaces = typeToken.getTypes().interfaces().rawTypes();
 		
 		fields = ImmutableList.copyOf(
-				injectableFields(nonStaticFields(classes.stream())).iterator());
+				injectableFields(nonStaticFields(classes.stream()), typeToken.getRawType()).iterator());
 		
 		methods = ImmutableList.copyOf(
-				injectableMethods(nonStaticMethods(classes.stream())).iterator());
+				injectableMethods(nonStaticMethods(classes.stream()), typeToken.getRawType()).iterator());
 		
 		constructors = ImmutableList.copyOf(
 				injectableConstructors(Stream.of(typeToken.getRawType().getDeclaredConstructors())).iterator());
@@ -120,21 +115,21 @@ public class PojoInjectionDescriptor<T> implements Serializable, IBeanDescriptor
 	}	
 	
 	
-	private Stream<? extends MethodInjectionDescriptor> injectableMethods(Stream<Method> nonStaticMethods) {
+	private Stream<? extends MethodInjectionDescriptor> injectableMethods(Stream<Method> nonStaticMethods, Class<?> declaringClass) {
 		return nonStaticMethods.map(m -> {
 			if (m.isAnnotationPresent(javax.inject.Inject.class) 
 					|| m.isAnnotationPresent(com.google.inject.Inject.class)) {
-				return new MethodInjectionDescriptor(m);
+				return new MethodInjectionDescriptor(m, declaringClass);
 			} 
 			else return null;
 		}).filter(x -> x != null);
 	}	
 
-	private Stream<? extends FieldInjectionDescriptor> injectableFields(Stream<Field> nonStaticFields) {
+	private Stream<? extends FieldInjectionDescriptor> injectableFields(Stream<Field> nonStaticFields, Class<?> declaringClass) {
 		return nonStaticFields.map(f -> {
 			if (f.isAnnotationPresent(javax.inject.Inject.class) 
 					|| f.isAnnotationPresent(com.google.inject.Inject.class)) {
-				return new FieldInjectionDescriptor(f);
+				return new FieldInjectionDescriptor(f, declaringClass);
 			} 
 			else return null;
 		}).filter(x -> x != null);

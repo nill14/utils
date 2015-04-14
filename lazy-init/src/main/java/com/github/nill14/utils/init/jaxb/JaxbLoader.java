@@ -3,7 +3,6 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.inject.Provider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -58,14 +57,14 @@ public class JaxbLoader {
         			private static final long serialVersionUID = 6911651120730545150L;
         			
         			@Override
-        			public Provider<?> resolve(Object pojo, IParameterType type) {
+        			public Object resolve(IParameterType type) {
         				if (type.getRawType() == String.class) {
         					String value = strings.get(type.getNamed().orElse(null));
         					if (value != null) {
-        						return () -> value;
+        						return value;
         					}
         				} 
-        				return () -> serviceRegistry.toResolver();
+        				return serviceRegistry.toResolver();
         			}
         		});
         	}

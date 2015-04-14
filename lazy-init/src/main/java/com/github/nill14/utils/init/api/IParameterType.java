@@ -5,6 +5,8 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import com.github.nill14.utils.init.impl.ParameterTypeBuilder;
 import com.google.common.reflect.TypeToken;
 
@@ -18,6 +20,8 @@ public interface IParameterType<T> {
 
 	boolean isParametrized();
 
+	@Nullable Class<?> getDeclaringClass();
+	
 	Type[] getParameterTypes();
 	
 	TypeToken<?> getFirstParamToken();

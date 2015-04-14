@@ -46,7 +46,7 @@ public class BeanInjector implements IBeanInjector {
 	}
 
 	private <T> T resolve(IParameterType<T> type) {
-		T bean = (T) resolver.resolve(null, type).get();
+		T bean = (T) resolver.resolve(type);
 		if (bean == null) {
 			throw new RuntimeException(String.format(
 					"Injection of bean %s failed!", type));

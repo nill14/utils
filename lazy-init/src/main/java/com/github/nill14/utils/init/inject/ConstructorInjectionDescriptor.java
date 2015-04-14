@@ -26,9 +26,10 @@ public class ConstructorInjectionDescriptor implements IMemberDescriptor {
 		Annotation[][] paramAnnotations = constructor.getParameterAnnotations();
 		Type[] paramTypes = constructor.getGenericParameterTypes();
 		Builder<IParameterType<?>> builder = ImmutableList.builder();
+		Class<?> declaringClass = constructor.getDeclaringClass();
 		
 		for (int i = 0; i < constructor.getParameterCount(); i++) {
-			builder.add(new ParameterTypeInjectionDescriptor<>(paramTypes[i], paramAnnotations[i]));
+			builder.add(new ParameterTypeInjectionDescriptor<>(paramTypes[i], paramAnnotations[i], declaringClass));
 		}
 		
 		parameterTypes = builder.build();

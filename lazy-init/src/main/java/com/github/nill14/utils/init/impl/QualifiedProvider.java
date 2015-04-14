@@ -23,7 +23,7 @@ public class QualifiedProvider<T> implements IQualifiedProvider<T> {
 	
 
 	private T resolveOrThrow(IParameterType<?> type) {
-		T object = (T) resolver.resolve(null, type).get();
+		T object = (T) resolver.resolve(type);
 		if (object != null) {
 			return object;
 		} else {
@@ -32,7 +32,7 @@ public class QualifiedProvider<T> implements IQualifiedProvider<T> {
 	}
 	
 	private Optional<T> resolveOptional(IParameterType<?> type) {
-		return Optional.ofNullable((T) resolver.resolve(null, type).get());
+		return Optional.ofNullable((T) resolver.resolve(type));
 	}
 
 	@Override

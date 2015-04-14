@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.springframework.context.ApplicationContext;
 
@@ -26,20 +25,20 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Provider<?> doResolveQualifiers(Object pojo, IParameterType<?> type, Class<?> clazz) {
-		Provider<?> result = IPropertyResolver.nullProvider();
+	protected Object doResolveQualifiers(IParameterType<?> type, Class<?> clazz) {
+		Object result = null;
 		
 		for (Annotation qualifier : type.getQualifiers()) {
-			Provider<?> query = IPropertyResolver.nullProvider();
+			Object query = null;
 			if (Named.class.equals(qualifier.annotationType())) {
 				String name = ((Named) qualifier).value();
-				query = findByName(pojo, name, clazz);
+				query = findByName(name, clazz);
 			} else {
-				query = findByQualifier(pojo, clazz, qualifier);
+				query = findByQualifier(clazz, qualifier);
 			}
 			
-			if (result != IPropertyResolver.nullProvider() && !result.equals(query)) {
-				return IPropertyResolver.nullProvider();
+			if (result != null && !result.equals(query)) {
+				return null;
 			} else {
 				result = query;
 			}
@@ -49,7 +48,7 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Provider<?> findByQualifier(Object pojo, Class<?> type, Annotation qualifier) {
+	protected Object findByQualifier(Class<?> type, Annotation qualifier) {
 		
 		Class<? extends Annotation> annotationClass = qualifier.annotationType();
 		Map<String, Object> beansWithAnnotation = context.getBeansWithAnnotation(annotationClass);
@@ -62,10 +61,10 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 				.collect(Collectors.toList());
 		
 		if (result.isEmpty()) {
-			return IPropertyResolver.nullProvider();
+			return null;
 		
 		} else if (result.size() == 1) {
-			return provider(result.get(0));
+			return result.get(0);
 			
 		} else {
 			throw new IllegalStateException("Expected one result, got "+ result);
@@ -75,24 +74,25 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	
 
 	@Override
-	protected Provider<?> findByName(Object pojo, String name, Class<?> type) {
+	protected Object findByName(String name, Class<?> type) {
 		if (context.isTypeMatch(name, type)) {
-			return provider(context.getBean(name, type));
+			return context.getBean(name, type);
 		}
-		return IPropertyResolver.nullProvider();
+		return null;
 	}
 
 	@Override
-	protected Provider<?> findByType(Object pojo, IParameterType<?> type, Class<?> clazz) {
+	protected Object findByType(IParameterType<?> type) {
+		Class<?> clazz = type.getRawType();
 		String[] names = context.getBeanNamesForType(clazz);
 		if (names.length > 0) {
-			return provider(context.getBean(names[0], clazz));
+			return context.getBean(names[0], clazz);
 		}
-		return IPropertyResolver.nullProvider();
+		return null;
 	}
 
 	@Override
-	protected Collection<?> findAllByType(Object pojo, Class<?> type) {
+	protected Collection<?> findAllByType(Class<?> type) {
 		return context.getBeansOfType(type).values();
 	}
 

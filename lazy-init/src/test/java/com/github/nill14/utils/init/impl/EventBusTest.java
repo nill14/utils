@@ -51,7 +51,7 @@ public class EventBusTest {
 	@Test
 	public void testExtended() {
 		assertNotNull(serviceRegistry.getOptionalService(EventBus.class));
-		assertNotNull(serviceRegistry.toResolver().resolve(null, IParameterType.of(EventBus.class)).get());
+		assertNotNull(serviceRegistry.toResolver().resolve(IParameterType.of(EventBus.class)));
 		
 		beanInjector.wire(EventBusSubscriberExtended.class);
 		

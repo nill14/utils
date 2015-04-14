@@ -21,7 +21,7 @@ public class MethodInjectionDescriptor implements IMemberDescriptor {
 	private final ImmutableMap<Class<? extends Annotation>, Annotation> annotations;
 	private final boolean optionalInject;
 
-	public MethodInjectionDescriptor(Method m) {
+	public MethodInjectionDescriptor(Method m, Class<?> declaringClass) {
 		this.method = m;
 		boolean optionalInject = true;
 		
@@ -30,7 +30,7 @@ public class MethodInjectionDescriptor implements IMemberDescriptor {
 		Builder<IParameterType<?>> builder = ImmutableList.builder();
 		
 		for (int i = 0; i < method.getParameterCount(); i++) {
-			ParameterTypeInjectionDescriptor<?> td = new ParameterTypeInjectionDescriptor<>(paramTypes[i], paramAnnotations[i]);
+			ParameterTypeInjectionDescriptor<?> td = new ParameterTypeInjectionDescriptor<>(paramTypes[i], paramAnnotations[i], declaringClass);
 			builder.add(td);
 			optionalInject |= td.isNullable();
 		}

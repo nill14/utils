@@ -2,8 +2,6 @@ package com.github.nill14.utils.init.impl;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.inject.Provider;
-
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.google.common.collect.ImmutableList;
@@ -45,10 +43,10 @@ public class ChainingPropertyResolver implements IPropertyResolver {
 	}
 	
 	@Override
-	public Provider<?> resolve(Object pojo, IParameterType<?> type) {
+	public Object resolve(IParameterType<?> type) {
 		for (IPropertyResolver resolver : items) {
-			Provider<?> result = resolver.resolve(pojo, type);
-			if (result != IPropertyResolver.nullProvider()) {
+			Object result = resolver.resolve(type);
+			if (result != null) {
 				return result;
 			}
 		}

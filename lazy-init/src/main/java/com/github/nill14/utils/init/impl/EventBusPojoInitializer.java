@@ -21,7 +21,7 @@ public class EventBusPojoInitializer implements IPojoInitializer {
 		EventBusSubscriber annotation = instance.getClass().getAnnotation(EventBusSubscriber.class);
 		if (annotation != null) {
 			IPropertyResolver resolver = pojoFactory.getResolver();
-			EventBus eventBus = (EventBus) resolver.resolve(this, IParameterType.of(EventBus.class)).get();
+			EventBus eventBus = (EventBus) resolver.resolve(IParameterType.of(EventBus.class));
 			if (eventBus != null) {
 				eventBus.register(instance);
 			} else {
@@ -35,7 +35,7 @@ public class EventBusPojoInitializer implements IPojoInitializer {
 		EventBusSubscriber annotation = instance.getClass().getAnnotation(EventBusSubscriber.class);
 		if (annotation != null) {
 			IPropertyResolver resolver = pojoFactory.getResolver();
-			EventBus eventBus = (EventBus) resolver.resolve(this, IParameterType.of(EventBus.class)).get();
+			EventBus eventBus = (EventBus) resolver.resolve(IParameterType.of(EventBus.class));
 			if (eventBus != null) {
 				eventBus.unregister(instance);
 			} else {

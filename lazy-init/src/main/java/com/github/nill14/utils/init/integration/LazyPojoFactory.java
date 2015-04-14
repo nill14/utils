@@ -130,8 +130,8 @@ public /*non-final on purpose*/ class LazyPojoFactory<F> implements IPojoFactory
 		private static final long serialVersionUID = 1L;
 		
 		@Override
-		public Provider<?> resolve(Object pojo, IParameterType<?> type) {
-			return getResolver().resolve(pojo, type);
+		public Object resolve(IParameterType<?> type) {
+			return getResolver().resolve(type);
 		}
 	};
 }

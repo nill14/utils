@@ -2,8 +2,6 @@ package com.github.nill14.utils.init.impl;
 
 import java.util.Collection;
 
-import javax.inject.Provider;
-
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IMemberDescriptor;
@@ -41,10 +39,7 @@ public class AnnotationInjectInitializer implements IPojoInitializer {
 	}
 
 	private void injectParam(IPropertyResolver resolver, Object instance, IMemberDescriptor member, ParameterTypeInjectionDescriptor<?> parameterType) {
-		Object value = resolver.resolve(instance, parameterType).get();
-		if (value instanceof LazyPojo) {
-			throw new RuntimeException("Probably error in ServiceRegistry");
-		}
+		Object value = resolver.resolve(parameterType);
 		
 		if (value != null) {
 			try {
@@ -82,11 +77,11 @@ public class AnnotationInjectInitializer implements IPojoInitializer {
 		Object[] args = new Object[types.size()];
 		int i = 0;
 		for (IParameterType<?> type : types) {
-			Provider<?> arg = resolver.resolve(null, type);
-			if (IPropertyResolver.nullProvider() == arg && !type.isNullable()) {
+			Object arg = resolver.resolve(type);
+			if (null == arg && !type.isNullable()) {
 				throw new RuntimeException(String.format("Cannot resolve property %s", type.getToken()));
 			}
-			args[i++] = arg.get();
+			args[i++] = arg;
 		}
 		return args;
 	}

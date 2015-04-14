@@ -251,34 +251,35 @@ public class ServiceRegistry implements IServiceRegistry {
 	private class ServiceRegistryPropertyResolver extends AbstractPropertyResolver {
 
 		@Override
-		protected Provider<?> findByQualifier(Object pojo, Class<?> type, Annotation qualifier) {
+		protected Object findByQualifier(Class<?> type, Annotation qualifier) {
 			ILazyPojo<?> lazyPojo = qualifiers.getOrDefault(type, Collections.emptyMap()).get(qualifier);
 			if (lazyPojo != null) {
-				return lazyPojo.toProvider();
+				return lazyPojo.getInstance();
 			} else {
-				return IPropertyResolver.nullProvider();
+				return null;
 			}
 		}
 		
 		@Override
-		protected Provider<?> findByName(Object pojo, String name, Class<?> type) {
+		protected Object findByName(String name, Class<?> type) {
 			ILazyPojo<?> bean = beans.get(name);
 			if (bean != null && type.isAssignableFrom(bean.getType().getRawType())) {
-				return bean.toProvider();
+				return bean.getInstance();
 			}
-			return IPropertyResolver.nullProvider();
+			return null;
 		}
 
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
-		protected Provider<?> findByType(Object pojo, IParameterType<?> type, Class<?> clazz) {
+		protected Object findByType(IParameterType<?> type) {
+			Class<?> clazz = type.getRawType();
 			Map<String, ILazyPojo<?>> serviceMap = getServiceMap((Class) clazz);
 			Optional<ILazyPojo<?>> first = serviceMap.values().stream().findFirst();
-			return first.map(ILazyPojo::toProvider).orElse(IPropertyResolver.nullProvider());
+			return first.map(x -> x.getInstance()).orElse(null);
 		}
 
 		@Override
-		protected Collection<?> findAllByType(Object pojo, Class<?> type) {
+		protected Collection<?> findAllByType(Class<?> type) {
 			return getServices(type);
 		}
 

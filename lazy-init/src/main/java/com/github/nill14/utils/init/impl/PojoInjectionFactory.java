@@ -29,10 +29,10 @@ public class PojoInjectionFactory<T> implements IPojoFactory<T> {
 		Preconditions.checkArgument(beanDescriptor.getConstructorDescriptors().size() > 0);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public T newInstance() {
 		IMemberDescriptor injectionDescriptor = beanDescriptor.getConstructorDescriptors().get(0);
-		
 		Object[] args = createArgs(injectionDescriptor.getParameterTypes());
 		
 		try {
@@ -50,7 +50,7 @@ public class PojoInjectionFactory<T> implements IPojoFactory<T> {
 		Object[] args = new Object[types.size()];
 		int i = 0;
 		for (IParameterType<?> type : types) {
-			Object arg = resolver.resolve(null, type).get();
+			Object arg = resolver.resolve(type);
 			if (arg == null && !type.isNullable()) {
 				throw new RuntimeException(String.format("Cannot resolve property %s", type.getToken()));
 			}
