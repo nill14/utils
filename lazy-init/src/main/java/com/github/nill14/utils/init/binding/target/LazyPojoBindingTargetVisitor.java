@@ -45,5 +45,9 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 		return LazyPojo.forFactory(pojoFactory, initializer);
 	}
 
+	@Override
+	public ILazyPojo<?> visit(ProvidesMethodBindingTarget<?> providesMethodBindingTarget) {
+		throw new UnsupportedOperationException();
+	}
 
 }

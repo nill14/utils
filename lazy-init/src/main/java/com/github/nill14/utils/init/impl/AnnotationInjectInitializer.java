@@ -28,13 +28,14 @@ public class AnnotationInjectInitializer implements IPojoInitializer {
 	}
 	
 	private void doInject(IBeanDescriptor<?> typeDescriptor, IPropertyResolver resolver, Object instance) {
-		for (IMemberDescriptor md : typeDescriptor.getMethodDescriptors()) {
-			injectMethod(resolver, instance, md);
-		}
-		
+		//according to specification, fields are injected before methods
 		for (IMemberDescriptor fd : typeDescriptor.getFieldDescriptors()) {
 			ParameterTypeInjectionDescriptor<?> parameterType = ((FieldInjectionDescriptor) fd).getParameterType();
 			injectParam(resolver, instance, fd, parameterType);
+		}
+
+		for (IMemberDescriptor md : typeDescriptor.getMethodDescriptors()) {
+			injectMethod(resolver, instance, md);
 		}
 	}
 
