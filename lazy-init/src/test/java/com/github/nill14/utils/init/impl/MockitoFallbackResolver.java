@@ -10,7 +10,7 @@ public class MockitoFallbackResolver implements IPropertyResolver {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public Object resolve(IParameterType<?> type) {
+	public Object resolve(IParameterType type) {
 		return Mockito.mock(type.getRawType(), Mockito.RETURNS_DEEP_STUBS);
 	}
 

@@ -63,7 +63,7 @@ public final class TestBinder implements Binder {
 	 * 
 	 * 
 	 * <pre>
-public Object resolve(Object pojo, IParameterType<?> type) {
+public Object resolve(Object pojo, IParameterType type) {
 	return import org.mockito.Mockito.mock(type.getRawType(), Mockito.RETURNS_DEEP_STUBS);
 }
 	 * 

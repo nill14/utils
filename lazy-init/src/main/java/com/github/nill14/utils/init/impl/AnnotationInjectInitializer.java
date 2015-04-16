@@ -30,7 +30,7 @@ public class AnnotationInjectInitializer implements IPojoInitializer {
 	private void doInject(IBeanDescriptor<?> typeDescriptor, IPropertyResolver resolver, Object instance) {
 		//according to specification, fields are injected before methods
 		for (IMemberDescriptor fd : typeDescriptor.getFieldDescriptors()) {
-			ParameterTypeInjectionDescriptor<?> parameterType = ((FieldInjectionDescriptor) fd).getParameterType();
+			ParameterTypeInjectionDescriptor parameterType = ((FieldInjectionDescriptor) fd).getParameterType();
 			injectParam(resolver, instance, fd, parameterType);
 		}
 
@@ -39,7 +39,7 @@ public class AnnotationInjectInitializer implements IPojoInitializer {
 		}
 	}
 
-	private void injectParam(IPropertyResolver resolver, Object instance, IMemberDescriptor member, ParameterTypeInjectionDescriptor<?> parameterType) {
+	private void injectParam(IPropertyResolver resolver, Object instance, IMemberDescriptor member, IParameterType parameterType) {
 		Object value = resolver.resolve(parameterType);
 		
 		if (value != null) {
@@ -70,14 +70,14 @@ public class AnnotationInjectInitializer implements IPojoInitializer {
 			
 	}	
 	
-	private Object[] createArgs(IPropertyResolver resolver, Collection<IParameterType<?>> types) {
+	private Object[] createArgs(IPropertyResolver resolver, Collection<IParameterType> types) {
 		if (types.isEmpty()) {
 			return null;
 		}
 		
 		Object[] args = new Object[types.size()];
 		int i = 0;
-		for (IParameterType<?> type : types) {
+		for (IParameterType type : types) {
 			Object arg = resolver.resolve(type);
 			if (null == arg && !type.isNullable()) {
 				throw new RuntimeException(String.format("Cannot resolve property %s", type.getToken()));

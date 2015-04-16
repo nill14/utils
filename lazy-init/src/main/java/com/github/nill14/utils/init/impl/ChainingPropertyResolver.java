@@ -43,7 +43,7 @@ public class ChainingPropertyResolver implements IPropertyResolver {
 	}
 	
 	@Override
-	public Object resolve(IParameterType<?> type) {
+	public Object resolve(IParameterType type) {
 		for (IPropertyResolver resolver : items) {
 			Object result = resolver.resolve(type);
 			if (result != null) {

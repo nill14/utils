@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 
 public class GuicePropertyResolver extends AbstractPropertyResolver {
@@ -18,15 +19,15 @@ public class GuicePropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Override
-	protected Object findByName(String name, Class<?> type) {
+	protected Object findByName(String name, IParameterType type) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	protected Object findByType(IParameterType<?> type) {
+	protected Object findByType(IParameterType type) {
 		Class<?> clazz = type.getRawType();
-		return injector.getProvider(clazz);
+		return injector.getInstance(clazz);
 	}
 
 	@Override
@@ -38,9 +39,8 @@ public class GuicePropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Override
-	protected Object findByQualifier(Class<?> type, Annotation qualifier) {
-		// TODO Auto-generated method stub
-		return null;
+	protected Object findByQualifier(IParameterType type, Annotation qualifier) {
+		return injector.getInstance(Key.get(type.getRawType(), qualifier));
 	}
 
 //	@Override

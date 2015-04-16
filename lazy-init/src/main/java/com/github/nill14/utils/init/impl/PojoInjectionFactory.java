@@ -42,14 +42,14 @@ public class PojoInjectionFactory<T> implements IPojoFactory<T> {
 		}
 	}
 	
-	private Object[] createArgs(Collection<IParameterType<?>> types) {
+	private Object[] createArgs(Collection<IParameterType> types) {
 		if (types.isEmpty()) {
 			return null;
 		}
 		
 		Object[] args = new Object[types.size()];
 		int i = 0;
-		for (IParameterType<?> type : types) {
+		for (IParameterType type : types) {
 			Object arg = resolver.resolve(type);
 			if (arg == null && !type.isNullable()) {
 				throw new RuntimeException(String.format("Cannot resolve property %s", type.getToken()));

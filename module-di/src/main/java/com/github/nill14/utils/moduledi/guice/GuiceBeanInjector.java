@@ -1,7 +1,7 @@
 package com.github.nill14.utils.moduledi.guice;
 
+import com.github.nill14.utils.init.api.BindingType;
 import com.github.nill14.utils.init.api.IBeanInjector;
-import com.github.nill14.utils.init.api.IParameterType;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -32,8 +32,8 @@ public class GuiceBeanInjector implements IBeanInjector {
 	}
 	
 	@Override
-	public <T> T wire(IParameterType<T> type) {
-		return wire(type.getToken());
+	public <T> T wire(BindingType<T> type) {
+		return (T) injector.getInstance(Key.get(type.getGenericType(), type.getQualifier()));
 	}
 
 

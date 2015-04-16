@@ -25,35 +25,12 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Object doResolveQualifiers(IParameterType<?> type, Class<?> clazz) {
-		Object result = null;
-		
-		for (Annotation qualifier : type.getQualifiers()) {
-			Object query = null;
-			if (Named.class.equals(qualifier.annotationType())) {
-				String name = ((Named) qualifier).value();
-				query = findByName(name, clazz);
-			} else {
-				query = findByQualifier(clazz, qualifier);
-			}
-			
-			if (result != null && !result.equals(query)) {
-				return null;
-			} else {
-				result = query;
-			}
-		}
-		
-		return result;
-	}
-
-	@Override
-	protected Object findByQualifier(Class<?> type, Annotation qualifier) {
+	protected Object findByQualifier(IParameterType type, Annotation qualifier) {
 		
 		Class<? extends Annotation> annotationClass = qualifier.annotationType();
 		Map<String, Object> beansWithAnnotation = context.getBeansWithAnnotation(annotationClass);
 		
-		Map<String, ?> beansOfType = context.getBeansOfType(type);
+		Map<String, ?> beansOfType = context.getBeansOfType(type.getRawType());
 		Collection<Object> values = Maps.difference(beansWithAnnotation, beansOfType).entriesInCommon().values();
 		
 		List<Object> result = values.stream()
@@ -74,15 +51,15 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	
 
 	@Override
-	protected Object findByName(String name, Class<?> type) {
-		if (context.isTypeMatch(name, type)) {
+	protected Object findByName(String name, IParameterType type) {
+		if (context.isTypeMatch(name, type.getRawType())) {
 			return context.getBean(name, type);
 		}
 		return null;
 	}
 
 	@Override
-	protected Object findByType(IParameterType<?> type) {
+	protected Object findByType(IParameterType type) {
 		Class<?> clazz = type.getRawType();
 		String[] names = context.getBeanNamesForType(clazz);
 		if (names.length > 0) {

@@ -1,64 +1,115 @@
 package com.github.nill14.utils.init.inject;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Member;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
+import com.github.nill14.utils.init.api.BindingType;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.meta.AnnotationScanner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 
-public class ParameterTypeInjectionDescriptor<T> implements IParameterType<T> {
+public class ParameterTypeInjectionDescriptor implements IParameterType {
 	
 	
 	private static final boolean isGuiceInjectPresent = ReflectionUtils.isClassPresent("com.google.inject.Inject");
 	private static final boolean isGuiceNamedPresent = ReflectionUtils.isClassPresent("com.google.inject.name.Named");
 	
 	private final Type type;
-	private final TypeToken<T> typeToken;
+	private final TypeToken<?> typeToken;
 	private final Optional<String> named;
 
-	//There are multiple annotations in Java8 but they are always packed in another annotation
-	private final ImmutableMap<Class<?>, Annotation> qualifiers;
-	private final ImmutableMap<Class<?>, Annotation> annotations;
+	private final @Nullable Annotation qualifier;
+	private final ImmutableMap<Class<? extends Annotation>, Annotation> annotations;
 	private final boolean optional;
 	private final boolean nullable;
 	private final Class<?> declaringClass;
 	
-	@SuppressWarnings("unchecked")
-	public ParameterTypeInjectionDescriptor(Type type, Annotation[] annotations, @Nullable Class<?> declaringClass) {
-		this.declaringClass = declaringClass;
-		this.type = type;
-		typeToken = (TypeToken<T>) TypeToken.of(type);
 
-		Map<Class<? extends Annotation>, Annotation> qualifiers = AnnotationScanner.findAnnotations(annotations, javax.inject.Qualifier.class);
-//		Map<Class<? extends Annotation>, Annotation> bindingAnnotations = AnnotationScanner.findAnnotations(annotations, com.google.inject.BindingAnnotation.class);
-		ImmutableMap.Builder<Class<?>, Annotation> builder = ImmutableMap.builder();
-		this.qualifiers = builder.putAll(qualifiers)/*.putAll(bindingAnnotations)*/.build();
-		this.annotations = ImmutableMap.copyOf(AnnotationScanner.indexAnnotations(annotations));
+	public static <T> ParameterTypeInjectionDescriptor ofFirstParam(IParameterType type) {
+		TypeToken<?> firstParamToken = type.getFirstParamToken();
+		ImmutableMap<Class<? extends Annotation>, Annotation> annotations = AnnotationScanner.indexAnnotations(type.getAnnotations().stream());
+				
+		return new ParameterTypeInjectionDescriptor(firstParamToken.getType(), firstParamToken, type.getNamed(), type.getQualifier(), annotations, type.getDeclaringClass());
+	}
+	
+	public static <T> ParameterTypeInjectionDescriptor of(BindingType<T> bindingType) {
+		Annotation qualifier = bindingType.getQualifier();
 		
-		javax.inject.Named named = (javax.inject.Named ) this.annotations.get(javax.inject.Named.class);
-		//see Names.named(String)
-		Optional<String> name = Optional.ofNullable(named).map(n -> n.value());
-		Optional<String> name2 = isGuiceNamedPresent ? OptionalGuiceDependency.getNamed(this.annotations): Optional.empty();
-		this.named = name.isPresent() ? name : name2;
+		Optional<String> optionalNamed = qualifier instanceof javax.inject.Named ? 
+				Optional.ofNullable(((javax.inject.Named ) qualifier).value()) : Optional.empty();
 		
-		Nullable nullable = (Nullable) this.annotations.get(javax.annotation.Nullable.class);
+		ImmutableMap<Class<? extends Annotation>, Annotation> annotations = qualifier != null ? 
+				AnnotationScanner.indexAnnotations(Stream.of(qualifier)) : ImmutableMap.of();
+				
+		return new ParameterTypeInjectionDescriptor(bindingType.getGenericType(), bindingType.getToken(), optionalNamed, qualifier, annotations, null);
+	}
+	
+	public static ParameterTypeInjectionDescriptor of(Type type, Annotation[] annotations, Member member, /*@Nullable Annotation qualifier,*/ @Nullable Class<?> declaringClass) {
+		Annotation qualifier = null;
+		ImmutableMap<Class<? extends Annotation>, Annotation> annotations2 = ImmutableMap.copyOf(AnnotationScanner.indexAnnotations(annotations));
+		Stream<Annotation> stream = Stream.of(annotations).filter(a -> a.annotationType().isAnnotationPresent(javax.inject.Qualifier.class));
+		if (isGuiceInjectPresent) {
+			stream = OptionalGuiceDependency.appendNamed(stream, annotations2);
+		}
 		
-		Optional<Boolean> googleInject = isGuiceInjectPresent ? 
-				OptionalGuiceDependency.isOptionalInject(this.annotations) : null;
-		this.nullable = nullable != null || googleInject != null && googleInject.get() == true;
+		Map<Class<? extends Annotation>, Annotation> qualifiers = AnnotationScanner.indexAnnotations(stream);
+		
+		if (qualifiers.size() > 1) {
+			throw new RuntimeException("Specification expects at most one qualifier: " + member); 
+			
+		} else if (qualifiers.size() == 1){
+			qualifier = qualifiers.values().iterator().next();
+		}
+				
+		Optional<String> optionalNamed;
+		javax.inject.Named named = (javax.inject.Named ) annotations2.get(javax.inject.Named.class);
+		if (named != null) {
+			optionalNamed = Optional.of(named.value());
+		
+		} else {
+			//see Names.named(String)
+			optionalNamed = isGuiceNamedPresent ? OptionalGuiceDependency.getOptionalNamed(annotations2): Optional.empty();
+		}
+	
+		return new ParameterTypeInjectionDescriptor(type, TypeToken.of(type), optionalNamed, qualifier, annotations2, declaringClass);
+	}
+	
+	
+	
+	
+	private ParameterTypeInjectionDescriptor(Type type, TypeToken<?> typeToken, Optional<String> named,
+			@Nullable Annotation qualifier, ImmutableMap<Class<? extends Annotation>, Annotation> annotations, 
+			@Nullable Class<?> declaringClass) {
+		this.type = type;
+		this.typeToken = typeToken;
+		this.named = named;
+		this.qualifier = qualifier;
+		this.annotations = annotations;
+		this.declaringClass = declaringClass;
 		
 		optional = java.util.Optional.class.isAssignableFrom(typeToken.getRawType())
 				|| com.google.common.base.Optional.class.isAssignableFrom(typeToken.getRawType());
+		
+		Nullable nullable = (Nullable) annotations.get(javax.annotation.Nullable.class);
+		if (nullable != null) {
+			this.nullable = true;
+		} else {
+			Optional<Boolean> googleInject = isGuiceInjectPresent ? 
+				OptionalGuiceDependency.isOptionalInject(annotations) : null;
+				this.nullable = googleInject != null && googleInject.get() == true;
+		}
+		
 	}
-	
+
 	@Override
 	public boolean isParametrized() {
 		return typeToken.getType() instanceof ParameterizedType;
@@ -97,7 +148,7 @@ public class ParameterTypeInjectionDescriptor<T> implements IParameterType<T> {
 	}
 	
 	@Override
-	public TypeToken<T> getToken() {
+	public TypeToken<?> getToken() {
 		return typeToken;
 	}
 	
@@ -112,8 +163,8 @@ public class ParameterTypeInjectionDescriptor<T> implements IParameterType<T> {
 	}
 	
 	@Override
-	public Collection<Annotation> getQualifiers() {
-		return qualifiers.values();
+	public Annotation getQualifier() {
+		return qualifier;
 	}
 
 	@Override
@@ -140,12 +191,23 @@ public class ParameterTypeInjectionDescriptor<T> implements IParameterType<T> {
 	
 	private static final class OptionalGuiceDependency {
 		
-		public static Optional<String> getNamed(ImmutableMap<Class<?>, Annotation> annotations) {
+		public static Stream<Annotation> appendNamed(Stream<Annotation> qualifiers, ImmutableMap<Class<? extends Annotation>, Annotation> annotations) {
 			com.google.inject.name.Named named = (com.google.inject.name.Named) annotations.get(com.google.inject.name.Named.class);
-			return Optional.ofNullable(named).map(com.google.inject.name.Named::value);
+			if (named != null) {
+				return Stream.concat(qualifiers, Stream.of(named));
+			}
+			return qualifiers;
 		}
 		
-		public static Optional<Boolean> isOptionalInject(ImmutableMap<Class<?>, Annotation> annotations) {
+		public static Optional<String> getOptionalNamed(ImmutableMap<Class<? extends Annotation>, Annotation> qualifiers) {
+			com.google.inject.name.Named gnamed = (com.google.inject.name.Named) qualifiers.get(com.google.inject.name.Named.class);
+			if (gnamed != null) {
+				return Optional.of(gnamed.value());
+			}
+			return Optional.empty();
+		}
+		
+		public static Optional<Boolean> isOptionalInject(ImmutableMap<Class<? extends Annotation>, Annotation> annotations) {
 			com.google.inject.Inject inject = (com.google.inject.Inject) annotations.get(com.google.inject.Inject.class);
 			if (inject != null) {
 				return Optional.of(inject.optional());

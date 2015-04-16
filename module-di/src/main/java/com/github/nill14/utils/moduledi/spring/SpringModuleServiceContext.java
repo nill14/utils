@@ -69,7 +69,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 	private final IPropertyResolver applicationContextResolver = new IPropertyResolver() {
 
 		@Override
-		public Object resolve(IParameterType<?> type) {
+		public Object resolve(IParameterType type) {
 			if (springPropertyResolver == null) {
 				//TODO this might be eventually the case when calling resolver from PojoFactory
 				throw new IllegalStateException("Wrong order, first must be called initializer");

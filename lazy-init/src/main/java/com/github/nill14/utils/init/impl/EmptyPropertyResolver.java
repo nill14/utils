@@ -21,13 +21,13 @@ public final class EmptyPropertyResolver extends AbstractPropertyResolver implem
 	}
 	
 	@Override
-	protected Object findByName(String name, Class<?> type) {
+	protected Object findByName(String name, IParameterType type) {
 		return null;
 	}
 
 
 	@Override
-	protected Object findByType(IParameterType<?> type) {
+	protected Object findByType(IParameterType type) {
 		return null;
 	}
 
@@ -39,7 +39,7 @@ public final class EmptyPropertyResolver extends AbstractPropertyResolver implem
 
 
 	@Override
-	protected Object findByQualifier(Class<?> type, Annotation qualifier) {
+	protected Object findByQualifier(IParameterType type, Annotation qualifier) {
 		return null;
 	}
 

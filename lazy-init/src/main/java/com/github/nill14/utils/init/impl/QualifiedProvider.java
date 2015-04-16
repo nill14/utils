@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.inject.Provider;
 
+import com.github.nill14.utils.init.api.BindingType;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IQualifiedProvider;
@@ -22,52 +23,52 @@ public class QualifiedProvider<T> implements IQualifiedProvider<T> {
 	}
 	
 
-	private T resolveOrThrow(IParameterType<?> type) {
+	private T resolveOrThrow(IParameterType type) {
 		T object = (T) resolver.resolve(type);
 		if (object != null) {
 			return object;
 		} else {
-			throw new RuntimeException("Cannot resolve " + type.getQualifiers());
+			throw new RuntimeException("Cannot resolve " + type.getQualifier());
 		}
 	}
 	
-	private Optional<T> resolveOptional(IParameterType<?> type) {
+	private Optional<T> resolveOptional(IParameterType type) {
 		return Optional.ofNullable((T) resolver.resolve(type));
 	}
 
 	@Override
 	public T getNamed(String named) {
-		IParameterType<?> type = IParameterType.builder(typeToken).named(named).build();
+		IParameterType type = IParameterType.of(BindingType.of(typeToken, named));
 		return resolveOrThrow(type);
 	}
 
 	@Override
 	public Optional<T> getOptionalNamed(String named) {
-		IParameterType<?> type = IParameterType.builder(typeToken).named(named).build();
+		IParameterType type = IParameterType.of(BindingType.of(typeToken, named));
 		return resolveOptional(type);
 	}
 
 	@Override
 	public T getQualified(Class<? extends Annotation> annotationType) {
-		IParameterType<?> type = IParameterType.builder(typeToken).annotatedWith(annotationType).build();
+		IParameterType type = IParameterType.of(BindingType.of(typeToken, annotationType));
 		return resolveOrThrow(type);
 	}
 
 	@Override
 	public Optional<T> getOptionalQualified(Class<? extends Annotation> annotationType) {
-		IParameterType<?> type = IParameterType.builder(typeToken).annotatedWith(annotationType).build();
+		IParameterType type = IParameterType.of(BindingType.of(typeToken, annotationType));
 		return resolveOptional(type);
 	}
 
 	@Override
 	public T getQualified(Annotation annotation) {
-		IParameterType<?> type = IParameterType.builder(typeToken).annotatedWith(annotation).build();
+		IParameterType type = IParameterType.of(BindingType.of(typeToken, annotation));
 		return resolveOrThrow(type);
 	}
 
 	@Override
 	public Optional<T> getOptionalQualified(Annotation annotation) {
-		IParameterType<?> type = IParameterType.builder(typeToken).annotatedWith(annotation).build();
+		IParameterType type = IParameterType.of(BindingType.of(typeToken, annotation));
 		return resolveOptional(type);
 	}
 	

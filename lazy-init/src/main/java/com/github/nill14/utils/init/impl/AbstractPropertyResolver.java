@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableSortedSet;
 public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	
 	@Override
-	public Object resolve(IParameterType<?> type) {
+	public Object resolve(IParameterType type) {
 		Class<?> rawType = type.getRawType();
 		
 		boolean isCollection = isCollection(type);
@@ -68,20 +68,17 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			return new QualifiedProvider(type.getFirstParamToken(), this);
 		
 		} else if (Provider.class.equals(rawType)) {
-			ParameterTypeInjectionDescriptor firstParamType = new ParameterTypeInjectionDescriptor(
-					type.getFirstParamToken().getType(), 
-					(Annotation[]) type.getAnnotations().toArray(new Annotation[0]), 
-					type.getDeclaringClass());
+			IParameterType firstParamType = ParameterTypeInjectionDescriptor.ofFirstParam(type);
+					
 			return new LazyResolvingProvider<>(this, firstParamType);
 		}
 		
-		Collection<Annotation> qualifiers = type.getQualifiers();
-		if (!qualifiers.isEmpty()) {
-			return doResolveQualifiers(type, rawType);
-		}
+		Annotation qualifier = type.getQualifier();
+		if (qualifier != null) {
+			return findByQualifier(type, qualifier);
 		
-		if (type.getNamed().isPresent()) { // find by name
-			Object result = findByName((String) type.getNamed().get(), rawType);
+		} else if (type.getNamed().isPresent()) { // find by name if supported
+			Object result = findByName(type.getNamed().get(), type);
 			if (result != null) {
 				return result;
 			}
@@ -113,30 +110,14 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		}
 	}
 	
-	protected Object doResolveQualifiers(IParameterType<?> type, Class<?> clazz) {
-		Object result = null;
-		
-		for (Annotation qualifier : type.getQualifiers()) {
-			Object query = findByQualifier(clazz, qualifier);
-			
-			if (result != null && !result.equals(query)) {
-				return null;
-			} else {
-				result = query;
-			}
-		}
-		
-		return result;
-	}
 	
-	
-	protected abstract @Nullable Object findByName(String name, Class<?> type);
-	protected abstract @Nullable Object findByType(IParameterType<?> type);
+	protected abstract @Nullable Object findByName(String name, IParameterType type);
+	protected abstract @Nullable Object findByType(IParameterType type);
 	protected abstract Collection<?> findAllByType(Class<?> type);
 
-	protected abstract @Nullable Object findByQualifier(Class<?> type, Annotation qualifier);
+	protected abstract @Nullable Object findByQualifier(IParameterType type, Annotation qualifier);
 	
-	protected boolean isCollection(IParameterType<?> type) {
+	protected boolean isCollection(IParameterType type) {
 		return Iterable.class.isAssignableFrom(type.getRawType());
 	}
 	

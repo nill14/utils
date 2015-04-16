@@ -7,16 +7,16 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-import com.github.nill14.utils.init.impl.ParameterTypeBuilder;
+import com.github.nill14.utils.init.inject.ParameterTypeInjectionDescriptor;
 import com.google.common.reflect.TypeToken;
 
-public interface IParameterType<T> {
+public interface IParameterType {
 
 	Class<?> getRawType();
 
 	Type getGenericType();
 	
-	TypeToken<T> getToken();
+	TypeToken<?> getToken();
 
 	boolean isParametrized();
 
@@ -26,7 +26,7 @@ public interface IParameterType<T> {
 	
 	TypeToken<?> getFirstParamToken();
 	
-	Collection<Annotation> getQualifiers();
+	@Nullable Annotation getQualifier();
 	
 	Optional<Annotation> getAnnotation(Class<? extends Annotation> annotation);
 	
@@ -38,22 +38,19 @@ public interface IParameterType<T> {
 
 	Optional<String> getNamed();
 
-	static <T> IParameterType<T> of(Class<T> clazz) {
-		return ParameterTypeBuilder.builder(clazz).build();
+	static <T> IParameterType of(Class<T> clazz) {
+		return ParameterTypeInjectionDescriptor.of(BindingType.of(clazz));
 	}
 
-	static <T> IParameterType<T> of(TypeToken<T> typeToken) {
-		return ParameterTypeBuilder.builder(typeToken).build();
-	}
-	
-	static <T> IParameterTypeBuilder<T> builder(Class<T> clazz) {
-		return ParameterTypeBuilder.builder(clazz);
-	}
-	
-	static <T> IParameterTypeBuilder<T> builder(TypeToken<T> typeToken) {
-		return ParameterTypeBuilder.builder(typeToken);
+	static <T> IParameterType of(TypeToken<T> typeToken) {
+		return ParameterTypeInjectionDescriptor.of(BindingType.of(typeToken)); 
 	}
 
+
+	static <T> IParameterType of(BindingType<T> bindingType) {
+		return ParameterTypeInjectionDescriptor.of(bindingType);
+	}
+	
 	
 	//TODO consider boolean isCollection and TypeToken getDependencyType
 	

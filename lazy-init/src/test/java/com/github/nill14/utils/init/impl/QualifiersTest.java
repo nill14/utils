@@ -30,7 +30,7 @@ public class QualifiersTest {
 	public void prepare() {
 		IServiceRegistry serviceRegistry = IServiceRegistry.newRegistry();
 		serviceRegistry.addService(MangoSync.class, IServiceContext.global());
-		serviceRegistry.addService(MangoAsync.class, IServiceContext.global());
+		serviceRegistry.addService(MangoAbc.class, IServiceContext.global());
 		serviceRegistry.addService(MangoHello.class, IServiceContext.global());
 		beanInjector = serviceRegistry.toBeanInjector();
 	}
@@ -40,7 +40,7 @@ public class QualifiersTest {
 		MangoBean bean = beanInjector.wire(MangoBean.class);
 		
 		assertNotNull(bean);
-		assertThat(bean.asyncMango, CoreMatchers.instanceOf(MangoAsync.class));
+		assertThat(bean.abcMango, CoreMatchers.instanceOf(MangoAbc.class));
 		assertThat(bean.syncMango, CoreMatchers.instanceOf(MangoSync.class));
 		assertThat(bean.helloMango, CoreMatchers.instanceOf(MangoHello.class));
 		assertNull(bean.missingMango);
@@ -88,13 +88,11 @@ public class QualifiersTest {
 		
 	}
 	
-	@Asynchronous
-	public static class MangoAsync extends Mango {
+	@AbcQualifier(ABC.A)
+	public static class MangoAbc extends Mango {
 		
 	}
 	
-	@AbcQualifier(ABC.A)
-	@AnotherNamed("hello")
 	@Named("helloMango")
 	public static class MangoHello extends Mango {
 		
@@ -108,13 +106,11 @@ public class QualifiersTest {
 		Mango syncMango;
 		
 		@Inject
-		@Asynchronous
+		@AbcQualifier(ABC.A)
 		@Nullable
-		Mango asyncMango;
+		Mango abcMango;
 		
 		@Inject
-		@AbcQualifier(ABC.A)
-		@AnotherNamed("hello")
 		@Named("helloMango")
 		@Nullable
 		Mango helloMango;

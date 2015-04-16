@@ -31,7 +31,7 @@ public class PojoInjectionDescriptor<T> implements Serializable, IBeanDescriptor
 	private final Set<Class<? super T>> interfaces;
 
 	@SuppressWarnings("unchecked")
-	public PojoInjectionDescriptor(IParameterType<?> parameterType) {
+	public PojoInjectionDescriptor(IParameterType parameterType) {
 		this((TypeToken<T>) TypeToken.of(parameterType.getGenericType()));
 	}
 	
