@@ -62,6 +62,21 @@ public class BeanInjector implements IBeanInjector {
 		return resolve(type);
 	}
 	
+	@Override
+	public <T> T getInstance(Class<T> beanClass) {
+		return resolve(BindingType.of(beanClass));
+	}
+
+	@Override
+	public <T> T getInstance(TypeToken<T> typeToken) {
+		return resolve(BindingType.of(typeToken));
+	}
+	
+	@Override
+	public <T> T getInstance(BindingType<T> type) {
+		return resolve(type);
+	}
+	
 	private final Provider<BeanInjector> provider = new Provider<BeanInjector>() {
 		
 		@Override
@@ -75,16 +90,19 @@ public class BeanInjector implements IBeanInjector {
 	}
 
 
+	@Override
 	public <T> Provider<T> getProvider(Class<T> beanClass) {
 		IParameterType type = IParameterType.of(BindingType.of(beanClass));
 		return new LazyResolvingProvider<>(resolver, type);
 	}
 
+	@Override
 	public <T> Provider<T> getProvider(TypeToken<T> typeToken) {
 		IParameterType type = IParameterType.of(BindingType.of(typeToken));
 		return new LazyResolvingProvider<>(resolver, type);
 	}
 
+	@Override
 	public <T> Provider<T> getProvider(BindingType<T> bindingType) {
 		IParameterType type = IParameterType.of(bindingType);
 		return new LazyResolvingProvider<>(resolver, type);
