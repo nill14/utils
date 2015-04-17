@@ -31,8 +31,8 @@ public class GuicePropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Override
-	protected Collection<?> findAllByType(Class<?> type) {
-		TypeLiteral<Object> literal = (TypeLiteral<Object>) TypeLiteral.get(type);
+	protected Collection<?> findAllByType(IParameterType type) {
+		TypeLiteral<Object> literal = (TypeLiteral<Object>) TypeLiteral.get(type.getGenericType());
 		return injector.findBindingsByType(literal).stream()
 				.map(b -> b.getProvider().get())
 				.collect(Collectors.toList());

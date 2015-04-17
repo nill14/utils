@@ -26,8 +26,8 @@ public class ActivationModule implements IModule {
 	public void startModule(IServiceRegistry registry) {
 		
 		ITaskService taskService = registry.getService(ITaskService.class);
-		Assert.assertEquals(Optional.of("reporter"), taskService.getReporter());
-		Assert.assertEquals(Optional.empty(), taskService.getAssignee());
+		Assert.assertEquals(taskService.getReporter(), Optional.of("reporter"));
+		Assert.assertEquals(taskService.getAssignee(), Optional.empty());
 		
 //		TaskBean taskBean = taskService.
 //		Assert.assertEquals(Optional.empty(), taskBean.getAssignee());

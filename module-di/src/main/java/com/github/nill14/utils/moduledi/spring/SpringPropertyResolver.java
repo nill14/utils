@@ -69,8 +69,8 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Collection<?> findAllByType(Class<?> type) {
-		return context.getBeansOfType(type).values();
+	protected Collection<?> findAllByType(IParameterType type) {
+		return context.getBeansOfType(type.getRawType()).values();
 	}
 
 

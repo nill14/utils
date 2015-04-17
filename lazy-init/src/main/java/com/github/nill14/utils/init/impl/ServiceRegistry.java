@@ -279,8 +279,8 @@ public class ServiceRegistry implements IServiceRegistry {
 		}
 
 		@Override
-		protected Collection<?> findAllByType(Class<?> type) {
-			return getServices(type);
+		protected Collection<?> findAllByType(IParameterType type) {
+			return getServices(type.getRawType());
 		}
 
 	};

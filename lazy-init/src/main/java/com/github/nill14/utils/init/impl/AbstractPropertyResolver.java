@@ -2,6 +2,7 @@ package com.github.nill14.utils.init.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 import javax.inject.Provider;
@@ -25,26 +26,26 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	
 	@Override
 	public Object resolve(IParameterType type) {
-		Class<?> rawType = type.getRawType();
 		
 		boolean isCollection = isCollection(type);
 		if (isCollection || type.isOptional()) { 
-			Class<?> paramClass = type.getFirstParamToken().getRawType();
+			Class<?> baseType = type.getRawType();
+			IParameterType paramType = type.getFirstParamType();
 
-			if (java.util.Optional.class.isAssignableFrom(rawType)) {
-				return java.util.Optional.ofNullable(doResolve(type, paramClass));
+			if (java.util.Optional.class.isAssignableFrom(baseType)) {
+				return java.util.Optional.ofNullable(doResolve(paramType));
 			}
 			
-			if (com.google.common.base.Optional.class.isAssignableFrom(rawType)) {
-				return com.google.common.base.Optional.fromNullable(doResolve(type, paramClass));
+			if (com.google.common.base.Optional.class.isAssignableFrom(baseType)) {
+				return com.google.common.base.Optional.fromNullable(doResolve(paramType));
 			}
 			
-			if (Iterable.class.isAssignableFrom(rawType)) {
-				return doResolveCollection(rawType, paramClass);
+			if (Iterable.class.isAssignableFrom(baseType)) {
+				return doResolveCollection(baseType, paramType);
 			}
 		} 
 	
-		Object result = doResolve(type, rawType);
+		Object result = doResolve(type);
 		if (result != null) {
 			return result;
 		}
@@ -60,7 +61,9 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected Object doResolve(IParameterType type, Class<?> rawType) {
+	protected Object doResolve(IParameterType type) {
+		Class<?> rawType = type.getRawType();
+		
 		if (IBeanInjector.class.equals(rawType)) {
 			return new BeanInjector(this);
 		
@@ -68,22 +71,23 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			return new QualifiedProvider(type.getFirstParamToken(), this);
 		
 		} else if (Provider.class.equals(rawType)) {
-			IParameterType firstParamType = ParameterTypeInjectionDescriptor.ofFirstParam(type);
-					
-			return new LazyResolvingProvider<>(this, firstParamType);
+			return new LazyResolvingProvider<>(this, type.getFirstParamType());
 		}
 		
+		Optional<String> named = type.getNamed();
 		Annotation qualifier = type.getQualifier();
 		if (qualifier != null) {
-			return findByQualifier(type, qualifier);
-		
-		} else if (type.getNamed().isPresent()) { // find by name if supported
-			Object result = findByName(type.getNamed().get(), type);
-			if (result != null) {
-				return result;
+			Object result = findByQualifier(type, qualifier);
+			if (result == null && named.isPresent()) {
+				return findByName(named.get(), type);
 			}
+			return result;
 		
-		} else { // find by type
+		} else if (named.isPresent()) { // find by name if supported
+			return findByName(named.get(), type);
+
+		} else { 
+			// find by type
 			Object result = findByType(type);
 			if (result != null) {
 				return result;
@@ -92,28 +96,28 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		return null;
 	}
 	
-	protected Object doResolveCollection(Class<?> rawType, Class<?> paramClass) {
-		Collection<?> providers = findAllByType(paramClass);
+	protected Object doResolveCollection(Class<?> collectionType, IParameterType paramType) {
+		Collection<?> providers = findAllByType(paramType);
 		Preconditions.checkNotNull(providers);
 		
-		if (rawType.isAssignableFrom(ImmutableList.class)) {
+		if (collectionType.isAssignableFrom(ImmutableList.class)) {
 			return ImmutableList.copyOf(providers);
 		
-		} else if (rawType.isAssignableFrom(ImmutableSet.class)) {
+		} else if (collectionType.isAssignableFrom(ImmutableSet.class)) {
 			return ImmutableSet.copyOf(providers);
 		
-		} else if (rawType.isAssignableFrom(ImmutableSortedSet.class)) {
+		} else if (collectionType.isAssignableFrom(ImmutableSortedSet.class)) {
 			return ImmutableSortedSet.copyOf(providers);
 		
 		} else {
-			throw new RuntimeException(rawType + "is an unsupported collection type");
+			throw new RuntimeException(collectionType + "is an unsupported collection type");
 		}
 	}
 	
 	
 	protected abstract @Nullable Object findByName(String name, IParameterType type);
 	protected abstract @Nullable Object findByType(IParameterType type);
-	protected abstract Collection<?> findAllByType(Class<?> type);
+	protected abstract Collection<?> findAllByType(IParameterType type);
 
 	protected abstract @Nullable Object findByQualifier(IParameterType type, Annotation qualifier);
 	

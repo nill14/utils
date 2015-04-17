@@ -26,6 +26,8 @@ public interface IParameterType {
 	
 	TypeToken<?> getFirstParamToken();
 	
+	IParameterType getFirstParamType();
+	
 	@Nullable Annotation getQualifier();
 	
 	Optional<Annotation> getAnnotation(Class<? extends Annotation> annotation);

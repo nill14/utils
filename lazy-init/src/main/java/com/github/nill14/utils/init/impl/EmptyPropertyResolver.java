@@ -33,7 +33,7 @@ public final class EmptyPropertyResolver extends AbstractPropertyResolver implem
 
 
 	@Override
-	protected Collection<?> findAllByType(Class<?> type) {
+	protected Collection<?> findAllByType(IParameterType type) {
 		return Collections.emptyList();
 	}
 

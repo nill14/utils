@@ -34,7 +34,7 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 	private final Class<?> declaringClass;
 	
 
-	public static <T> ParameterTypeInjectionDescriptor ofFirstParam(IParameterType type) {
+	private static <T> ParameterTypeInjectionDescriptor ofFirstParam(IParameterType type) {
 		TypeToken<?> firstParamToken = type.getFirstParamToken();
 		ImmutableMap<Class<? extends Annotation>, Annotation> annotations = AnnotationScanner.indexAnnotations(type.getAnnotations().stream());
 				
@@ -125,6 +125,15 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 		if (type instanceof ParameterizedType) {
 			Type argType = ((ParameterizedType) type).getActualTypeArguments()[0];
 			return TypeToken.of(argType);
+		}
+		throw new IllegalStateException();
+	}
+	
+	
+	@Override
+	public IParameterType getFirstParamType() {
+		if (type instanceof ParameterizedType) {
+			return ofFirstParam(this);
 		}
 		throw new IllegalStateException();
 	}
