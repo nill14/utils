@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.util.Optional;
 
 import com.github.nill14.utils.init.meta.Annotations;
+import com.google.inject.Key;
 
 public interface IQualifiedProvider<T> {
 

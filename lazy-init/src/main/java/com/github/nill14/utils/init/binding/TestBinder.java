@@ -67,7 +67,7 @@ public Object resolve(Object pojo, IParameterType type) {
 	return import org.mockito.Mockito.mock(type.getRawType(), Mockito.RETURNS_DEEP_STUBS);
 }
 	 * 
-	 * </pre
+	 * </pre>
 	 * 
 	 */
 	public TestBinder withFallbackResolver(IPropertyResolver resolver) {
