@@ -1,10 +1,11 @@
 package com.github.nill14.utils.init.binding.impl;
 
 import java.lang.annotation.Annotation;
-import java.util.Set;
 
 import javax.inject.Provider;
 
+import com.github.nill14.utils.init.api.BindingType;
+import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.AnnotatedBindingBuilder;
 import com.github.nill14.utils.init.binding.Binder;
 import com.github.nill14.utils.init.binding.LinkedBindingBuilder;
@@ -14,15 +15,16 @@ import com.github.nill14.utils.init.binding.target.BeanTypeBindingTarget;
 import com.github.nill14.utils.init.binding.target.ProviderInstanceBindingTarget;
 import com.github.nill14.utils.init.binding.target.ProviderTypeBindingTarget;
 import com.github.nill14.utils.init.meta.Annotations;
+import com.github.nill14.utils.init.scope.PrototypeScope;
 import com.github.nill14.utils.init.util.Element;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 
 public final class BindingBuilder<T> implements AnnotatedBindingBuilder<T> {
 	
 	private final TypeToken<T> keyToken;
-	private Annotation annotation;
+	private Annotation qualifier;
 	private BindingTarget<? extends T> target;
+	private IScope scope = PrototypeScope.instance();
 	private final Object source;
 	private final Element<BindingImpl<?>> element;
 
@@ -33,7 +35,8 @@ public final class BindingBuilder<T> implements AnnotatedBindingBuilder<T> {
 		this.keyToken = bindToken;
 		this.target = new BeanTypeBindingTarget<>(bindToken);
 		
-		element.update(new BindingImpl<T>(bindToken, ImmutableSet.of(), target, source));
+		//no qualifier at the moment of creation
+		element.update(new BindingImpl<T>(BindingType.of(bindToken), target, scope, source));
 	}
 
 
@@ -85,22 +88,23 @@ public final class BindingBuilder<T> implements AnnotatedBindingBuilder<T> {
 
 	@Override
 	public LinkedBindingBuilder<T> annotatedWith(Class<? extends Annotation> annotationType) {
-		this.annotation = Annotations.annotation(annotationType);
+		this.qualifier = Annotations.annotation(annotationType);
 		buildBinder();
 		return this;
 	}
 
 	@Override
 	public LinkedBindingBuilder<T> annotatedWith(Annotation annotation) {
-		this.annotation = annotation;
+		this.qualifier = annotation;
 		buildBinder();
 		return this;
 	}
 	
 	private void buildBinder() {
-		Set<Annotation> annotations = annotation == null ? ImmutableSet.of() : ImmutableSet.of(annotation); 
+		BindingType<T> bindingType = qualifier == null ? 
+				BindingType.of(keyToken) : BindingType.of(keyToken, qualifier); 
 		
-		element.update(new BindingImpl<T>(keyToken, annotations, target, source));
+		element.update(new BindingImpl<T>(bindingType, target, scope, source));
 	}
 
 }

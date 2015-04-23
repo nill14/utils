@@ -1,27 +1,24 @@
 package com.github.nill14.utils.init.binding.impl;
 
-import java.lang.annotation.Annotation;
-import java.util.Set;
-
+import com.github.nill14.utils.init.api.BindingType;
+import com.github.nill14.utils.init.api.IScope;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.reflect.TypeToken;
 
 public final class BindingImpl<T> {
 	
-	private final TypeToken<T> token;
-	private final Set<Annotation> qualifiers;
+	private final BindingType<T> bindingType;
 	private final BindingTarget<? extends T> target;
 	private final Object source;
+	private final IScope scope;
 
-	public BindingImpl(TypeToken<T> token, Set<Annotation> qualifiers, BindingTarget<? extends T> target, Object source) {
-		Preconditions.checkNotNull(token);
-		Preconditions.checkNotNull(qualifiers);
+	public BindingImpl(BindingType<T> type, BindingTarget<? extends T> target, IScope scope, Object source) {
+		Preconditions.checkNotNull(type);
+		Preconditions.checkNotNull(scope);
 		Preconditions.checkNotNull(target);
 		Preconditions.checkNotNull(source);
-		this.token = token;
-		this.qualifiers = ImmutableSet.copyOf(qualifiers);
+		this.bindingType = type;
 		this.target = target;
+		this.scope = scope;
 		this.source = source;
 	}
 	
@@ -30,13 +27,8 @@ public final class BindingImpl<T> {
 		return target;
 	}
 	
-	
-	public Set<Annotation> getQualifiers() {
-		return qualifiers;
-	}
-	
-	public TypeToken<T> getKeyToken() {
-		return token;
+	public BindingType<T> getBindingType() {
+		return bindingType;
 	}
   
 //	public TypeToken<T> getValueToken() {
@@ -45,6 +37,10 @@ public final class BindingImpl<T> {
 	
 	public Object getSource() {
 		return source;
+	}
+	
+	public IScope getScope() {
+		return scope;
 	}
 	
 }

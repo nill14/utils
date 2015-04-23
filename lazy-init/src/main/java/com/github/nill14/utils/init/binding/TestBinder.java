@@ -1,11 +1,9 @@
 package com.github.nill14.utils.init.binding;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-
+import com.github.nill14.utils.init.api.BindingType;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -89,12 +87,11 @@ public Object resolve(Object pojo, IParameterType type) {
 		
 		
 		for (BindingImpl<?> binding : bindings) {
-			TypeToken<?> keyToken = binding.getKeyToken();
-			Set<Annotation> qualifiers = binding.getQualifiers();
+			BindingType<?> bindingType = binding.getBindingType();
 			
 			ILazyPojo<?> lazyPojo = binding.getBindingTarget().accept(bindingTargetVisitor);
 			
-			serviceRegistry.addBinding(keyToken, qualifiers, lazyPojo);
+			serviceRegistry.addBinding(bindingType, lazyPojo);
 		}
 		
 		return serviceRegistry.toBeanInjector();

@@ -1,10 +1,9 @@
 package com.github.nill14.utils.init.binding;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.github.nill14.utils.init.api.BindingType;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -72,12 +71,11 @@ public final class ModuleBinder implements Binder {
 		
 		
 		for (BindingImpl<?> binding : bindings) {
-			TypeToken<?> keyToken = binding.getKeyToken();
-			Set<Annotation> qualifiers = binding.getQualifiers();
+			BindingType<?> bindingType = binding.getBindingType();
 			
 			ILazyPojo<?> lazyPojo = binding.getBindingTarget().accept(bindingTargetVisitor);
 			
-			serviceRegistry.addBinding(keyToken, qualifiers, lazyPojo); //TODO add access check
+			serviceRegistry.addBinding(bindingType, lazyPojo); //TODO add access check
 		}
 		
 //		return serviceRegistry.toBeanInjector();
