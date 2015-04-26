@@ -96,18 +96,16 @@ public final class LazyPojo<T> implements ILazyPojo<T> {
 	@Override
 	public boolean freeInstance() {
 		boolean released = false;
-		T instance = this.instance;
+		T instance;
+		
+		synchronized (this) {
+			instance = this.instance;
+			this.instance = null;
+		}
+		
 		if (instance != null) {
-			
-			synchronized (this) {
-				instance = this.instance;
-				if (instance != null) {
-					
-					this.instance = null;
-					initializer.destroy(this, factory, instance);
-					released = true;
-				}
-			}
+			initializer.destroy(this, factory, instance);
+			released = true;
 		}
 		
 		return released;

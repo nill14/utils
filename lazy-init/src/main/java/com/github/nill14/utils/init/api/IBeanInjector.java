@@ -15,18 +15,21 @@ public interface IBeanInjector {
 	void injectMembers(Object bean);
 	
 	/**
-	 * prefer getInstance
+	 * @deprecated prefer getInstance
 	 */
+	@Deprecated
 	<T> T wire(Class<T> beanClass);
 
 	/**
-	 * prefer getInstance
+	 * @deprecated prefer getInstance
 	 */
+	@Deprecated
 	<T> T wire(TypeToken<T> typeToken);
 
 	/**
-	 * prefer getInstance
+	 * @deprecated prefer getInstance
 	 */
+	@Deprecated
 	<T> T wire(BindingType<T> type);
 	
 	<T> T getInstance(Class<T> beanClass);
