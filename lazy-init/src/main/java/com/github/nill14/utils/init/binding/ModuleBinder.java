@@ -1,5 +1,6 @@
 package com.github.nill14.utils.init.binding;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -17,6 +18,7 @@ import com.github.nill14.utils.init.util.Element;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
+import com.google.inject.Scope;
 
 public final class ModuleBinder implements Binder {
 	
@@ -47,6 +49,12 @@ public final class ModuleBinder implements Binder {
 	@Override
 	public <T> AnnotatedBindingBuilder<T> bind(Class<T> type) {
 		return new BindingBuilder<T>(this, newElement(), source, TypeToken.of(type));
+	}
+	
+	@Override
+	public void bindScope(Class<? extends Annotation> annotationType, Scope scope) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 	}
 
 	public ModuleBinder withResolver(IPropertyResolver resolver) {

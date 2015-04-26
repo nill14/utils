@@ -5,21 +5,24 @@ import javax.inject.Provider;
 import com.github.nill14.utils.init.api.BindingType;
 import com.github.nill14.utils.init.api.IScope;
 
-public class PrototypeScope implements IScope {
+public class SingletonScope implements IScope {
+
+	private final ScopeContext context = new ScopeContext();
 	
-	private PrototypeScope() {
+	private SingletonScope() {
 	}
 
 	@Override
 	public <T> Provider<T> scope(BindingType<T> type, Provider<T> unscoped) {
-		return unscoped;
+		return context.scope(type, unscoped);
 	}
 	
 	
 	
-	private static final PrototypeScope INSTANCE = new PrototypeScope();
-	public static final PrototypeScope instance() {
+	private static final SingletonScope INSTANCE = new SingletonScope();
+	public static final SingletonScope instance() {
 		return INSTANCE;
 	}
 
+	
 }
