@@ -29,12 +29,18 @@ public class LazyPojoTest {
 	private static final String GREETING = "Hello World!";
 	private static final Logger log = LoggerFactory.getLogger(LazyPojoTest.class);
 	private final ExecutorService executor = Executors.newCachedThreadPool();
-	private ILazyPojo<IGreeter> lazyPojo;
-	private AtomicInteger instances;
+	private volatile ILazyPojo<IGreeter> lazyPojo;
 
-	private IPojoInitializer factoryInitializer; 
+	private volatile IPojoInitializer factoryInitializer;
+	private volatile AtomicInteger instances; 
 			
 	class CountingPojoInitializer implements IPojoInitializer {
+		
+		private final AtomicInteger instances;
+
+		public CountingPojoInitializer(AtomicInteger instances) {
+			this.instances = instances;
+		}
 		
 		@Override
 		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
@@ -62,7 +68,7 @@ public class LazyPojoTest {
 	@BeforeMethod
 	public void init() {
 		instances = new AtomicInteger();
-		factoryInitializer = new CountingPojoInitializer();
+		factoryInitializer = new CountingPojoInitializer(instances);
 		lazyPojo = LazyPojo.forProvider(GreeterFactory.class, IPropertyResolver.empty(), factoryInitializer);
 		assertEquals(0, instances.get());
 	}
