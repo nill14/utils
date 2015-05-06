@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 
 import javax.inject.Named;
 
+import com.github.nill14.utils.init.meta.impl.AnnotationInvocationHandler;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

@@ -27,9 +27,11 @@ public final class BindingBuilder<T> implements AnnotatedBindingBuilder<T> {
 	private IScope scope = PrototypeScope.instance();
 	private final Object source;
 	private final Element<BindingImpl<?>> element;
+	private final Binder binder;
 
 	
 	public BindingBuilder(Binder binder, Element<BindingImpl<?>> element, Object source, TypeToken<T> bindToken) {
+		this.binder = binder;
 		this.element = element;
 		this.source = source;
 		this.keyToken = bindToken;
@@ -83,7 +85,8 @@ public final class BindingBuilder<T> implements AnnotatedBindingBuilder<T> {
 
 	@Override
 	public void in(Class<? extends Annotation> scopeAnnotation) {
-		throw new UnsupportedOperationException("TODO");
+		scope = binder.getScope(scopeAnnotation);
+		buildBinder();
 	}
 
 	@Override

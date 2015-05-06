@@ -6,10 +6,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Provider;
 
-import org.testng.collections.Lists;
-
 import com.github.nill14.utils.init.api.BindingType;
 import com.github.nill14.utils.init.api.IPojoDestroyer;
+import com.google.common.collect.Lists;
 
 public final class ScopeContext {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.nill14.utils.init.meta;
+package com.github.nill14.utils.init.meta.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;

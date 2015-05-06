@@ -42,7 +42,7 @@ public class PojoProviderFactory<T> implements IPojoFactory<T> {
 		this.provider = provider;
 	}
 	
-	protected PojoProviderFactory(TypeToken<T> typeToken, Provider<T> provider, IPropertyResolver resolver) {
+	public PojoProviderFactory(TypeToken<T> typeToken, Provider<T> provider, IPropertyResolver resolver) {
 		this.typeToken = typeToken;
 		this.resolver = resolver;
 		this.provider = provider;

@@ -9,6 +9,7 @@ import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
+import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.impl.BindingBuilder;
 import com.github.nill14.utils.init.binding.impl.BindingImpl;
 import com.github.nill14.utils.init.binding.target.LazyPojoBindingTargetVisitor;
@@ -19,7 +20,6 @@ import com.github.nill14.utils.init.util.Element;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
-import com.google.inject.Scope;
 
 public final class TestBinder implements Binder {
 	
@@ -48,7 +48,13 @@ public final class TestBinder implements Binder {
 	}
 	
 	@Override
-	public void bindScope(Class<? extends Annotation> annotationType, Scope scope) {
+	public void bindScope(Class<? extends Annotation> annotationType, IScope scope) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public IScope getScope(Class<? extends Annotation> annotationType) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
@@ -91,7 +97,7 @@ public Object resolve(Object pojo, IParameterType type) {
 		
 		
 		LazyPojoBindingTargetVisitor bindingTargetVisitor = new LazyPojoBindingTargetVisitor(
-				resolver, initializer);
+				resolver, initializer, (binding) -> null); // we do not support linked bindings at the moment
 		
 		
 		for (BindingImpl<?> binding : bindings) {
