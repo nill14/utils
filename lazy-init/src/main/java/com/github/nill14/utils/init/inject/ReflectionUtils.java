@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import javax.inject.Provider;
 
-import com.github.nill14.utils.init.api.BindingType;
+import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.Binder;
 import com.github.nill14.utils.init.binding.impl.BindingImpl;
@@ -67,9 +67,9 @@ public enum ReflectionUtils {
 				
 				
 				
-				BindingType type = qualifier.isPresent() ? 
-						BindingType.of(typeToken, qualifier.get()) : 
-							BindingType.of(typeToken);
+				BindingKey type = qualifier.isPresent() ? 
+						BindingKey.of(typeToken, qualifier.get()) : 
+							BindingKey.of(typeToken);
 				IScope scope = scopeAnnotation.map(a -> binder.getScope(a.annotationType())).orElse(PrototypeScope.instance());
 				
 				BindingImpl binding = new BindingImpl(type, target, scope, module);				

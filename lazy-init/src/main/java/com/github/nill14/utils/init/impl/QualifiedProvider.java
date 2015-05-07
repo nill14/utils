@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import javax.inject.Provider;
 
-import com.github.nill14.utils.init.api.BindingType;
+import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IQualifiedProvider;
@@ -38,37 +38,37 @@ public class QualifiedProvider<T> implements IQualifiedProvider<T> {
 
 	@Override
 	public T getNamed(String named) {
-		IParameterType type = IParameterType.of(BindingType.of(typeToken, named));
+		IParameterType type = IParameterType.of(BindingKey.of(typeToken, named));
 		return resolveOrThrow(type);
 	}
 
 	@Override
 	public Optional<T> getOptionalNamed(String named) {
-		IParameterType type = IParameterType.of(BindingType.of(typeToken, named));
+		IParameterType type = IParameterType.of(BindingKey.of(typeToken, named));
 		return resolveOptional(type);
 	}
 
 	@Override
 	public T getQualified(Class<? extends Annotation> annotationType) {
-		IParameterType type = IParameterType.of(BindingType.of(typeToken, annotationType));
+		IParameterType type = IParameterType.of(BindingKey.of(typeToken, annotationType));
 		return resolveOrThrow(type);
 	}
 
 	@Override
 	public Optional<T> getOptionalQualified(Class<? extends Annotation> annotationType) {
-		IParameterType type = IParameterType.of(BindingType.of(typeToken, annotationType));
+		IParameterType type = IParameterType.of(BindingKey.of(typeToken, annotationType));
 		return resolveOptional(type);
 	}
 
 	@Override
 	public T getQualified(Annotation annotation) {
-		IParameterType type = IParameterType.of(BindingType.of(typeToken, annotation));
+		IParameterType type = IParameterType.of(BindingKey.of(typeToken, annotation));
 		return resolveOrThrow(type);
 	}
 
 	@Override
 	public Optional<T> getOptionalQualified(Annotation annotation) {
-		IParameterType type = IParameterType.of(BindingType.of(typeToken, annotation));
+		IParameterType type = IParameterType.of(BindingKey.of(typeToken, annotation));
 		return resolveOptional(type);
 	}
 	

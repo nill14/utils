@@ -41,16 +41,16 @@ public interface IParameterType {
 	Optional<String> getNamed();
 
 	static <T> IParameterType of(Class<T> clazz) {
-		return ParameterTypeInjectionDescriptor.of(BindingType.of(clazz));
+		return ParameterTypeInjectionDescriptor.of(BindingKey.of(clazz));
 	}
 
 	static <T> IParameterType of(TypeToken<T> typeToken) {
-		return ParameterTypeInjectionDescriptor.of(BindingType.of(typeToken)); 
+		return ParameterTypeInjectionDescriptor.of(BindingKey.of(typeToken)); 
 	}
 
 
-	static <T> IParameterType of(BindingType<T> bindingType) {
-		return ParameterTypeInjectionDescriptor.of(bindingType);
+	static <T> IParameterType of(BindingKey<T> BindingKey) {
+		return ParameterTypeInjectionDescriptor.of(BindingKey);
 	}
 	
 	

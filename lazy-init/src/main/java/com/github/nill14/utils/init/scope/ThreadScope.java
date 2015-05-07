@@ -2,7 +2,7 @@ package com.github.nill14.utils.init.scope;
 
 import javax.inject.Provider;
 
-import com.github.nill14.utils.init.api.BindingType;
+import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IScope;
 
 public class ThreadScope implements IScope {
@@ -14,7 +14,7 @@ public class ThreadScope implements IScope {
 	}
 
 	@Override
-	public <T> Provider<T> scope(BindingType<T> type, Provider<T> unscoped) {
+	public <T> Provider<T> scope(BindingKey<T> type, Provider<T> unscoped) {
 		return threadLocal.get().scope(type, unscoped);
 	}
 	

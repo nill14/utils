@@ -4,7 +4,7 @@ import java.lang.annotation.Annotation;
 
 import javax.inject.Provider;
 
-import com.github.nill14.utils.init.api.BindingType;
+import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.AnnotatedBindingBuilder;
 import com.github.nill14.utils.init.binding.Binder;
@@ -38,7 +38,7 @@ public final class BindingBuilder<T> implements AnnotatedBindingBuilder<T> {
 		this.target = new BeanTypeBindingTarget<>(bindToken);
 		
 		//no qualifier at the moment of creation
-		element.update(new BindingImpl<T>(BindingType.of(bindToken), target, scope, source));
+		element.update(new BindingImpl<T>(BindingKey.of(bindToken), target, scope, source));
 	}
 
 
@@ -104,10 +104,10 @@ public final class BindingBuilder<T> implements AnnotatedBindingBuilder<T> {
 	}
 	
 	private void buildBinder() {
-		BindingType<T> bindingType = qualifier == null ? 
-				BindingType.of(keyToken) : BindingType.of(keyToken, qualifier); 
+		BindingKey<T> bindingKey = qualifier == null ? 
+				BindingKey.of(keyToken) : BindingKey.of(keyToken, qualifier); 
 		
-		element.update(new BindingImpl<T>(bindingType, target, scope, source));
+		element.update(new BindingImpl<T>(bindingKey, target, scope, source));
 	}
 
 }

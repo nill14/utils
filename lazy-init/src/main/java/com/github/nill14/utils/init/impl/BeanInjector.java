@@ -2,7 +2,8 @@ package com.github.nill14.utils.init.impl;
 
 import javax.inject.Provider;
 
-import com.github.nill14.utils.init.api.BindingType;
+
+import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
@@ -37,7 +38,7 @@ public class BeanInjector implements IBeanInjector {
 		initializer.init(null, pojoFactory, bean);
 	}
 
-	private <T> T resolve(BindingType<T> type) {
+	private <T> T resolve(BindingKey<T> type) {
 		IParameterType parameterType = IParameterType.of(type);
 		T bean = (T) resolver.resolve(parameterType);
 		if (bean == null) {
@@ -49,31 +50,31 @@ public class BeanInjector implements IBeanInjector {
 
 	@Override
 	public <T> T wire(Class<T> beanClass) {
-		return resolve(BindingType.of(beanClass));
+		return resolve(BindingKey.of(beanClass));
 	}
 
 	@Override
 	public <T> T wire(TypeToken<T> typeToken) {
-		return resolve(BindingType.of(typeToken));
+		return resolve(BindingKey.of(typeToken));
 	}
 	
 	@Override
-	public <T> T wire(BindingType<T> type) {
+	public <T> T wire(BindingKey<T> type) {
 		return resolve(type);
 	}
 	
 	@Override
 	public <T> T getInstance(Class<T> beanClass) {
-		return resolve(BindingType.of(beanClass));
+		return resolve(BindingKey.of(beanClass));
 	}
 
 	@Override
 	public <T> T getInstance(TypeToken<T> typeToken) {
-		return resolve(BindingType.of(typeToken));
+		return resolve(BindingKey.of(typeToken));
 	}
 	
 	@Override
-	public <T> T getInstance(BindingType<T> type) {
+	public <T> T getInstance(BindingKey<T> type) {
 		return resolve(type);
 	}
 	
@@ -92,19 +93,19 @@ public class BeanInjector implements IBeanInjector {
 
 	@Override
 	public <T> Provider<T> getProvider(Class<T> beanClass) {
-		IParameterType type = IParameterType.of(BindingType.of(beanClass));
+		IParameterType type = IParameterType.of(BindingKey.of(beanClass));
 		return new LazyResolvingProvider<>(resolver, type);
 	}
 
 	@Override
 	public <T> Provider<T> getProvider(TypeToken<T> typeToken) {
-		IParameterType type = IParameterType.of(BindingType.of(typeToken));
+		IParameterType type = IParameterType.of(BindingKey.of(typeToken));
 		return new LazyResolvingProvider<>(resolver, type);
 	}
 
 	@Override
-	public <T> Provider<T> getProvider(BindingType<T> bindingType) {
-		IParameterType type = IParameterType.of(bindingType);
+	public <T> Provider<T> getProvider(BindingKey<T> BindingKey) {
+		IParameterType type = IParameterType.of(BindingKey);
 		return new LazyResolvingProvider<>(resolver, type);
 	}
 

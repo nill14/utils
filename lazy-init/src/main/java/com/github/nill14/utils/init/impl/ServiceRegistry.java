@@ -15,7 +15,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Qualifier;
 
-import com.github.nill14.utils.init.api.BindingType;
+import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.ILazyPojo;
@@ -206,9 +206,9 @@ public class ServiceRegistry implements IServiceRegistry {
 	}
 	
 
-	public void addBinding(BindingType<?> bindingType, ILazyPojo<?> lazyPojo) {
+	public void addBinding(BindingKey<?> BindingKey, ILazyPojo<?> lazyPojo) {
 		String globalName = generateGlobalName(lazyPojo.getType().getRawType());
-		addElement(bindingType.getRawType(), globalName, lazyPojo, bindingType.getQualifier());
+		addElement(BindingKey.getRawType(), globalName, lazyPojo, BindingKey.getQualifier());
 		Object old = beans.put(globalName, lazyPojo);
 		Preconditions.checkArgument(old == null, "Duplicate bean " + old);
 	}

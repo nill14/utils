@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 import javax.inject.Provider;
 
-import com.github.nill14.utils.init.api.BindingType;
+import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -20,7 +20,7 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 	
 	private final IPropertyResolver resolver;
 	private final IPojoInitializer initializer;
-	private Function<BindingType<?>, ILazyPojo<?>> lookupFunction;
+	private Function<BindingKey<?>, ILazyPojo<?>> lookupFunction;
 
 	/**
 	 * 
@@ -30,7 +30,7 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 	 */
 	public LazyPojoBindingTargetVisitor(IPropertyResolver resolver, 
 			IPojoInitializer initializer,
-			Function<BindingType<?>, 
+			Function<BindingKey<?>, 
 			ILazyPojo<?>> lookupFunction) {
 		this.resolver = resolver;
 		this.initializer = initializer;
@@ -77,12 +77,12 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 	
 	@Override
 	public ILazyPojo<?> visit(LinkedBindingTarget<?> linkedBindingTarget) {
-		BindingType<?> bindingType = linkedBindingTarget.getBindingType();
-		ILazyPojo<?> lazyPojo = lookupFunction.apply(bindingType);
+		BindingKey<?> BindingKey = linkedBindingTarget.getBindingType();
+		ILazyPojo<?> lazyPojo = lookupFunction.apply(BindingKey);
 		if (lazyPojo == null) {
 			//linked binding was not found, thus create a new lazyPojo
 			//the same flow as for BeanTypeBindingTarget
-			IPojoFactory<?> pojoFactory = new PojoInjectionFactory<>(bindingType.getToken(), resolver);
+			IPojoFactory<?> pojoFactory = new PojoInjectionFactory<>(BindingKey.getToken(), resolver);
 			return LazyPojo.forFactory(pojoFactory, initializer);
 		}
 

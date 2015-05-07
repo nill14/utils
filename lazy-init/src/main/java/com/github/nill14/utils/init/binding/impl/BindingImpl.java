@@ -1,22 +1,22 @@
 package com.github.nill14.utils.init.binding.impl;
 
-import com.github.nill14.utils.init.api.BindingType;
+import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IScope;
 import com.google.common.base.Preconditions;
 
 public final class BindingImpl<T> {
 	
-	private final BindingType<T> bindingType;
+	private final BindingKey<T> BindingKey;
 	private final BindingTarget<? extends T> target;
 	private final Object source;
 	private final IScope scope;
 
-	public BindingImpl(BindingType<T> type, BindingTarget<? extends T> target, IScope scope, Object source) {
-		Preconditions.checkNotNull(type);
+	public BindingImpl(BindingKey<T> key, BindingTarget<? extends T> target, IScope scope, Object source) {
+		Preconditions.checkNotNull(key);
 		Preconditions.checkNotNull(scope);
 		Preconditions.checkNotNull(target);
 		Preconditions.checkNotNull(source);
-		this.bindingType = type;
+		this.BindingKey = key;
 		this.target = target;
 		this.scope = scope;
 		this.source = source;
@@ -27,8 +27,8 @@ public final class BindingImpl<T> {
 		return target;
 	}
 	
-	public BindingType<T> getBindingType() {
-		return bindingType;
+	public BindingKey<T> getBindingKey() {
+		return BindingKey;
 	}
   
 //	public TypeToken<T> getValueToken() {

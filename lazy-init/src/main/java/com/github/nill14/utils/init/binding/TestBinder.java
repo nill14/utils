@@ -4,7 +4,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.github.nill14.utils.init.api.BindingType;
+import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -101,11 +101,11 @@ public Object resolve(Object pojo, IParameterType type) {
 		
 		
 		for (BindingImpl<?> binding : bindings) {
-			BindingType<?> bindingType = binding.getBindingType();
+			BindingKey<?> BindingKey = binding.getBindingKey();
 			
 			ILazyPojo<?> lazyPojo = binding.getBindingTarget().accept(bindingTargetVisitor);
 			
-			serviceRegistry.addBinding(bindingType, lazyPojo);
+			serviceRegistry.addBinding(BindingKey, lazyPojo);
 		}
 		
 		return serviceRegistry.toBeanInjector();

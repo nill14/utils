@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
-import com.github.nill14.utils.init.api.BindingType;
+import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.meta.AnnotationScanner;
 import com.google.common.collect.ImmutableMap;
@@ -41,8 +41,8 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 		return new ParameterTypeInjectionDescriptor(firstParamToken.getType(), firstParamToken, type.getNamed(), type.getQualifier(), annotations, type.getDeclaringClass());
 	}
 	
-	public static <T> ParameterTypeInjectionDescriptor of(BindingType<T> bindingType) {
-		Annotation qualifier = bindingType.getQualifier();
+	public static <T> ParameterTypeInjectionDescriptor of(BindingKey<T> BindingKey) {
+		Annotation qualifier = BindingKey.getQualifier();
 		
 		Optional<String> optionalNamed = qualifier instanceof javax.inject.Named ? 
 				Optional.ofNullable(((javax.inject.Named ) qualifier).value()) : Optional.empty();
@@ -50,7 +50,7 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 		ImmutableMap<Class<? extends Annotation>, Annotation> annotations = qualifier != null ? 
 				AnnotationScanner.indexAnnotations(Stream.of(qualifier)) : ImmutableMap.of();
 				
-		return new ParameterTypeInjectionDescriptor(bindingType.getGenericType(), bindingType.getToken(), optionalNamed, qualifier, annotations, null);
+		return new ParameterTypeInjectionDescriptor(BindingKey.getGenericType(), BindingKey.getToken(), optionalNamed, qualifier, annotations, null);
 	}
 	
 	public static ParameterTypeInjectionDescriptor of(Type type, Annotation[] annotations, Member member, /*@Nullable Annotation qualifier,*/ @Nullable Class<?> declaringClass) {

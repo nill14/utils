@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 import com.github.nill14.parsers.dependency.IDependencyDescriptorBuilder;
 import com.github.nill14.utils.init.Calculator;
 import com.github.nill14.utils.init.ICalculator;
-import com.github.nill14.utils.init.api.BindingType;
+import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.binding.AnnotatedBindingBuilder;
 import com.github.nill14.utils.init.binding.Binder;
@@ -155,7 +155,7 @@ public class ModulesTest {
 			}
 		});
 		
-		ICalculator calc = beanInjector.wire(BindingType.of(ICalculator.class, Synchronous.class));
+		ICalculator calc = beanInjector.wire(BindingKey.of(ICalculator.class, Synchronous.class));
 		MatcherAssert.assertThat(calc, CoreMatchers.instanceOf(ICalculator.class));
 	}
 	
