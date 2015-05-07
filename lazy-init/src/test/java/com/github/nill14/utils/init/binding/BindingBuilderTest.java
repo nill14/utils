@@ -22,7 +22,7 @@ public class BindingBuilderTest {
 		b.bind(Calculator.class);//.in(Synchronous.class);
 		
 		IBeanInjector beanInjector = b.toBeanInjector();
-		Object object = beanInjector.wire(BindingKey.of(ICalculator.class, Synchronous.class));
+		Object object = beanInjector.getInstance(BindingKey.of(ICalculator.class, Synchronous.class));
 		
 		assertThat(object, CoreMatchers.instanceOf(ICalculator.class));
 	}

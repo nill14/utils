@@ -132,7 +132,7 @@ public class ModulesTest {
 			}
 		});
 		
-		ICalculator calc = beanInjector.wire(ICalculator.class);
+		ICalculator calc = beanInjector.getInstance(ICalculator.class);
 		MatcherAssert.assertThat(calc, CoreMatchers.instanceOf(ICalculator.class));
 	}
 	
@@ -155,7 +155,7 @@ public class ModulesTest {
 			}
 		});
 		
-		ICalculator calc = beanInjector.wire(BindingKey.of(ICalculator.class, Synchronous.class));
+		ICalculator calc = beanInjector.getInstance(BindingKey.of(ICalculator.class, Synchronous.class));
 		MatcherAssert.assertThat(calc, CoreMatchers.instanceOf(ICalculator.class));
 	}
 	

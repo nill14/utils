@@ -22,7 +22,7 @@ public class InjectionMembersTest {
 		TestBinder b = new TestBinder();
 		b.bind(Dep.class);
 		IBeanInjector beanInjector = b.toBeanInjector();
-		BeanWithMethodInject bean = beanInjector.wire(BeanWithMethodInject.class);
+		BeanWithMethodInject bean = beanInjector.getInstance(BeanWithMethodInject.class);
 		assertNotNull(bean.getDependency());
 	}
 	
@@ -31,7 +31,7 @@ public class InjectionMembersTest {
 		TestBinder b = new TestBinder();
 		b.bind(Dep.class);
 		IBeanInjector beanInjector = b.toBeanInjector();
-		BeanWithConstructor bean = beanInjector.wire(BeanWithConstructor.class);
+		BeanWithConstructor bean = beanInjector.getInstance(BeanWithConstructor.class);
 		assertNotNull(bean.getDependency());
 	}
 	
@@ -40,7 +40,7 @@ public class InjectionMembersTest {
 		TestBinder b = new TestBinder();
 		b.bind(Dep.class);
 		IBeanInjector beanInjector = b.toBeanInjector();
-		BeanWithTwoConstructors bean = beanInjector.wire(BeanWithTwoConstructors.class);
+		BeanWithTwoConstructors bean = beanInjector.getInstance(BeanWithTwoConstructors.class);
 	}
 	
 	public static class Dep {

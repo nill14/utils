@@ -37,7 +37,7 @@ public class QualifiersTest {
 	
 	@Test
 	public void testMangoBean() {
-		MangoBean bean = beanInjector.wire(MangoBean.class);
+		MangoBean bean = beanInjector.getInstance(MangoBean.class);
 		
 		assertNotNull(bean);
 		assertThat(bean.abcMango, CoreMatchers.instanceOf(MangoAbc.class));

@@ -42,7 +42,7 @@ public class EventBusTest {
 	
 	@Test
 	public void testClassic() {
-		beanInjector.wire(EventBusSubscriberClassic.class);
+		beanInjector.getInstance(EventBusSubscriberClassic.class);
 		
 		eventBus.post(new SampleEvent());
 		verify(printStream).printf(anyString(), Mockito.anyVararg());
@@ -53,7 +53,7 @@ public class EventBusTest {
 		assertNotNull(serviceRegistry.getOptionalService(EventBus.class));
 		assertNotNull(serviceRegistry.toResolver().resolve(IParameterType.of(EventBus.class)));
 		
-		beanInjector.wire(EventBusSubscriberExtended.class);
+		beanInjector.getInstance(EventBusSubscriberExtended.class);
 		
 		eventBus.post(new SampleEvent());
 		verify(printStream, atLeastOnce()).printf(anyString(), Mockito.anyVararg());

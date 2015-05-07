@@ -41,13 +41,13 @@ public class QualifiedProviderTest {
 
 	@Test
 	public void testTypeToken() throws NoSuchFieldException, SecurityException {
-		QualifiedProvider<Mango> mangoProvider = beanInjector.wire(new TypeToken<QualifiedProvider<Mango>>() {});
+		QualifiedProvider<Mango> mangoProvider = beanInjector.getInstance(new TypeToken<QualifiedProvider<Mango>>() {});
 		assertNotNull(mangoProvider);
 	}
 	
 	@Test
 	public void testMangoBeanAnnotated() throws NoSuchFieldException, SecurityException {
-		QualifiedProvider<Mango> mangoProvider = beanInjector.wire(new TypeToken<QualifiedProvider<Mango>>() {});
+		QualifiedProvider<Mango> mangoProvider = beanInjector.getInstance(new TypeToken<QualifiedProvider<Mango>>() {});
 		
 		AbcQualifier abcQualifier = MangoBean.class.getDeclaredField("helloMango").getAnnotation(AbcQualifier.class);
 		assertThat(mangoProvider.getQualified(abcQualifier), CoreMatchers.instanceOf(MangoAsync.class));
@@ -55,21 +55,21 @@ public class QualifiedProviderTest {
 	
 	@Test
 	public void testMangoBeanAnnotatedType() throws NoSuchFieldException, SecurityException {
-		QualifiedProvider<Mango> mangoProvider = beanInjector.wire(new TypeToken<QualifiedProvider<Mango>>() {});
+		QualifiedProvider<Mango> mangoProvider = beanInjector.getInstance(new TypeToken<QualifiedProvider<Mango>>() {});
 		
 		assertThat(mangoProvider.getQualified(Synchronous.class), CoreMatchers.instanceOf(MangoSync.class));
 	}
 
 	@Test
 	public void testMangoBeanNamed() throws NoSuchFieldException, SecurityException {
-		QualifiedProvider<Mango> mangoProvider = beanInjector.wire(new TypeToken<QualifiedProvider<Mango>>() {});
+		QualifiedProvider<Mango> mangoProvider = beanInjector.getInstance(new TypeToken<QualifiedProvider<Mango>>() {});
 		//FIXME make sure that guice Named and javax Named can resolve to each other.
 		assertThat(mangoProvider.getNamed("helloMango"), CoreMatchers.instanceOf(MangoHello.class));
 	}
 
 	@Test(expectedExceptions = RuntimeException.class)
 	public void testMangoBeanFail() {
-		QualifiedProvider<Mango> mangoProvider = beanInjector.wire(new TypeToken<QualifiedProvider<Mango>>() {});
+		QualifiedProvider<Mango> mangoProvider = beanInjector.getInstance(new TypeToken<QualifiedProvider<Mango>>() {});
 		
 		mangoProvider.getQualified(AbcQualifier.class);
 	}
