@@ -34,7 +34,7 @@ public class ConstructorInjectionDescriptor implements IMemberDescriptor {
 		
 		parameterTypes = builder.build();
 		
-		this.annotations = ImmutableMap.copyOf(AnnotationScanner.indexAnnotations(constructor.getAnnotations()));
+		this.annotations = ImmutableMap.copyOf(AnnotationScanner.indexAnnotations(constructor));
 	}
 
 	

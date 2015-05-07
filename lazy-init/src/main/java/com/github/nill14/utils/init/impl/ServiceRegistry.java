@@ -289,16 +289,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	};
 	
 	private Annotation getTypeQualifier(Class<?> clazz) {
-		ImmutableCollection<Annotation> values = AnnotationScanner.findAnnotations(clazz.getAnnotations(), Qualifier.class).values();
-		if (values.size() > 1) {
-			throw new IllegalArgumentException(String.format("%s can have at most one qualifier", clazz.getName()));
-		}
-		else if (values.isEmpty()) {
-			return null;
-		}
-		else {
-			return values.iterator().next();
-		}
+		return AnnotationScanner.findQualifier(clazz).orElse(null);
 	}
 
 	

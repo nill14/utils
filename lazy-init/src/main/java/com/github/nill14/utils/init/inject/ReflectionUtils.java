@@ -62,14 +62,11 @@ public enum ReflectionUtils {
 				TypeToken typeToken = TypeToken.of(m.getGenericReturnType());
 				ProvidesMethodBindingTarget<Object> target = new ProvidesMethodBindingTarget<>(m, module);
 				
-				Optional<Annotation> qualifier = AnnotationScanner.findQualifier(m.getAnnotations(), m);
-				Optional<Annotation> scopeAnnotation = AnnotationScanner.findScope(m.getAnnotations(), m);
+				Annotation qualifier = AnnotationScanner.findQualifier(m).orElse(null);
+				Optional<Annotation> scopeAnnotation = AnnotationScanner.findScope(m);
 				
 				
-				
-				BindingKey type = qualifier.isPresent() ? 
-						BindingKey.of(typeToken, qualifier.get()) : 
-							BindingKey.of(typeToken);
+				BindingKey type = BindingKey.of(typeToken, qualifier);
 				IScope scope = scopeAnnotation.map(a -> binder.getScope(a.annotationType())).orElse(PrototypeScope.instance());
 				
 				BindingImpl binding = new BindingImpl(type, target, scope, module);				

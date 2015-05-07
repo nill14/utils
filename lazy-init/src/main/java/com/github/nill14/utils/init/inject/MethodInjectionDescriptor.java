@@ -38,7 +38,7 @@ public class MethodInjectionDescriptor implements IMemberDescriptor {
 		parameterTypes = builder.build();
 		this.optionalInject = optionalInject;
 		
-		this.annotations = ImmutableMap.copyOf(AnnotationScanner.indexAnnotations(method.getAnnotations()));
+		this.annotations = ImmutableMap.copyOf(AnnotationScanner.indexAnnotations(method));
 	}
 
 	@Override
