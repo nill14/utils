@@ -104,8 +104,7 @@ public final class BindingBuilder<T> implements AnnotatedBindingBuilder<T> {
 	}
 	
 	private void buildBinder() {
-		BindingKey<T> bindingKey = qualifier == null ? 
-				BindingKey.of(keyToken) : BindingKey.of(keyToken, qualifier); 
+		BindingKey<T> bindingKey = BindingKey.of(keyToken, qualifier); 
 		
 		element.update(new BindingImpl<T>(bindingKey, target, scope, source));
 	}
