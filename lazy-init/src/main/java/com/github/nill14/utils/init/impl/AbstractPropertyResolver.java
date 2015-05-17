@@ -14,7 +14,6 @@ import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IQualifiedProvider;
-import com.github.nill14.utils.init.inject.ParameterTypeInjectionDescriptor;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -50,14 +49,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			return result;
 		}
 
-		IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
-		if (typeDescriptor.canBeInstantiated()) {
-			IPojoFactory<Object> factory = new PojoInjectionFactory<>(typeDescriptor, this);
-			IPojoInitializer initializer = IPojoInitializer.standard();
-			return LazyPojo.forFactory(factory, initializer).getInstance();
-		}
-		
-		return null;
+		return doPrototype(type);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -125,4 +117,13 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		return Iterable.class.isAssignableFrom(type.getRawType());
 	}
 	
+	protected Object doPrototype(IParameterType type) {
+		IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
+		if (typeDescriptor.canBeInstantiated()) {
+			IPojoFactory<Object> factory = new PojoInjectionFactory<>(typeDescriptor, this);
+			IPojoInitializer initializer = IPojoInitializer.standard();
+			return LazyPojo.forFactory(factory, initializer).getInstance();
+		}
+		return null;
+	}
 }

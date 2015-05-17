@@ -41,8 +41,8 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 		return new ParameterTypeInjectionDescriptor(firstParamToken.getType(), firstParamToken, type.getNamed(), type.getQualifier(), annotations, type.getDeclaringClass());
 	}
 	
-	public static <T> ParameterTypeInjectionDescriptor of(BindingKey<T> BindingKey) {
-		Annotation qualifier = BindingKey.getQualifier();
+	public static <T> ParameterTypeInjectionDescriptor of(BindingKey<T> bindingKey) {
+		Annotation qualifier = bindingKey.getQualifier();
 		
 		Optional<String> optionalNamed = qualifier instanceof javax.inject.Named ? 
 				Optional.ofNullable(((javax.inject.Named ) qualifier).value()) : Optional.empty();
@@ -50,7 +50,7 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 		ImmutableMap<Class<? extends Annotation>, Annotation> annotations = qualifier != null ? 
 				AnnotationScanner.indexAnnotations(Stream.of(qualifier)) : ImmutableMap.of();
 				
-		return new ParameterTypeInjectionDescriptor(BindingKey.getGenericType(), BindingKey.getToken(), optionalNamed, qualifier, annotations, null);
+		return new ParameterTypeInjectionDescriptor(bindingKey.getGenericType(), bindingKey.getToken(), optionalNamed, qualifier, annotations, null);
 	}
 	
 	public static ParameterTypeInjectionDescriptor of(Type type, Annotation[] annotations, Member member, /*@Nullable Annotation qualifier,*/ @Nullable Class<?> declaringClass) {
@@ -159,6 +159,11 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 	@Override
 	public TypeToken<?> getToken() {
 		return typeToken;
+	}
+	
+	@Override
+	public BindingKey<?> getBindingKey() {
+		return BindingKey.of(typeToken, qualifier);
 	}
 	
 	@Override

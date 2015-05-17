@@ -6,6 +6,7 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 
 import com.github.nill14.utils.init.api.IParameterType;
+import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.binding.impl.BindingTarget;
 import com.github.nill14.utils.init.binding.impl.BindingTargetVisitor;
@@ -53,7 +54,10 @@ public class ProvidesMethodBindingTarget<T> implements BindingTarget<T> {
 		Object[] args = createArgs(resolver, member.getParameterTypes());
 		
 		try {
-			return member.invoke(instance, args);
+			Object object = member.invoke(instance, args);
+//			IPojoInitializer.standard().init(null, pojoFactory, object);
+			//TODO inject members
+			return object;
 		} catch (ReflectiveOperationException e) {
 			throw new RuntimeException(String.format(
 					"Cannot inject %s", member), e);

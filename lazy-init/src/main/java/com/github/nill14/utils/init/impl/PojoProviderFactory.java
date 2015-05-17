@@ -38,6 +38,13 @@ public class PojoProviderFactory<T> implements IPojoFactory<T> {
      */
 	public PojoProviderFactory(Provider<T> provider, IPropertyResolver resolver) {
 		this.typeToken = ReflectionUtils.getProviderReturnTypeToken(provider);
+		if (Object.class.equals(typeToken.getRawType())) {
+			throw new IllegalArgumentException(
+					"This constructor cannot be used with a Provider of Object type. "
+					+ "This limitation provides some type safety. "
+					+ "Note that expression () -> new Integer(5) has as a return type Object"	);
+		}
+		
 		this.resolver = resolver;
 		this.provider = provider;
 	}

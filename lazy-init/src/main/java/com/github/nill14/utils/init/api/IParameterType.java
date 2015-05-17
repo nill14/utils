@@ -17,6 +17,8 @@ public interface IParameterType {
 	Type getGenericType();
 	
 	TypeToken<?> getToken();
+	
+	BindingKey<?> getBindingKey();
 
 	boolean isParametrized();
 
