@@ -13,6 +13,9 @@ import javax.annotation.PreDestroy;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
+import com.github.nill14.utils.init.inject.ReflectionUtils;
+import com.google.common.reflect.TypeToken;
+import com.google.common.reflect.TypeToken.TypeSet;
 
 @SuppressWarnings("serial")
 public class AnnotationLifecycleInitializer implements IPojoInitializer {

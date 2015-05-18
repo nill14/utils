@@ -89,7 +89,7 @@ public enum ReflectionUtils {
 				.getTypes()
 				.stream()
 				.filter(t -> !t.getRawType().isInterface())
-				.filter(t -> Object.class.equals(t.getRawType()))
+				.filter(t -> !Object.class.equals(t.getRawType()))
 				.map(t -> t.getRawType());
 	}
 }

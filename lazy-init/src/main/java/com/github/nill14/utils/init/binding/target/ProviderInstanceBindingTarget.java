@@ -4,6 +4,7 @@ import javax.inject.Provider;
 
 import com.github.nill14.utils.init.binding.impl.BindingTarget;
 import com.github.nill14.utils.init.binding.impl.BindingTargetVisitor;
+import com.google.common.reflect.TypeToken;
 
 public class ProviderInstanceBindingTarget<T> implements BindingTarget<T> {
 	
@@ -15,6 +16,11 @@ public class ProviderInstanceBindingTarget<T> implements BindingTarget<T> {
 	
 	public Provider<T> getProvider() {
 		return provider;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public TypeToken<T> getProviderToken() {
+		return TypeToken.of((Class<T>)provider.getClass());
 	}
 	
 	@Override

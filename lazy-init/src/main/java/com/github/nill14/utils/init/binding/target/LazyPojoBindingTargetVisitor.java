@@ -14,13 +14,14 @@ import com.github.nill14.utils.init.impl.LazyPojo;
 import com.github.nill14.utils.init.impl.PojoFactoryAdapter;
 import com.github.nill14.utils.init.impl.PojoInjectionFactory;
 import com.github.nill14.utils.init.impl.PojoProviderFactory;
+import com.google.common.reflect.TypeToken;
 
 public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyPojo<?>> {
 
 	
 	private final IPropertyResolver resolver;
 	private final IPojoInitializer initializer;
-	private Function<BindingKey<?>, ILazyPojo<?>> lookupFunction;
+	private final Function<BindingKey<?>, ILazyPojo<?>> lookupFunction;
 
 	/**
 	 * 
@@ -45,7 +46,9 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 
 	@Override
 	public ILazyPojo<?> visit(ProviderInstanceBindingTarget<?> bindingTarget) {
-		IPojoFactory<?> pojoFactory = new PojoProviderFactory<>(bindingTarget.getProvider(), resolver);
+		IPojoFactory<?> pojoFactory = new PojoProviderFactory<Object>(
+				(TypeToken<Object>) bindingTarget.getProviderToken(), 
+				(Provider<Object>) bindingTarget.getProvider(), resolver);
 		return LazyPojo.forFactory(pojoFactory, initializer);
 	}
 
