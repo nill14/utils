@@ -29,11 +29,11 @@ public class AnnotationLifecycleInitializer implements IPojoInitializer {
 	}
 	
 	private Optional<Method> getMethod(Object instance, Class<? extends Annotation> annotationClass) {
-		Method[] methods = instance.getClass().getDeclaredMethods();
-		return Stream.of(methods)
-				.filter(m -> !Modifier.isStatic(m.getModifiers()))
-				.filter(m -> m.isAnnotationPresent(annotationClass))
-				.findFirst();
+		return ReflectionUtils.getSuperClasses(instance.getClass())
+			.flatMap(cls -> Stream.of(cls.getDeclaredMethods()))
+			.filter(m -> !Modifier.isStatic(m.getModifiers()))
+			.filter(m -> m.isAnnotationPresent(annotationClass))
+			.findFirst();
 	}	
 	
 	private Object invoke(Object instance, Method method, Object[] args) {
@@ -50,7 +50,12 @@ public class AnnotationLifecycleInitializer implements IPojoInitializer {
 		Optional<Method> optional = getMethod(instance, PreDestroy.class);
 		if (optional.isPresent()) {
 			Method method = optional.get();
-			method.setAccessible(true);
+			if (!method.isAccessible()) {
+				method.setAccessible(true);
+			}
+			if (method.getParameterCount() != 0) {
+				throw new RuntimeException(method + " must not have any parameters. (PreDestroy annotated)");
+			}
 			invoke(instance, method, null);
 		}
 	}
@@ -59,7 +64,12 @@ public class AnnotationLifecycleInitializer implements IPojoInitializer {
 		Optional<Method> optional = getMethod(instance, PostConstruct.class);
 		if (optional.isPresent()) {
 			Method method = optional.get();
-			method.setAccessible(true);
+			if (!method.isAccessible()) {
+				method.setAccessible(true);
+			}
+			if (method.getParameterCount() != 0) {
+				throw new RuntimeException(method + " must not have any parameters. (PostConstruct annotated)");
+			}
 			invoke(instance, method, null);
 		}
 	}

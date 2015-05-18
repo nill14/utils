@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.inject.Provider;
 
@@ -17,6 +18,7 @@ import com.github.nill14.utils.init.meta.Provides;
 import com.github.nill14.utils.init.scope.PrototypeScope;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
+import com.google.common.reflect.TypeToken.TypeSet;
 
 public enum ReflectionUtils {
 	;
@@ -75,5 +77,19 @@ public enum ReflectionUtils {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * 
+	 * @param clazz
+	 * @return All classes including self, excluding interfaces and Object.class
+	 */
+	public static <T> Stream<Class<? super T>> getSuperClasses(Class<T> clazz) {
+		return TypeToken.of(clazz)
+				.getTypes()
+				.stream()
+				.filter(t -> !t.getRawType().isInterface())
+				.filter(t -> Object.class.equals(t.getRawType()))
+				.map(t -> t.getRawType());
 	}
 }
