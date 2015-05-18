@@ -75,6 +75,40 @@ public /*final*/ class BindingKey<T> {
 	}
 	
 	
+	
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((qualifier == null) ? 0 : qualifier.hashCode());
+		result = prime * result + ((typeToken == null) ? 0 : typeToken.hashCode());
+		return result;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BindingKey other = (BindingKey) obj;
+		if (qualifier == null) {
+			if (other.qualifier != null)
+				return false;
+		} else if (!qualifier.equals(other.qualifier))
+			return false;
+		if (typeToken == null) {
+			if (other.typeToken != null)
+				return false;
+		} else if (!typeToken.equals(other.typeToken))
+			return false;
+		return true;
+	}
+
 	@Override
 	public String toString() {
 		if (qualifier != null) {
