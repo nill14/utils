@@ -12,7 +12,7 @@ public class LinkedBindingTarget<T> implements BindingTarget<T> {
 		this.targetType = targetType;
 	}
 	
-	public BindingKey<T> getBindingType() {
+	public BindingKey<T> getBindingKey() {
 		return targetType;
 	}
 	

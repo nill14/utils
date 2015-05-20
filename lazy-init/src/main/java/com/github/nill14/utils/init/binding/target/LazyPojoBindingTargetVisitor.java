@@ -80,12 +80,12 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 	
 	@Override
 	public ILazyPojo<?> visit(LinkedBindingTarget<?> linkedBindingTarget) {
-		BindingKey<?> BindingKey = linkedBindingTarget.getBindingType();
-		ILazyPojo<?> lazyPojo = lookupFunction.apply(BindingKey);
+		BindingKey<?> bindingKey = linkedBindingTarget.getBindingKey();
+		ILazyPojo<?> lazyPojo = lookupFunction.apply(bindingKey);
 		if (lazyPojo == null) {
 			//linked binding was not found, thus create a new lazyPojo
 			//the same flow as for BeanTypeBindingTarget
-			IPojoFactory<?> pojoFactory = new PojoInjectionFactory<>(BindingKey.getToken(), resolver);
+			IPojoFactory<?> pojoFactory = new PojoInjectionFactory<>(bindingKey.getToken(), resolver);
 			return LazyPojo.forFactory(pojoFactory, initializer);
 		}
 
