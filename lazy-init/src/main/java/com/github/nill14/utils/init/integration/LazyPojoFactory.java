@@ -1,12 +1,13 @@
 package com.github.nill14.utils.init.integration;
 
+import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
-import com.github.nill14.utils.init.api.ILazyPojo;
+import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -48,7 +49,7 @@ public /*non-final on purpose*/ class LazyPojoFactory<F> implements IPojoFactory
 	//class type F is here G - factory
 	@SuppressWarnings("unchecked")
 	protected <T, G extends Provider<T>> LazyPojoFactory(TypeToken<G> factoryType, Class<G> factoryClass) {
-		PojoFactoryAdapter<T, G> factoryAdapter = new PojoFactoryAdapter<T, G>(factoryType, delegatingResolver, delegatingInitializer);
+		PojoFactoryAdapter<T, G> factoryAdapter = new PojoFactoryAdapter<T, G>(factoryType, delegatingResolver);
 		this.factoryToken = (TypeToken<F>) factoryType;
 		this.delegate = (IPojoFactory<F>) factoryAdapter;
 		this.doubleFactory = true;
@@ -60,7 +61,9 @@ public /*non-final on purpose*/ class LazyPojoFactory<F> implements IPojoFactory
 
 	@Override
 	public F newInstance() {
-		return delegate.newInstance();
+		F instance = delegate.newInstance();
+		resolver.initializeBean(instance);
+		return instance;
 	}
 
 	@Override
@@ -115,13 +118,13 @@ public /*non-final on purpose*/ class LazyPojoFactory<F> implements IPojoFactory
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
-			getInitializer().init(lazyPojo, pojoFactory, instance);
+		public void init(IPojoFactory<?> pojoFactory, Object instance) {
+			getInitializer().init(pojoFactory, instance);
 		}
 		
 		@Override
-		public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
-			getInitializer().destroy(lazyPojo, pojoFactory, instance);
+		public void destroy(IPojoFactory<?> pojoFactory, Object instance) {
+			getInitializer().destroy(pojoFactory, instance);
 		}
 	};
 	
@@ -132,6 +135,20 @@ public /*non-final on purpose*/ class LazyPojoFactory<F> implements IPojoFactory
 		@Override
 		public Object resolve(IParameterType type) {
 			return getResolver().resolve(type);
+		}
+
+		@Override
+		public IBeanInjector toBeanInjector() {
+			return getResolver().toBeanInjector();
+		}
+
+		@Override
+		public void initializeBean(Object instance) {
+			getResolver().initializeBean(instance);
+		}
+		@Override
+		public List<IPojoInitializer> getInitializers() {
+			return getResolver().getInitializers();
 		}
 	};
 }

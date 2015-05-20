@@ -38,6 +38,7 @@ import com.google.common.collect.ImmutableSet;
  * The ServiceRegistry must not be serializable. Serializing the registry indicates a programming error.
  *
  */
+@Deprecated
 public class ServiceRegistry implements IServiceRegistry {
 	
 	private final ConcurrentHashMap<String, ILazyPojo<?>> beans = new ConcurrentHashMap<>();

@@ -36,7 +36,9 @@ public class PojoInjectionFactory<T> implements IPojoFactory<T> {
 		Object[] args = createArgs(injectionDescriptor.getParameterTypes());
 		
 		try {
-			return (T) injectionDescriptor.invoke(null, args);
+			T instance = (T) injectionDescriptor.invoke(null, args);
+			resolver.initializeBean(instance);
+			return instance;
 		} catch (ReflectiveOperationException e) {
 			throw new RuntimeException(injectionDescriptor.toString(), e);
 		}

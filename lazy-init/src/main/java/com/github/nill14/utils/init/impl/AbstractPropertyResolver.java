@@ -2,6 +2,7 @@ package com.github.nill14.utils.init.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
@@ -19,9 +20,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.reflect.TypeToken;
 
 @SuppressWarnings("serial")
 public abstract class AbstractPropertyResolver implements IPropertyResolver {
+	
+	protected final IBeanInjector beanInjector = new BeanInjector(this);
+	private final ChainingPojoInitializer initializer = new ChainingPojoInitializer();
+	
 	
 	@Override
 	public Object resolve(IParameterType type) {
@@ -57,7 +63,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		Class<?> rawType = type.getRawType();
 		
 		if (IBeanInjector.class.equals(rawType)) {
-			return new BeanInjector(this);
+			return toBeanInjector();
 		
 		} else if (IQualifiedProvider.class.equals(rawType)) {
 			return new QualifiedProvider(type.getFirstParamToken(), this);
@@ -120,10 +126,57 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	protected Object doPrototype(IParameterType type) {
 		IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
 		if (typeDescriptor.canBeInstantiated()) {
-			IPojoFactory<Object> factory = new PojoInjectionFactory<>(typeDescriptor, this);
-			IPojoInitializer initializer = IPojoInitializer.standard();
-			return LazyPojo.forFactory(factory, initializer).getInstance();
+			return new PojoInjectionFactory<>(typeDescriptor, this).newInstance();
 		}
 		return null;
+	}
+	
+	@Override
+	public IBeanInjector toBeanInjector() {
+		return beanInjector;
+	}
+	
+	@Override
+	public void initializeBean(Object instance) {
+		IPropertyResolver resolver = this;
+		//TODO fix this hack
+		IPojoInitializer.standard().init(new IPojoFactory<Object>() {
+
+			@Override
+			public Object newInstance() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public TypeToken<Object> getType() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public IPropertyResolver getResolver() {
+				return resolver;
+			}
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public IBeanDescriptor<Object> getDescriptor() {
+				return new PojoInjectionDescriptor<>((Class<Object>) instance.getClass());
+			}
+		}, instance);
+		
+	}
+	
+	protected void insertInitializer(IPojoInitializer initializer) {
+		this.initializer.insert(initializer);
+	}
+	
+	public void appendInitializer(IPojoInitializer extraInitializer) {
+		this.initializer.append(initializer);
+	}
+	
+	
+	@Override
+	public List<IPojoInitializer> getInitializers() {
+		return initializer.getItems();
 	}
 }

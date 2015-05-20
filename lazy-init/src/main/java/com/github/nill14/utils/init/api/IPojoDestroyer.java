@@ -5,5 +5,19 @@ import java.io.Serializable;
 public interface IPojoDestroyer extends Serializable {
 
 	void destroy(IPojoFactory<?> pojoFactory, Object instance);
+
+	static IPojoDestroyer empty() {
+		return new IPojoDestroyer() {
+			
+			@Override
+			public void destroy(IPojoFactory<?> pojoFactory, Object instance) {
+				// TODO Auto-generated method stub
+				
+			}
+		};
+	}
 	
+	static IPojoDestroyer standard() {
+		return empty();
+	}
 }

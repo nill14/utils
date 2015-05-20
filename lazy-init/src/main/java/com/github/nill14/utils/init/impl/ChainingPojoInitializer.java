@@ -1,9 +1,9 @@
 package com.github.nill14.utils.init.impl;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.google.common.collect.ImmutableList;
@@ -58,17 +58,21 @@ public class ChainingPojoInitializer implements IPojoInitializer {
 	}
 	
 	@Override
-	public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
+	public void init(IPojoFactory<?> pojoFactory, Object instance) {
 		for (IPojoInitializer item : items) {
-			item.init(lazyPojo, pojoFactory, instance);
+			item.init(pojoFactory, instance);
 		}
 	}
 
 	@Override
-	public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
+	public void destroy(IPojoFactory<?> pojoFactory, Object instance) {
 		for (IPojoInitializer item : items) {
-			item.destroy(lazyPojo, pojoFactory, instance);
+			item.destroy(pojoFactory, instance);
 		}
+	}
+	
+	public List<IPojoInitializer> getItems() {
+		return Collections.unmodifiableList(items);
 	}
 
 }

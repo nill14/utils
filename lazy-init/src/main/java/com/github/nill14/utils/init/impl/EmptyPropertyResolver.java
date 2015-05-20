@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
 
+import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 
@@ -42,7 +43,6 @@ public final class EmptyPropertyResolver extends AbstractPropertyResolver implem
 	protected Object findByQualifier(IParameterType type, Annotation qualifier) {
 		return null;
 	}
-
 
 
 }

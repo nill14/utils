@@ -3,43 +3,39 @@ package com.github.nill14.utils.init.impl;
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
-import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
-import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.github.nill14.utils.init.inject.ReflectionUtils;
 import com.google.common.reflect.TypeToken;
 
-public class PojoFactoryAdapter<T, F extends Provider<? extends T>> implements IPojoFactory<T>, IPojoInitializer {
+public class PojoFactoryAdapter<T, F extends Provider<? extends T>> implements IPojoFactory<T> {
 	
 	private static final long serialVersionUID = 1L;
-	private final ILazyPojo<F> lazyFactory;
 	private final TypeToken<T> typeToken;
 	private final IPojoFactory<F> pojoFactory;
-	private final IPojoInitializer pojoInitializer;
 
     /** Cache the beanDescriptor */
     private IBeanDescriptor<T> beanDescriptor;
+	private IPropertyResolver resolver;
 
-	public PojoFactoryAdapter(TypeToken<F> providerType, IPropertyResolver resolver, IPojoInitializer initializer) {
+	public PojoFactoryAdapter(TypeToken<F> providerType, IPropertyResolver resolver) {
 		this.typeToken = ReflectionUtils.getProviderReturnTypeToken(providerType);
 		this.pojoFactory = new PojoInjectionFactory<>(providerType, resolver);
-		this.pojoInitializer = initializer;
-		this.lazyFactory = new LazyPojo<F>(pojoFactory, initializer);
 	}
     
 	@SuppressWarnings("unused")
-	private PojoFactoryAdapter(IPojoFactory<F> pojoFactory, TypeToken<T> typeToken, IPojoInitializer factoryInitializer) {
+	private <P extends Provider<? extends T>> PojoFactoryAdapter(IPojoFactory<F> pojoFactory, TypeToken<T> typeToken, IPropertyResolver resolver) {
 		this.pojoFactory = pojoFactory;
 		this.typeToken = typeToken;
-		this.pojoInitializer = factoryInitializer;
-		this.lazyFactory = new LazyPojo<F>(pojoFactory, factoryInitializer);
+		this.resolver = resolver;
 	}
 
 	@Override
 	public T newInstance() {
-		return lazyFactory.getInstance().get();
+		T instance = pojoFactory.newInstance().get();
+		resolver.initializeBean(instance);
+		return instance;
 	}
 
 	@Override
@@ -51,24 +47,6 @@ public class PojoFactoryAdapter<T, F extends Provider<? extends T>> implements I
 		return pojoFactory.getType();
 	}
 	
-	@Override
-	public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
-		//factoryInitializer was already invoked by lazyFactory.getInstance() call
-		//now we inject the object returned from lazyFactory.getInstance().get()
-		//since we are both the factory and initializer we get the chance to do init as well as
-		// we want to inject also pojo properties (if any), not only factory properties
-		pojoInitializer.init(lazyPojo, pojoFactory, instance);
-	}
-	
-	@Override
-	public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
-		//delegate the destruction to the factoryInitializer
-		//the factory is not re-used but re-created for each object
-		lazyFactory.freeInstance();
-
-		//cleanup on the pojo 
-		pojoInitializer.destroy(lazyPojo, pojoFactory, instance);
-	}
 	
 	@Override
 	public IPropertyResolver getResolver() {

@@ -7,6 +7,7 @@ import javax.inject.Provider;
 
 import com.github.nill14.utils.init.impl.ServiceRegistry;
 
+@Deprecated
 public interface IServiceRegistry {
 
 	<T> void addSingleton(T serviceBean);

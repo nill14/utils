@@ -11,7 +11,6 @@ import org.hamcrest.CoreMatchers;
 import org.testng.annotations.Test;
 
 import com.github.nill14.utils.init.api.IPojoFactory;
-import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.google.common.reflect.TypeToken;
 
@@ -78,7 +77,7 @@ public class PojoFactoriesTest {
 	public void factoryAdapterTest() {
 		TypeToken<Impl> typeToken = TypeToken.of(Impl.class);
 		TypeToken<ImplProvider> providerToken = TypeToken.of(ImplProvider.class);
-		PojoFactoryAdapter<Impl, ImplProvider> adapter = new PojoFactoryAdapter<>(providerToken, IPropertyResolver.empty(), IPojoInitializer.empty());
+		PojoFactoryAdapter<Impl, ImplProvider> adapter = new PojoFactoryAdapter<>(providerToken, IPropertyResolver.empty());
 		IPojoFactory<Impl> factory = adapter;
 		assertEquals(typeToken, factory.getType());
 		assertThat(factory.newInstance(), CoreMatchers.instanceOf(Impl.class));

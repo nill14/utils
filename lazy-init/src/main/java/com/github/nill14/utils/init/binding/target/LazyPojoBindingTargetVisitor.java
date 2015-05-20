@@ -60,7 +60,7 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 
 	@Override
 	public ILazyPojo<?> visit(ProviderTypeBindingTarget<?> bindingTarget) {
-		IPojoFactory<?> pojoFactory = new PojoFactoryAdapter<>(bindingTarget.getToken(), resolver, initializer);
+		IPojoFactory<?> pojoFactory = new PojoFactoryAdapter<>(bindingTarget.getToken(), resolver);
 		return LazyPojo.forFactory(pojoFactory, initializer);
 	}
 

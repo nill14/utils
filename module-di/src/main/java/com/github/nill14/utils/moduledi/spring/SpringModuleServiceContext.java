@@ -1,12 +1,13 @@
 package com.github.nill14.utils.moduledi.spring;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.github.nill14.utils.init.api.ILazyPojo;
+import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -77,12 +78,39 @@ public class SpringModuleServiceContext implements IServiceContext {
 			return springPropertyResolver.resolve(type);
 		}
 		
+		@Override
+		public void initializeBean(Object instance) {
+			if (springPropertyResolver == null) {
+				//TODO this might be eventually the case when calling resolver from PojoFactory
+				throw new IllegalStateException("Wrong order, first must be called initializer");
+			}
+			springPropertyResolver.initializeBean(instance);
+		}
+		
+		@Override
+		public IBeanInjector toBeanInjector() {
+			if (springPropertyResolver == null) {
+				//TODO this might be eventually the case when calling resolver from PojoFactory
+				throw new IllegalStateException("Wrong order, first must be called initializer");
+			}
+			return springPropertyResolver.toBeanInjector();
+		}
+		
+		@Override
+		public List<IPojoInitializer> getInitializers() {
+			if (springPropertyResolver == null) {
+				//TODO this might be eventually the case when calling resolver from PojoFactory
+				throw new IllegalStateException("Wrong order, first must be called initializer");
+			}
+			return springPropertyResolver.getInitializers();
+		}
+		
 	};
 
 	private final IPojoInitializer applicationContextInitializer = new IPojoInitializer() {
 		
 		@Override
-		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
+		public void init(IPojoFactory<?> pojoFactory, Object instance) {
 			if (ctxStarted.compareAndSet(false, true)) {
 				initApplicationContext(registry);
 				if (ctx != null) {
@@ -92,7 +120,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 		}
 		
 		@Override
-		public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
+		public void destroy(IPojoFactory<?> pojoFactory, Object instance) {
 			// nothing to do
 		}
 	};

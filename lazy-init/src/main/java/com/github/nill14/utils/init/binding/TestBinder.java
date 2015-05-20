@@ -4,18 +4,17 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.github.nill14.utils.init.api.BindingKey;
+import javax.inject.Singleton;
+
 import com.github.nill14.utils.init.api.IBeanInjector;
-import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.impl.BindingBuilder;
 import com.github.nill14.utils.init.binding.impl.BindingImpl;
-import com.github.nill14.utils.init.binding.target.LazyPojoBindingTargetVisitor;
 import com.github.nill14.utils.init.impl.ChainingPojoInitializer;
 import com.github.nill14.utils.init.impl.ChainingPropertyResolver;
-import com.github.nill14.utils.init.impl.ServiceRegistry;
+import com.github.nill14.utils.init.scope.SingletonScope;
 import com.github.nill14.utils.init.util.Element;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -23,9 +22,8 @@ import com.google.common.reflect.TypeToken;
 
 public final class TestBinder implements Binder {
 	
-	private final ServiceRegistry serviceRegistry = new ServiceRegistry();
 	private final ChainingPojoInitializer initializer = ChainingPojoInitializer.defaultInitializer();
-	private final ChainingPropertyResolver resolver = new ChainingPropertyResolver(serviceRegistry.toResolver());
+	private final ChainingPropertyResolver resolver = new ChainingPropertyResolver();
 
 	private final List<Element<BindingImpl<?>>> elements = Lists.newArrayList();
 	private final AtomicBoolean configurationLocker = new AtomicBoolean(false);
@@ -88,27 +86,15 @@ public Object resolve(Object pojo, IParameterType type) {
 	}
 	
 	
-	public ServiceRegistry getRegistry() {
-		return serviceRegistry;
-	}
-	
 	public IBeanInjector toBeanInjector() {
+		bindScope(Singleton.class, SingletonScope.instance());
+		
 		ImmutableList<BindingImpl<?>> bindings = freezeBindings();
 		
 		
-		LazyPojoBindingTargetVisitor bindingTargetVisitor = new LazyPojoBindingTargetVisitor(
-				resolver, initializer, (binding) -> null); // we do not support linked bindings at the moment
+		SimplePropertyResolver propertyResolver = new SimplePropertyResolver(bindings, initializer);
 		
-		
-		for (BindingImpl<?> binding : bindings) {
-			BindingKey<?> BindingKey = binding.getBindingKey();
-			
-			ILazyPojo<?> lazyPojo = binding.getBindingTarget().accept(bindingTargetVisitor);
-			
-			serviceRegistry.addBinding(BindingKey, lazyPojo);
-		}
-		
-		return serviceRegistry.toBeanInjector();
+		return propertyResolver.toBeanInjector();
 	}
 
 	public ImmutableList<BindingImpl<?>> freezeBindings() {

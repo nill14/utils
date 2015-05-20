@@ -2,13 +2,14 @@ package com.github.nill14.utils.moduledi.guice;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
-import com.github.nill14.utils.init.api.ILazyPojo;
+import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -60,13 +61,35 @@ public class GuiceModuleServiceContext implements IServiceContext {
 			}
 			return null;
 		}
+
+		@Override
+		public IBeanInjector toBeanInjector() {
+			if (propertyResolver != null) {
+				return propertyResolver.toBeanInjector();
+			}
+			return null;
+		}
+
+		@Override
+		public void initializeBean(Object instance) {
+			if (propertyResolver != null) {
+				propertyResolver.initializeBean(instance);
+			}
+		}
 		
+		@Override
+		public List<IPojoInitializer> getInitializers() {
+			if (propertyResolver != null) {
+				propertyResolver.getInitializers();
+			}
+			return Collections.emptyList();
+		}
 	};
 
 	private final IPojoInitializer contextInitializer = new IPojoInitializer() {
 		
 		@Override
-		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
+		public void init(IPojoFactory<?> pojoFactory, Object instance) {
 			if (ctxStarted.compareAndSet(false, true)) {
 //				Injector injector = Guice.createInjector((Module) module);
 				Injector injector = new InternalInjectorCreator()
@@ -79,7 +102,7 @@ public class GuiceModuleServiceContext implements IServiceContext {
 		}
 		
 		@Override
-		public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
+		public void destroy(IPojoFactory<?> pojoFactory, Object instance) {
 			// nothing to do
 		}
 	};

@@ -1,6 +1,7 @@
 package com.github.nill14.utils.init.api;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -23,4 +24,10 @@ public interface IPropertyResolver extends Serializable {
 //	static <T> Provider<T> nullProvider() {
 //		return AbstractPropertyResolver.nullProvider();
 //	}
+	
+	IBeanInjector toBeanInjector();
+	
+	List<IPojoInitializer> getInitializers(); 
+	
+	void initializeBean(Object instance);
 }

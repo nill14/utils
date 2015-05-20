@@ -43,7 +43,7 @@ public class LazyPojoTest {
 		}
 		
 		@Override
-		public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
+		public void init(IPojoFactory<?> pojoFactory, Object instance) {
 			//instance could be also IGreeter
 			if (instance instanceof GreeterFactory) {
 				GreeterFactory factory = (GreeterFactory) instance;
@@ -54,7 +54,7 @@ public class LazyPojoTest {
 		}
 		
 		@Override
-		public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) {
+		public void destroy(IPojoFactory<?> pojoFactory, Object instance) {
 			//instance could be also IGreeter
 			if (instance instanceof GreeterFactory) {
 				GreeterFactory factory = (GreeterFactory) instance;

@@ -19,6 +19,10 @@ public class PojoProviderFactory<T> implements IPojoFactory<T> {
 	public static <T> PojoProviderFactory<T> nullFactory(Class<T> nullType) {
 		return new PojoProviderFactory<T>(TypeToken.of(nullType), () -> null, IPropertyResolver.empty());
 	}
+	
+	public static <T> PojoProviderFactory<T> of(TypeToken<T> typeToken, Provider<T> provider, IPropertyResolver resolver) {
+		return new PojoProviderFactory<T>(typeToken, provider, resolver);
+	}
 
 	private static final long serialVersionUID = 1L;	
 	private final TypeToken<T> typeToken;
@@ -64,7 +68,9 @@ public class PojoProviderFactory<T> implements IPojoFactory<T> {
 	
 	@Override
 	public T newInstance() {
-		return provider.get();
+		T instance = provider.get();
+		resolver.initializeBean(instance);
+		return instance;
 	}
 
 	@Override

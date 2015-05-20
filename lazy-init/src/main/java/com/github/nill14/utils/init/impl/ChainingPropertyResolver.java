@@ -1,8 +1,11 @@
 package com.github.nill14.utils.init.impl;
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
+import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.google.common.collect.ImmutableList;
 
@@ -50,6 +53,23 @@ public class ChainingPropertyResolver implements IPropertyResolver {
 				return result;
 			}
 		}
+		return null;
+	}
+	
+	@Override
+	public IBeanInjector toBeanInjector() {
+		return new BeanInjector(this);
+	}
+	
+	@Override
+	public void initializeBean(Object instance) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<IPojoInitializer> getInitializers() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

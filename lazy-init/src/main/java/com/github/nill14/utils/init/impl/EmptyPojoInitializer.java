@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 
@@ -21,10 +20,10 @@ public final class EmptyPojoInitializer implements IPojoInitializer {
 	}
 	
 	@Override
-	public void init(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) { }
+	public void init(IPojoFactory<?> pojoFactory, Object instance) { }
 
 	@Override
-	public void destroy(ILazyPojo<?> lazyPojo, IPojoFactory<?> pojoFactory, Object instance) { }
+	public void destroy(IPojoFactory<?> pojoFactory, Object instance) { }
 
 	private void writeObject(ObjectOutputStream stream) throws IOException { }
 
