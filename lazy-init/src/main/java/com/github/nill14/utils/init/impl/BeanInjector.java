@@ -49,21 +49,6 @@ public class BeanInjector implements IBeanInjector {
 	}
 
 	@Override
-	public <T> T wire(Class<T> beanClass) {
-		return resolve(BindingKey.of(beanClass));
-	}
-
-	@Override
-	public <T> T wire(TypeToken<T> typeToken) {
-		return resolve(BindingKey.of(typeToken));
-	}
-	
-	@Override
-	public <T> T wire(BindingKey<T> type) {
-		return resolve(type);
-	}
-	
-	@Override
 	public <T> T getInstance(Class<T> beanClass) {
 		return resolve(BindingKey.of(beanClass));
 	}

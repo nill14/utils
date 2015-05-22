@@ -24,21 +24,6 @@ public class GuiceBeanInjector implements IBeanInjector {
 	}
 	
 	@Override
-	public <T> T wire(Class<T> beanClass) {
-		return injector.getInstance(beanClass);
-	}
-
-	@Override
-	public <T> T wire(TypeToken<T> typeToken) {
-		return (T) injector.getInstance(Key.get(TypeLiteral.get(typeToken.getType())));
-	}
-	
-	@Override
-	public <T> T wire(BindingKey<T> type) {
-		return (T) injector.getInstance(Key.get(type.getGenericType(), type.getQualifier()));
-	}
-
-	@Override
 	public <T> T getInstance(Class<T> beanClass) {
 		return injector.getInstance(beanClass);
 	}

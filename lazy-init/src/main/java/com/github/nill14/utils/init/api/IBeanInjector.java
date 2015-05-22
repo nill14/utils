@@ -14,24 +14,6 @@ public interface IBeanInjector {
 	
 	void injectMembers(Object bean);
 	
-	/**
-	 * @deprecated prefer getInstance
-	 */
-	@Deprecated
-	<T> T wire(Class<T> beanClass);
-
-	/**
-	 * @deprecated prefer getInstance
-	 */
-	@Deprecated
-	<T> T wire(TypeToken<T> typeToken);
-
-	/**
-	 * @deprecated prefer getInstance
-	 */
-	@Deprecated
-	<T> T wire(BindingKey<T> type);
-	
 	<T> T getInstance(Class<T> beanClass);
 	
 	<T> T getInstance(TypeToken<T> typeToken);
