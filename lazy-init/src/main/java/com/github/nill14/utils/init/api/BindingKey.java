@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 import com.github.nill14.utils.init.meta.Annotations;
 import com.google.common.reflect.TypeToken;
 
-public /*final*/ class BindingKey<T> {
+public final class BindingKey<T> {
 
 
 	public static <T> BindingKey<T> of(Class<T> clazz) {
