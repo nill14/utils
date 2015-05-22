@@ -50,9 +50,14 @@ public final class LazyPojo<T> implements ILazyPojo<T> {
 		return new LazyPojo<>(factoryAdapter, destroyer);
 	}
 	
-	public static <T> ILazyPojo<T> forProvider(
+	public static <T> ILazyPojo<T> forProvider(TypeToken<T> returnType,
+			Provider<T> provider) {
+		return forProvider(returnType, provider, IPropertyResolver.empty(), IPojoDestroyer.empty());
+	}
+	
+	public static <T> ILazyPojo<T> forProvider(TypeToken<T> returnType,
 			Provider<T> provider, IPropertyResolver resolver, IPojoDestroyer destroyer) {
-		IPojoFactory<T> pojoFactory = new PojoProviderFactory<>(provider, resolver);
+		IPojoFactory<T> pojoFactory = new PojoProviderFactory<>(returnType, provider, resolver);
 		return new LazyPojo<>(pojoFactory, destroyer);
 	}
 	

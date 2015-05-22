@@ -21,7 +21,7 @@ public class LazySingleton<T> implements ILazyPojo<T>, IExtraFactory<T> {
 	}
 
 	public static <T> LazySingleton<T> of(Class<T> type, Supplier<T> factory) {
-		ILazyPojo<T> lazyPojo = LazyPojo.forProvider(() -> factory.get(), IPropertyResolver.empty(),
+		ILazyPojo<T> lazyPojo = LazyPojo.forProvider(TypeToken.of(type), () -> factory.get(), IPropertyResolver.empty(),
 				IPojoInitializer.empty());
 		return newProxy(lazyPojo);
 	}
