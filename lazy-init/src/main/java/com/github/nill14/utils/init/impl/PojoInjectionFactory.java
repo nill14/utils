@@ -33,13 +33,13 @@ public class PojoInjectionFactory<T> implements IPojoFactory<T> {
 	@Override
 	public T newInstance() {
 		IMemberDescriptor injectionDescriptor = beanDescriptor.getConstructorDescriptors().get(0);
-		Object[] args = createArgs(injectionDescriptor.getParameterTypes());
 		
 		try {
+			Object[] args = createArgs(injectionDescriptor.getParameterTypes());
 			T instance = (T) injectionDescriptor.invoke(null, args);
 			resolver.initializeBean(instance);
 			return instance;
-		} catch (ReflectiveOperationException e) {
+		} catch (ReflectiveOperationException | RuntimeException e) {
 			throw new RuntimeException(injectionDescriptor.toString(), e);
 		}
 	}

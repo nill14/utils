@@ -58,11 +58,11 @@ public class AnnotationInjectInitializer implements IPojoInitializer {
 	}
 	
 	private void injectMethod(IPropertyResolver resolver, Object instance, IMemberDescriptor member) {
-		Object[] args = createArgs(resolver, member.getParameterTypes());
 		
 		try {
+			Object[] args = createArgs(resolver, member.getParameterTypes());
 			member.invoke(instance, args);
-		} catch (ReflectiveOperationException e) {
+		} catch (ReflectiveOperationException | RuntimeException e) {
 			throw new RuntimeException(String.format(
 					"Cannot inject %s", member), e);
 		}
