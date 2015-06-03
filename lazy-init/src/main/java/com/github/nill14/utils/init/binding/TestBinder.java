@@ -1,19 +1,23 @@
 package com.github.nill14.utils.init.binding;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Singleton;
 
+import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.impl.BindingBuilder;
 import com.github.nill14.utils.init.binding.impl.BindingImpl;
+import com.github.nill14.utils.init.binding.target.AnnotatedElementBindingTargetVisitor;
 import com.github.nill14.utils.init.impl.ChainingPojoInitializer;
 import com.github.nill14.utils.init.impl.ChainingPropertyResolver;
+import com.github.nill14.utils.init.meta.AnnotationScanner;
 import com.github.nill14.utils.init.scope.SingletonScope;
 import com.github.nill14.utils.init.util.Element;
 import com.google.common.collect.ImmutableList;
@@ -102,9 +106,23 @@ public Object resolve(Object pojo, IParameterType type) {
 
 	public ImmutableList<BindingImpl<?>> freezeBindings() {
 		configurationLocker.set(true);
+		
 		ImmutableList<BindingImpl<?>> bindings = ImmutableList.copyOf(
-				elements.stream().map(Element::getValue).iterator());
+				elements.stream().map(Element::getValue).map(this::scanQualifier).iterator());
 		return bindings;
+	}
+	
+	private <T> BindingImpl<T> scanQualifier(BindingImpl<T> binding) {
+		AnnotatedElementBindingTargetVisitor targetVisitor = new AnnotatedElementBindingTargetVisitor();
+		BindingKey<T> bindingKey = binding.getBindingKey();
+		if (bindingKey.getQualifier() == null) {
+			AnnotatedElement annotatedElement = binding.getBindingTarget().accept(targetVisitor);
+			Annotation qualifier = AnnotationScanner.findQualifier(annotatedElement).orElse(null);
+			return new BindingImpl<>(bindingKey.withQualifier(qualifier), 
+					binding.getBindingTarget(), binding.getScope(), binding.getSource());
+		}
+		
+		return binding;
 	}
 	
 }

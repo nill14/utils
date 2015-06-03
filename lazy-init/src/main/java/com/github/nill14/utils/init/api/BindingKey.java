@@ -74,7 +74,9 @@ public final class BindingKey<T> {
 		return null;
 	}
 	
-	
+	public BindingKey<T> withQualifier(Annotation qualifier) {
+		return BindingKey.of(typeToken, qualifier);
+	}
 	
 	
 	@Override

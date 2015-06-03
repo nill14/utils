@@ -1,6 +1,7 @@
 package com.github.nill14.utils.init.binding;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -11,10 +12,12 @@ import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.impl.BindingBuilder;
 import com.github.nill14.utils.init.binding.impl.BindingImpl;
+import com.github.nill14.utils.init.binding.target.AnnotatedElementBindingTargetVisitor;
 import com.github.nill14.utils.init.binding.target.LazyPojoBindingTargetVisitor;
 import com.github.nill14.utils.init.impl.ChainingPojoInitializer;
 import com.github.nill14.utils.init.impl.ChainingPropertyResolver;
 import com.github.nill14.utils.init.impl.ServiceRegistry;
+import com.github.nill14.utils.init.meta.AnnotationScanner;
 import com.github.nill14.utils.init.util.Element;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -77,7 +80,7 @@ public final class ModuleBinder implements Binder {
 	public void build() {
 		configurationLocker.set(true);
 		ImmutableList<BindingImpl<?>> bindings = ImmutableList.copyOf(
-				elements.stream().map(Element::getValue).iterator());
+				elements.stream().map(Element::getValue).map(this::scanQualifier).iterator());
 		
 		
 		LazyPojoBindingTargetVisitor bindingTargetVisitor = new LazyPojoBindingTargetVisitor(
@@ -95,4 +98,18 @@ public final class ModuleBinder implements Binder {
 //		return serviceRegistry.toBeanInjector();
 		
 	}
+	
+	private <T> BindingImpl<T> scanQualifier(BindingImpl<T> binding) {
+		AnnotatedElementBindingTargetVisitor targetVisitor = new AnnotatedElementBindingTargetVisitor();
+		BindingKey<T> bindingKey = binding.getBindingKey();
+		if (bindingKey.getQualifier() == null) {
+			AnnotatedElement annotatedElement = binding.getBindingTarget().accept(targetVisitor);
+			Annotation qualifier = AnnotationScanner.findQualifier(annotatedElement).orElse(null);
+			return new BindingImpl<>(bindingKey.withQualifier(qualifier), 
+					binding.getBindingTarget(), binding.getScope(), binding.getSource());
+		}
+		
+		return binding;
+	}
+	
 }

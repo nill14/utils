@@ -2,10 +2,10 @@ package com.github.nill14.utils.init.meta;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.GenericDeclaration;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
 import javax.inject.Qualifier;
 import javax.inject.Scope;
 
@@ -40,8 +40,13 @@ public class AnnotationScanner {
 		return indexAnnotations(annotations.filter(a -> a.annotationType().isAnnotationPresent(metaAnnotation)));
 	}
 	
-	public static Optional<Annotation> findQualifier(GenericDeclaration member) {
-		return findQualifier(Stream.of(member.getAnnotations()), member);
+	public static Optional<Annotation> findQualifier(@Nullable AnnotatedElement member) {
+		if (member != null) {
+			return findQualifier(Stream.of(member.getAnnotations()), member);
+		
+		} else {
+			return Optional.empty();
+		}
 	}
 	
 	public static Optional<Annotation> findQualifier(Stream<Annotation> annotations, AnnotatedElement member) {
