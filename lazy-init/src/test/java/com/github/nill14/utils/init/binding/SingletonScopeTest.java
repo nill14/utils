@@ -2,6 +2,7 @@ package com.github.nill14.utils.init.binding;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.testng.Assert;
@@ -59,6 +60,7 @@ public class SingletonScopeTest {
 	}
 	
 	private class Bean implements IBean {
+		@Inject
 		public Bean() {
 			instances.incrementAndGet();
 		}
