@@ -29,15 +29,20 @@ public class PojoInjectionFactory<T> implements IPojoFactory<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public T newInstance(IPropertyResolver resolver) {
+		T instance = doCreateInstance(resolver);
+		resolver.initializeBean(getDescriptor(), instance);
+		return instance;
+	}
+
+	private T doCreateInstance(IPropertyResolver resolver) {
 		IMemberDescriptor injectionDescriptor = beanDescriptor.getConstructorDescriptors().get(0);
 		
 		try {
 			Object[] args = createArgs(resolver, injectionDescriptor.getParameterTypes());
-			T instance = (T) injectionDescriptor.invoke(null, args);
-			resolver.initializeBean(instance);
-			return instance;
+			return (T) injectionDescriptor.invoke(null, args);
 		} catch (ReflectiveOperationException | RuntimeException e) {
-			throw new RuntimeException(injectionDescriptor.toString(), e);
+			throw new RuntimeException(String.format(
+					"Cannot inject constructor %s: %s", injectionDescriptor, e.getMessage()), e);
 		}
 	}
 	

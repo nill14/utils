@@ -80,12 +80,12 @@ public class SpringModuleServiceContext implements IServiceContext {
 		}
 		
 		@Override
-		public void initializeBean(Object instance) {
+		public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance) {
 			if (springPropertyResolver == null) {
 				//TODO this might be eventually the case when calling resolver from PojoFactory
 				throw new IllegalStateException("Wrong order, first must be called initializer");
 			}
-			springPropertyResolver.initializeBean(instance);
+			springPropertyResolver.initializeBean(beanDescriptor, instance);
 		}
 		
 		@Override
@@ -104,6 +104,27 @@ public class SpringModuleServiceContext implements IServiceContext {
 				throw new IllegalStateException("Wrong order, first must be called initializer");
 			}
 			return springPropertyResolver.getInitializers();
+		}
+
+		@Override
+		public <T> void destroyBean(IBeanDescriptor<T> beanDescriptor, Object instance) {
+			if (springPropertyResolver == null) {
+				//TODO this might be eventually the case when calling resolver from PojoFactory
+				throw new IllegalStateException("Wrong order, first must be called initializer");
+			}
+			springPropertyResolver.destroyBean(beanDescriptor, instance);
+		}
+
+		@Override
+		public void insertInitializer(IPojoInitializer initializer) {
+			// TODO Auto-generated method stub
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void appendInitializer(IPojoInitializer extraInitializer) {
+			// TODO Auto-generated method stub
+			throw new UnsupportedOperationException();
 		}
 		
 	};

@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Singleton;
 
+import com.github.nill14.utils.annotation.Experimental;
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -29,7 +30,6 @@ import com.google.common.reflect.TypeToken;
 public final class TestBinder implements Binder {
 	
 	private final Map<Class<? extends Annotation>, IScope> scopes = Maps.newHashMap();
-	private final ChainingPojoInitializer initializer = ChainingPojoInitializer.defaultInitializer();
 	private final ChainingPropertyResolver resolver = new ChainingPropertyResolver();
 
 	private final List<Element<BindingImpl<?>>> elements = Lists.newArrayList();
@@ -75,7 +75,7 @@ public final class TestBinder implements Binder {
 	}
 	
 	public TestBinder withInitializer(IPojoInitializer initializer) {
-		this.initializer.insert(initializer);
+		this.resolver.appendInitializer(initializer);
 		return this;
 	}
 	
@@ -97,6 +97,17 @@ public Object resolve(Object pojo, IParameterType type) {
 		return this;
 	}
 	
+	@Experimental
+	@Deprecated
+	public IPropertyResolver toResolver() {
+		
+		ImmutableList<BindingImpl<?>> bindings = freezeBindings();
+		
+		
+		return new SimplePropertyResolver(bindings, 
+				new ChainingPojoInitializer(resolver.getInitializers()));
+	}
+	
 	
 	public IBeanInjector toBeanInjector() {
 //		bindScope(Singleton.class, SingletonScope.instance());
@@ -104,7 +115,10 @@ public Object resolve(Object pojo, IParameterType type) {
 		ImmutableList<BindingImpl<?>> bindings = freezeBindings();
 		
 		
-		SimplePropertyResolver propertyResolver = new SimplePropertyResolver(bindings, initializer);
+		SimplePropertyResolver propertyResolver = new SimplePropertyResolver(bindings, 
+				new ChainingPojoInitializer(resolver.getInitializers()));
+		
+		
 		
 		return propertyResolver.toBeanInjector();
 	}

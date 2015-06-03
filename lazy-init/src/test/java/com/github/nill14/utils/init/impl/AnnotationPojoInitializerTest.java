@@ -1,7 +1,10 @@
 package com.github.nill14.utils.init.impl;
 
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.testng.Assert.assertNotNull;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -13,33 +16,35 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.github.nill14.utils.init.ITimeService;
+import com.github.nill14.utils.init.InitSpy;
 import com.github.nill14.utils.init.TimeService;
 import com.github.nill14.utils.init.api.ILazyPojo;
-import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
-import com.github.nill14.utils.init.api.IServiceRegistry;
+import com.github.nill14.utils.init.binding.TestBinder;
+import com.github.nill14.utils.init.meta.Annotations;
 
 public class AnnotationPojoInitializerTest {
 
 	private static final Logger log = LoggerFactory.getLogger(AnnotationPojoInitializerTest.class);
 	private ITimeService timeService;
 	private ILazyPojo<TimeService> lazyPojo;
-	private TimeService spy;
+	private InitSpy spy;
 	private IPropertyResolver resolver;
 	
 	@BeforeMethod
 	public void init() {
 		new TimeService();
-		spy = mock(TimeService.class);
+		spy = mock(InitSpy.class);
 
-		IServiceRegistry registry = IServiceRegistry.newRegistry();
-		registry.addSingleton(ZoneId.systemDefault());
-		registry.addSingleton("greeting", "greeting");
-		registry.addSingleton(spy);
-		resolver = registry.toResolver();
+		TestBinder b = new TestBinder();
 		
-		IPojoInitializer initializer = IPojoInitializer.standard();
-		lazyPojo = LazyPojo.forBean(TimeService.class, resolver, initializer);
+		b.bind(ZoneId.class).toInstance(ZoneId.systemDefault());
+		b.bind(String.class).annotatedWith(Annotations.named("greeting")).toInstance("greeting");
+		b.bind(InitSpy.class).toInstance(spy);
+		
+		resolver = b.toResolver();
+		
+		lazyPojo = LazyPojo.forBean(TimeService.class, resolver);
 		timeService = LazyJdkProxy.newProxy(ITimeService.class, lazyPojo);
 	}
 	
@@ -50,8 +55,7 @@ public class AnnotationPojoInitializerTest {
 	
 	@Test
 	public void testIntegration() {
-		IPojoInitializer initializer = IPojoInitializer.standard();
-		ILazyPojo<TimeService> lazyPojo = LazyPojo.forBean(TimeService.class, resolver, initializer);
+		ILazyPojo<TimeService> lazyPojo = LazyPojo.forBean(TimeService.class, resolver);
 		ITimeService timeService = LazyJdkProxy.newProxy(ITimeService.class, lazyPojo);
 		LocalDateTime now = timeService.getNow();
 		log.info("testIntegration: {}", now);

@@ -4,21 +4,23 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
 
-import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
+import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 
 @SuppressWarnings("serial")
 public final class EmptyPropertyResolver extends AbstractPropertyResolver implements IPropertyResolver {
 
-	public static final EmptyPropertyResolver instance = new EmptyPropertyResolver();
 	public static EmptyPropertyResolver empty() {
-		return instance;
+		return new EmptyPropertyResolver(IPojoInitializer.standard());
 	}
 	
+	public static EmptyPropertyResolver empty(IPojoInitializer pojoInitializer) {
+		return new EmptyPropertyResolver(IPojoInitializer.standard());
+	}
 	
-	private EmptyPropertyResolver() {
-		
+	private EmptyPropertyResolver(IPojoInitializer pojoInitializer) {
+		insertInitializer(pojoInitializer);
 	}
 	
 	@Override
@@ -43,6 +45,15 @@ public final class EmptyPropertyResolver extends AbstractPropertyResolver implem
 	protected Object findByQualifier(IParameterType type, Annotation qualifier) {
 		return null;
 	}
+	
+	public void insertInitializer(IPojoInitializer initializer) {
+		super.insertInitializer(initializer);
+	}
+	
+	public void appendInitializer(IPojoInitializer extraInitializer) {
+		super.appendInitializer(extraInitializer);
+	}
+	
 
 
 }

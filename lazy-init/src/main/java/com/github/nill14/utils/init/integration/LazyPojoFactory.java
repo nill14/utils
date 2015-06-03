@@ -54,7 +54,7 @@ public /*non-final on purpose*/ class LazyPojoFactory<F> implements IPojoFactory
 	@Override
 	public F newInstance(IPropertyResolver resolver) {
 		F instance = delegate.newInstance(resolver);
-		resolver.initializeBean(instance);
+		resolver.initializeBean(getDescriptor(), instance);
 		return instance;
 	}
 

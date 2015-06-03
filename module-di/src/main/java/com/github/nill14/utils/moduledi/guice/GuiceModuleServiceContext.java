@@ -72,9 +72,9 @@ public class GuiceModuleServiceContext implements IServiceContext {
 		}
 
 		@Override
-		public void initializeBean(Object instance) {
+		public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance) {
 			if (propertyResolver != null) {
-				propertyResolver.initializeBean(instance);
+				propertyResolver.initializeBean(beanDescriptor, instance);
 			}
 		}
 		
@@ -85,6 +85,25 @@ public class GuiceModuleServiceContext implements IServiceContext {
 			}
 			return Collections.emptyList();
 		}
+		
+		@Override
+		public <T> void destroyBean(IBeanDescriptor<T> beanDescriptor, Object instance) {
+			if (propertyResolver != null) {
+				propertyResolver.destroyBean(beanDescriptor, instance);
+			}
+		}
+
+		@Override
+		public void insertInitializer(IPojoInitializer initializer) {
+			// TODO Auto-generated method stub
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void appendInitializer(IPojoInitializer extraInitializer) {
+			// TODO Auto-generated method stub
+			throw new UnsupportedOperationException();
+		}		
 	};
 
 	private final IPojoInitializer contextInitializer = new IPojoInitializer() {

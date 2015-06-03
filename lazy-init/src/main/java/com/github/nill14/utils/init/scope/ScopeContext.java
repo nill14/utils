@@ -8,7 +8,6 @@ import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
-import com.github.nill14.utils.init.api.IPojoDestroyer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.google.common.collect.Lists;
 
@@ -59,7 +58,7 @@ public final class ScopeContext {
 			return instance;
 		}
 		
-		private void destroy(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, IPojoDestroyer destroyer) {
+		private void destroy(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor) {
 			T instance;
 			
 			synchronized (this) {
@@ -68,17 +67,18 @@ public final class ScopeContext {
 			}
 			
 			if (instance != null) {
-				destroyer.destroy(resolver, beanDescriptor, instance);  
+				resolver.destroyBean(beanDescriptor, instance);
 			}
 		}
 	}
 	
-	public void terminate(IPojoDestroyer destroyer) {
+	public void terminate() {
 		if (lifecycleTracker.compareAndSet(true, false)) {
 			List<ScopeProviderProxy<?>> providers = Lists.newArrayList(map.values());
 			map.clear();
 			for (ScopeProviderProxy<?> provider : providers) {
-				provider.destroy(IPropertyResolver.empty(), null, destroyer);//FIXME parameters
+				IPropertyResolver resolver = null; //FIXME
+				resolver.destroyBean(null, null);
 			}
 		}
 	}

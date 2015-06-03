@@ -27,7 +27,14 @@ public interface IPropertyResolver extends Serializable {
 	
 	IBeanInjector toBeanInjector();
 	
-	List<IPojoInitializer> getInitializers(); 
 	
-	void initializeBean(Object instance);
+	<T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance);
+	
+	<T> void destroyBean(IBeanDescriptor<T> beanDescriptor, Object instance);
+	
+	void insertInitializer(IPojoInitializer initializer);
+
+	void appendInitializer(IPojoInitializer extraInitializer);
+
+	List<IPojoInitializer> getInitializers(); 
 }

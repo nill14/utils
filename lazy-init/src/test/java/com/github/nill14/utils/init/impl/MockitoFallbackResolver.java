@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.mockito.Mockito;
 
+import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -20,8 +21,12 @@ public class MockitoFallbackResolver implements IPropertyResolver {
 	}
 
 	@Override
-	public void initializeBean(Object instance) {
-		// TODO Auto-generated method stub
+	public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance) {
+	}
+	
+	@Override
+	public <T> void destroyBean(IBeanDescriptor<T> beanDescriptor, Object instance) {
+		
 	}
 	
 	@Override
@@ -32,6 +37,16 @@ public class MockitoFallbackResolver implements IPropertyResolver {
 	@Override
 	public List<IPojoInitializer> getInitializers() {
 		return Collections.emptyList();
+	}
+
+	@Override
+	public void insertInitializer(IPojoInitializer initializer) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void appendInitializer(IPojoInitializer extraInitializer) {
+		throw new UnsupportedOperationException();
 	}
 	
 }

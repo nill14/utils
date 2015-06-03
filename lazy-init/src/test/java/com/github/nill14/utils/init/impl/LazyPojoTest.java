@@ -1,7 +1,10 @@
 package com.github.nill14.utils.init.impl;
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
-import static org.testng.Assert.*;
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -18,7 +21,6 @@ import com.github.nill14.utils.init.GreeterFactory;
 import com.github.nill14.utils.init.IGreeter;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.ILazyPojo;
-import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 
@@ -32,10 +34,11 @@ public class LazyPojoTest {
 	private final ExecutorService executor = Executors.newCachedThreadPool();
 	private volatile ILazyPojo<IGreeter> lazyPojo;
 
-	private volatile IPojoInitializer factoryInitializer;
 	private static final AtomicInteger instances = new AtomicInteger();
+	private static final IPojoInitializer factoryInitializer = new CountingPojoInitializer(instances);
+	private final EmptyPropertyResolver resolver = EmptyPropertyResolver.empty(factoryInitializer);
 			
-	class CountingPojoInitializer implements IPojoInitializer {
+	static class CountingPojoInitializer implements IPojoInitializer {
 		
 		private final AtomicInteger instances;
 
@@ -69,8 +72,8 @@ public class LazyPojoTest {
 	@BeforeMethod
 	public void init() {
 		instances.set(0);
-		factoryInitializer = new CountingPojoInitializer(instances);
-		lazyPojo = LazyPojo.forProvider(GreeterFactory.class, IPropertyResolver.empty(), factoryInitializer);
+		
+		lazyPojo = LazyPojo.forProvider(GreeterFactory.class, resolver);
 		assertEquals(0, instances.get());
 	}
 

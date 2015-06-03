@@ -41,7 +41,7 @@ public class LazyJavassistProxyTest {
 	
 	@BeforeClass
 	public static void setUp() {
-		lazyObject = LazyPojo.forBean(Calculator.class, IPropertyResolver.empty(), initializer);
+		lazyObject = LazyPojo.forBean(Calculator.class, IPropertyResolver.empty());
 		calcProxy = LazyJavassistProxy.newProxy(ICalculator.class, lazyObject);
 	}
 	

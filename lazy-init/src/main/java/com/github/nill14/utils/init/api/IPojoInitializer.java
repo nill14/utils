@@ -5,9 +5,11 @@ import java.io.Serializable;
 import com.github.nill14.utils.init.impl.ChainingPojoInitializer;
 import com.github.nill14.utils.init.impl.EmptyPojoInitializer;
 
-public interface IPojoInitializer extends IPojoDestroyer, Serializable {
+public interface IPojoInitializer extends Serializable {
 
 	<T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance);
+	
+	default <T> void destroy(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {}
 	
 	
 	static <T> IPojoInitializer empty() {

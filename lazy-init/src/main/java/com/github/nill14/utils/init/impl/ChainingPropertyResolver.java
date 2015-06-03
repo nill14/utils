@@ -3,6 +3,7 @@ package com.github.nill14.utils.init.impl;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -12,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 @SuppressWarnings("serial")
 public class ChainingPropertyResolver implements IPropertyResolver {
 	
+	private final ChainingPojoInitializer initializer = ChainingPojoInitializer.defaultInitializer();
 	private final CopyOnWriteArrayList<IPropertyResolver> items;
 	
 	public ChainingPropertyResolver(IPropertyResolver... resolvers) {
@@ -62,14 +64,28 @@ public class ChainingPropertyResolver implements IPropertyResolver {
 	}
 	
 	@Override
-	public void initializeBean(Object instance) {
-		// TODO Auto-generated method stub
-		
+	public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance) {
+		initializer.init(this, beanDescriptor, instance);
 	}
 
 	@Override
+	public <T> void destroyBean(IBeanDescriptor<T> beanDescriptor, Object instance) {
+		initializer.destroy(this, beanDescriptor, instance);
+	}
+	
+	@Override
+	public void insertInitializer(IPojoInitializer initializer) {
+		this.initializer.insert(initializer);
+	}
+	
+	@Override
+	public void appendInitializer(IPojoInitializer extraInitializer) {
+		this.initializer.append(initializer);
+	}
+	
+	
+	@Override
 	public List<IPojoInitializer> getInitializers() {
-		// TODO Auto-generated method stub
-		return null;
+		return initializer.getItems();
 	}
 }

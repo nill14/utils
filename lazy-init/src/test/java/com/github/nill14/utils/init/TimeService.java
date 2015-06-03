@@ -27,7 +27,7 @@ public class TimeService extends AbstractService implements ITimeService {
 	private Optional<Calendar> calendar;
 	
 	@Inject
-	private TimeService spy;
+	private InitSpy spy;
 	
 	@Inject
 	private List<ICalculator> calcs;
@@ -46,7 +46,7 @@ public class TimeService extends AbstractService implements ITimeService {
 		return LocalDateTime.now(zone);
 	}
 	
-	public TimeService getSpy() {
+	public InitSpy getSpy() {
 		return spy;
 	}
 	

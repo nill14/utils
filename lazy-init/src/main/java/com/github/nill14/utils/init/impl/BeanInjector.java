@@ -2,12 +2,10 @@ package com.github.nill14.utils.init.impl;
 
 import javax.inject.Provider;
 
-
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
-import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.google.common.reflect.TypeToken;
 
@@ -15,27 +13,21 @@ import com.google.common.reflect.TypeToken;
 public class BeanInjector implements IBeanInjector {
 	
 	private final IPropertyResolver resolver;
-	private final IPojoInitializer initializer;
 
 	public BeanInjector(IPropertyResolver resolver) {
 		this.resolver = resolver;
-		this.initializer = IPojoInitializer.standard();
 	}
 
-	public BeanInjector(IPropertyResolver resolver, IPojoInitializer initializer) {
-		this.resolver = resolver;
-		this.initializer = initializer;
-	}
 	
 	public void wire(Object bean) {
 		IPojoFactory<Object> pojoFactory = PojoProviderFactory.singleton(bean);
-		initializer.init(resolver, pojoFactory.getDescriptor(), bean);
+		resolver.initializeBean(pojoFactory.getDescriptor(), bean);
 	}
 
 	@Override
 	public void injectMembers(Object bean) {
 		IPojoFactory<Object> pojoFactory = PojoProviderFactory.singleton(bean);
-		initializer.init(resolver, pojoFactory.getDescriptor(), bean);
+		resolver.initializeBean(pojoFactory.getDescriptor(), bean);
 	}
 
 	private <T> T resolve(BindingKey<T> type) {

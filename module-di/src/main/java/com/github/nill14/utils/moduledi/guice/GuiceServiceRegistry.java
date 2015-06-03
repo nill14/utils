@@ -148,7 +148,7 @@ public class GuiceServiceRegistry implements IServiceRegistry {
 	
 	private <S, F extends Provider<? extends S>> Provider<S> toProvider(Class<S> iface,	Class<F> factoryClass) {
 		//TODO injection for bean
-		return () -> LazyPojo.forProvider(factoryClass, toResolver(), IPojoInitializer.standard()).getInstance();
+		return () -> LazyPojo.forProvider(factoryClass, toResolver()).getInstance();
 	}
 
 	@Override

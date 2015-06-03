@@ -45,8 +45,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	private final ConcurrentHashMap<Class<?>, Map<String, ILazyPojo<?>>> services = new ConcurrentHashMap<>();
 	private final ConcurrentHashMap<Class<?>, Map<Annotation, ILazyPojo<?>>> qualifiers = new ConcurrentHashMap<>();
 	
-	private final IPropertyResolver resolver = new ServiceRegistryPropertyResolver();
-	private final ChainingPojoInitializer pojoInitializer = ChainingPojoInitializer.defaultInitializer();
+	private final ServiceRegistryPropertyResolver resolver = new ServiceRegistryPropertyResolver();
 	
 	public ServiceRegistry() {
 	}
@@ -66,14 +65,6 @@ public class ServiceRegistry implements IServiceRegistry {
 		addService(generateGlobalName(serviceBean), serviceBean, context);
 	}
 	
-	private <T> IPojoInitializer getInitializer(IServiceContext context) {
-		Optional<IPojoInitializer> contextInitializer = context.getInitializer();
-		if (contextInitializer.isPresent()) {
-			return pojoInitializer.with(contextInitializer.get());
-		} else {
-			return pojoInitializer;
-		}
-	}
 	
 	private <T> IPropertyResolver getResolver(IServiceContext context) {
 		Optional<IPropertyResolver> customResolver = context.getCustomResolver();
@@ -95,9 +86,8 @@ public class ServiceRegistry implements IServiceRegistry {
 	@Override
 	public <S, T extends S> void addService(String name, Class<T> serviceBean, IServiceContext context) {
 		
-		IPojoInitializer initializer = getInitializer(context);
 		IPropertyResolver resolver = getResolver(context);
-		ILazyPojo<T> lazyPojo = LazyPojo.forBean(serviceBean, resolver, initializer);
+		ILazyPojo<T> lazyPojo = LazyPojo.forBean(serviceBean, resolver);
 		
 		ILazyPojo<T> proxy = newProxy(lazyPojo, serviceBean);
 		IBeanDescriptor<T> pd = new PojoInjectionDescriptor<>(serviceBean);
@@ -116,9 +106,8 @@ public class ServiceRegistry implements IServiceRegistry {
 	public <S, F extends Provider<? extends S>> void addServiceFactory(
 			Class<S> iface, String name, Class<F> factoryBean, IServiceContext context) {
 		
-		IPojoInitializer initializer = getInitializer(context);
 		IPropertyResolver resolver = getResolver(context);
-		ILazyPojo<S> lazyPojo = LazyPojo.forProvider(factoryBean, resolver, initializer);
+		ILazyPojo<S> lazyPojo = LazyPojo.forProvider(factoryBean, resolver);
 		ILazyPojo<F> proxy = newProxy(lazyPojo, factoryBean);
 		
 		IBeanDescriptor<S> pd = new PojoInjectionDescriptor<>(iface);
@@ -248,11 +237,15 @@ public class ServiceRegistry implements IServiceRegistry {
 	
 	@Override
 	public IBeanInjector toBeanInjector() {
-		return new BeanInjector(toResolver(), pojoInitializer);
+		return new BeanInjector(toResolver());
 	}
 	
 	@SuppressWarnings("serial")
 	private class ServiceRegistryPropertyResolver extends AbstractPropertyResolver {
+		
+		public ServiceRegistryPropertyResolver() {
+			super(IPojoInitializer.standard());
+		}
 
 		@Override
 		protected Object findByQualifier(IParameterType type, Annotation qualifier) {

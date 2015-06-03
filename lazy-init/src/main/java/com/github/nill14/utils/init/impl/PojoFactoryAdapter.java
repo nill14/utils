@@ -32,7 +32,7 @@ public class PojoFactoryAdapter<T, F extends Provider<? extends T>> implements I
 	@Override
 	public T newInstance(IPropertyResolver resolver) {
 		T instance = pojoFactory.newInstance(resolver).get();
-		resolver.initializeBean(instance);
+		resolver.initializeBean(getDescriptor(), instance);
 		return instance;
 	}
 

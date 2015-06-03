@@ -6,9 +6,7 @@ import java.util.concurrent.Future;
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.ILazyPojo;
-import com.github.nill14.utils.init.api.IPojoDestroyer;
 import com.github.nill14.utils.init.api.IPojoFactory;
-import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.impl.LazyPojo;
 import com.github.nill14.utils.init.impl.PojoProviderFactory;
@@ -23,15 +21,14 @@ public class LazySingleton<T> implements ILazyPojo<T>, IExtraFactory<T> {
 	}
 
 	public static <T> LazySingleton<T> of(Class<T> type, Supplier<T> factory) {
-		ILazyPojo<T> lazyPojo = LazyPojo.forProvider(TypeToken.of(type), () -> factory.get(), IPropertyResolver.empty(),
-				IPojoInitializer.empty());
+		ILazyPojo<T> lazyPojo = LazyPojo.forProvider(TypeToken.of(type), () -> factory.get(), IPropertyResolver.empty());
 		return newProxy(lazyPojo);
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <T> ILazyPojo<T> lazyNull() {
 		IPojoFactory<T> nullFactory = (PojoProviderFactory<T>) PojoProviderFactory.nullFactory(Object.class);
-		return (ILazyPojo<T>) LazyPojo.forFactory(nullFactory, IPropertyResolver.empty(), IPojoDestroyer.empty());
+		return (ILazyPojo<T>) LazyPojo.forFactory(nullFactory, IPropertyResolver.empty());
 	}
 
 	private final ILazyPojo<T> delegate;

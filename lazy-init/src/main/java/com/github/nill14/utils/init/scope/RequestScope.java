@@ -52,7 +52,7 @@ public class RequestScope implements IScope {
 			throw new IllegalStateException("Cannot stop the scope when any isn't active.");
 		}
 		threadLocal.remove();
-		scopeContext.terminate(null);//TODO null
+		scopeContext.terminate();
 	}
 	
 }

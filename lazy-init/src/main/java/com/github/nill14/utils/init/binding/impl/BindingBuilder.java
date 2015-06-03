@@ -16,6 +16,7 @@ import com.github.nill14.utils.init.binding.target.ProviderInstanceBindingTarget
 import com.github.nill14.utils.init.binding.target.ProviderTypeBindingTarget;
 import com.github.nill14.utils.init.meta.Annotations;
 import com.github.nill14.utils.init.scope.PrototypeScope;
+import com.github.nill14.utils.init.scope.SingletonScope;
 import com.github.nill14.utils.init.util.Element;
 import com.google.common.reflect.TypeToken;
 
@@ -59,6 +60,7 @@ public final class BindingBuilder<T> implements AnnotatedBindingBuilder<T> {
 	@Override
 	public void toInstance(T instance) {
 		target = new BeanInstanceBindingTarget<>(instance);
+		scope = SingletonScope.instance();
 		buildBinder();
 	}
 

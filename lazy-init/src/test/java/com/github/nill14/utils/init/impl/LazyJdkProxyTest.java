@@ -20,9 +20,10 @@ import com.github.nill14.utils.init.api.IPropertyResolver;
 public class LazyJdkProxyTest {
 
 	private static final Logger log = LoggerFactory.getLogger(LazyJdkProxyTest.class);
-	private static ICalculator calcProxy;
-	private static ILazyPojo<Calculator> lazyObject;
+	private ICalculator calcProxy;
+	private ILazyPojo<Calculator> lazyObject;
 	private static AtomicInteger instances = new AtomicInteger();
+	private final EmptyPropertyResolver resolver = EmptyPropertyResolver.empty(initializer);
 
 	private static final IPojoInitializer initializer = new IPojoInitializer() {
 		@Override
@@ -37,8 +38,8 @@ public class LazyJdkProxyTest {
 	};
 	
 	@BeforeClass
-	public static void setUp() {
-		lazyObject = LazyPojo.forBean(Calculator.class, IPropertyResolver.empty(), initializer);
+	public void setUp() {
+		lazyObject = LazyPojo.forBean(Calculator.class, resolver);
 		calcProxy = LazyJdkProxy.newProxy(ICalculator.class, lazyObject);
 	}
 	

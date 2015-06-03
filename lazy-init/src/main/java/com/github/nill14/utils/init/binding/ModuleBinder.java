@@ -26,7 +26,6 @@ import com.google.common.reflect.TypeToken;
 public final class ModuleBinder implements Binder {
 	
 	private final List<Element<BindingImpl<?>>> elements = Lists.newArrayList();
-	private final ChainingPojoInitializer initializer = ChainingPojoInitializer.defaultInitializer();
 	private final ChainingPropertyResolver resolver;
 	private final Object source;
 	private final ServiceRegistry serviceRegistry;
@@ -72,7 +71,7 @@ public final class ModuleBinder implements Binder {
 	}
 	
 	public ModuleBinder withInitializer(IPojoInitializer initializer) {
-		this.initializer.insert(initializer);
+		this.resolver.appendInitializer(initializer);
 		return this;
 	}
 	
@@ -84,7 +83,7 @@ public final class ModuleBinder implements Binder {
 		
 		
 		LazyPojoBindingTargetVisitor bindingTargetVisitor = new LazyPojoBindingTargetVisitor(
-				resolver, initializer, (binding) -> null); // we do not support linked bindings at the moment
+				resolver, (binding) -> null); // we do not support linked bindings at the moment
 		
 		
 		for (BindingImpl<?> binding : bindings) {

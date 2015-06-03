@@ -93,7 +93,7 @@ public class CustomScopeTest {
 	private static class CustomScopeImpl extends AbstractThreadScope {
 		
 		public void destroy() {
-			get().terminate(IPojoInitializer.standard());
+			get().terminate();
 		}
 		
 	}
