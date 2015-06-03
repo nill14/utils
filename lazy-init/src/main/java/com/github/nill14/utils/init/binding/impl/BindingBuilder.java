@@ -60,7 +60,6 @@ public final class BindingBuilder<T> implements AnnotatedBindingBuilder<T> {
 	@Override
 	public void toInstance(T instance) {
 		target = new BeanInstanceBindingTarget<>(instance);
-		scope = SingletonScope.instance();
 		buildBinder();
 	}
 

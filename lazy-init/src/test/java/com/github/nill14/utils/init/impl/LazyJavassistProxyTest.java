@@ -1,12 +1,12 @@
 package com.github.nill14.utils.init.impl;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -14,7 +14,6 @@ import com.github.nill14.utils.init.Calculator;
 import com.github.nill14.utils.init.ICalculator;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.ILazyPojo;
-import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 
@@ -39,16 +38,12 @@ public class LazyJavassistProxyTest {
 		}
 	};
 	
-	@BeforeClass
-	public static void setUp() {
-		lazyObject = LazyPojo.forBean(Calculator.class, IPropertyResolver.empty());
-		calcProxy = LazyJavassistProxy.newProxy(ICalculator.class, lazyObject);
-	}
 	
 	@BeforeMethod
 	public void init() {
-		lazyObject.freeInstance();
-		assertEquals(0, instances.get());
+		lazyObject = LazyPojo.forBean(Calculator.class, EmptyPropertyResolver.empty(initializer));
+		calcProxy = LazyJavassistProxy.newProxy(ICalculator.class, lazyObject);
+		instances.set(0);
 	}
 
 	@Test

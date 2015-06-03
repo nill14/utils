@@ -16,7 +16,7 @@ public final class EmptyPropertyResolver extends AbstractPropertyResolver implem
 	}
 	
 	public static EmptyPropertyResolver empty(IPojoInitializer pojoInitializer) {
-		return new EmptyPropertyResolver(IPojoInitializer.standard());
+		return new EmptyPropertyResolver(pojoInitializer);
 	}
 	
 	private EmptyPropertyResolver(IPojoInitializer pojoInitializer) {

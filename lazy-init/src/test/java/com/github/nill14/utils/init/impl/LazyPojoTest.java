@@ -6,10 +6,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -25,7 +27,7 @@ import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 
 @SuppressWarnings("serial")
-@Test(invocationCount = 10)
+//@Test(invocationCount = 10)
 public class LazyPojoTest {
 	
 	private static final String DESTROYED = "destroyed";
@@ -103,25 +105,28 @@ public class LazyPojoTest {
 		assertEquals(instances.get(), 1);
 	}
 	
-	@Test
+//	@Test
 	public void stressTest() throws InterruptedException, ExecutionException {
-		lazyPojo.init(executor);
-		lazyPojo.init(executor);
-		lazyPojo.init(executor);
-		lazyPojo.destroy(executor);
-		lazyPojo.destroy(executor);
-		lazyPojo.init(executor);
-		lazyPojo.destroy(executor);
-		lazyPojo.init(executor);
-		lazyPojo.destroy(executor);
-		lazyPojo.destroy(executor);
-		lazyPojo.destroy(executor);
-		lazyPojo.init(executor);
-		lazyPojo.init(executor);
-		lazyPojo.init(executor);
-		lazyPojo.destroy(executor);
-		lazyPojo.init(executor);
-		lazyPojo.destroy(executor);
+		
+		ExecutorService ex = Executors.newFixedThreadPool(8);
+		Random rnd = new Random();
+		for (int i = 0; i < 10; ) {
+			ex.submit(new Runnable() {
+				
+				@Override
+				public void run() {
+					if (rnd.nextBoolean()) {
+						lazyPojo.init(executor);
+					
+					} else {
+						lazyPojo.destroy(executor);
+					}
+				}
+			});
+		}
+
+		ex.shutdown();
+		ex.awaitTermination(1, TimeUnit.SECONDS);
 		
 		int actual = instances.get();
 		log.info("actual (stress): {}", actual);
