@@ -9,7 +9,7 @@ import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.github.nill14.utils.init.inject.ReflectionUtils;
 import com.google.common.reflect.TypeToken;
 
-public class PojoFactoryAdapter<T, F extends Provider<? extends T>> implements IPojoFactory<T> {
+public final class ProviderTypePojoFactory<T, F extends Provider<? extends T>> implements IPojoFactory<T> {
 	
 	private static final long serialVersionUID = 1L;
 	private final TypeToken<T> typeToken;
@@ -18,13 +18,13 @@ public class PojoFactoryAdapter<T, F extends Provider<? extends T>> implements I
     /** Cache the beanDescriptor */
     private IBeanDescriptor<T> beanDescriptor;
 
-	public PojoFactoryAdapter(TypeToken<F> providerType) {
+	public ProviderTypePojoFactory(TypeToken<F> providerType) {
 		this.typeToken = ReflectionUtils.getProviderReturnTypeToken(providerType);
-		this.pojoFactory = new PojoInjectionFactory<>(providerType);
+		this.pojoFactory = new BeanTypePojoFactory<>(providerType);
 	}
     
 	@SuppressWarnings("unused")
-	private <P extends Provider<? extends T>> PojoFactoryAdapter(IPojoFactory<F> pojoFactory, TypeToken<T> typeToken, IPropertyResolver resolver) {
+	private <P extends Provider<? extends T>> ProviderTypePojoFactory(IPojoFactory<F> pojoFactory, TypeToken<T> typeToken, IPropertyResolver resolver) {
 		this.pojoFactory = pojoFactory;
 		this.typeToken = typeToken;
 	}

@@ -9,12 +9,14 @@ import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.binding.impl.BindingTargetVisitor;
+import com.github.nill14.utils.init.impl.BeanInstancePojoFactory;
+import com.github.nill14.utils.init.impl.BeanTypePojoFactory;
 import com.github.nill14.utils.init.impl.LazyPojo;
-import com.github.nill14.utils.init.impl.PojoFactoryAdapter;
-import com.github.nill14.utils.init.impl.PojoInjectionFactory;
-import com.github.nill14.utils.init.impl.PojoProviderFactory;
+import com.github.nill14.utils.init.impl.ProviderTypePojoFactory;
+import com.github.nill14.utils.init.impl.ProviderInstancePojoFactory;
 import com.google.common.reflect.TypeToken;
 
+@Deprecated
 public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyPojo<?>> {
 
 	
@@ -36,13 +38,13 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 	
 	@Override
 	public ILazyPojo<?> visit(BeanInstanceBindingTarget<?> bindingTarget) {
-		IPojoFactory<?> pojoFactory = PojoProviderFactory.singleton(bindingTarget.getInstance());
+		IPojoFactory<?> pojoFactory = BeanInstancePojoFactory.singleton(bindingTarget.getInstance());
 		return LazyPojo.forFactory(pojoFactory, resolver);
 	}
 
 	@Override
 	public ILazyPojo<?> visit(ProviderInstanceBindingTarget<?> bindingTarget) {
-		IPojoFactory<?> pojoFactory = new PojoProviderFactory<Object>(
+		IPojoFactory<?> pojoFactory = new ProviderInstancePojoFactory<Object>(
 				(TypeToken<Object>) bindingTarget.getProviderToken(), 
 				(Provider<Object>) bindingTarget.getProvider());
 		return LazyPojo.forFactory(pojoFactory, resolver);
@@ -50,13 +52,13 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 
 	@Override
 	public ILazyPojo<?> visit(BeanTypeBindingTarget<?> bindingTarget) {
-		IPojoFactory<?> pojoFactory = new PojoInjectionFactory<>(bindingTarget.getToken());
+		IPojoFactory<?> pojoFactory = new BeanTypePojoFactory<>(bindingTarget.getToken());
 		return LazyPojo.forFactory(pojoFactory, resolver);
 	}
 
 	@Override
 	public ILazyPojo<?> visit(ProviderTypeBindingTarget<?> bindingTarget) {
-		IPojoFactory<?> pojoFactory = new PojoFactoryAdapter<>(bindingTarget.getToken());
+		IPojoFactory<?> pojoFactory = new ProviderTypePojoFactory<>(bindingTarget.getToken());
 		return LazyPojo.forFactory(pojoFactory, resolver);
 	}
 
@@ -64,7 +66,7 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 	public ILazyPojo<?> visit(ProvidesMethodBindingTarget<?> bindingTarget) {
 		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
-		IPojoFactory<?> pojoFactory = new PojoProviderFactory(bindingTarget.getToken(), new Provider<Object>() {
+		IPojoFactory<?> pojoFactory = new ProviderInstancePojoFactory(bindingTarget.getToken(), new Provider<Object>() {
 			@Override
 			public Object get() {
 				return bindingTarget.injectMethod(resolver);
@@ -81,7 +83,7 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 		if (lazyPojo == null) {
 			//linked binding was not found, thus create a new lazyPojo
 			//the same flow as for BeanTypeBindingTarget
-			IPojoFactory<?> pojoFactory = new PojoInjectionFactory<>(bindingKey.getToken());
+			IPojoFactory<?> pojoFactory = new BeanTypePojoFactory<>(bindingKey.getToken());
 			return LazyPojo.forFactory(pojoFactory, resolver);
 		}
 

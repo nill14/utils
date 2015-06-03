@@ -8,9 +8,10 @@ import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.binding.impl.BindingTargetVisitor;
-import com.github.nill14.utils.init.impl.PojoFactoryAdapter;
-import com.github.nill14.utils.init.impl.PojoInjectionFactory;
-import com.github.nill14.utils.init.impl.PojoProviderFactory;
+import com.github.nill14.utils.init.impl.BeanInstancePojoFactory;
+import com.github.nill14.utils.init.impl.BeanTypePojoFactory;
+import com.github.nill14.utils.init.impl.ProviderTypePojoFactory;
+import com.github.nill14.utils.init.impl.ProviderInstancePojoFactory;
 import com.google.common.reflect.TypeToken;
 
 public class PojoFactoryBindingTargetVisitor implements BindingTargetVisitor<IPojoFactory<?>> {
@@ -34,29 +35,29 @@ public class PojoFactoryBindingTargetVisitor implements BindingTargetVisitor<IPo
 	
 	@Override
 	public IPojoFactory<?> visit(BeanInstanceBindingTarget<?> bindingTarget) {
-		return PojoProviderFactory.singleton(bindingTarget.getInstance());
+		return BeanInstancePojoFactory.singleton(bindingTarget.getInstance());
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public IPojoFactory<?> visit(ProviderInstanceBindingTarget<?> bindingTarget) {
-		return PojoProviderFactory.of((TypeToken<Object>) bindingTarget.getProviderToken(), (Provider<Object>) bindingTarget.getProvider());
+		return ProviderInstancePojoFactory.of((TypeToken<Object>) bindingTarget.getProviderToken(), (Provider<Object>) bindingTarget.getProvider());
 	}
 
 	@Override
 	public IPojoFactory<?> visit(BeanTypeBindingTarget<?> bindingTarget) {
-		return new PojoInjectionFactory<>(bindingTarget.getToken());
+		return new BeanTypePojoFactory<>(bindingTarget.getToken());
 	}
 
 	@Override
 	public IPojoFactory<?> visit(ProviderTypeBindingTarget<?> bindingTarget) {
-		return new PojoFactoryAdapter<>(bindingTarget.getToken());
+		return new ProviderTypePojoFactory<>(bindingTarget.getToken());
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public IPojoFactory<?> visit(ProvidesMethodBindingTarget<?> bindingTarget) {
-		return PojoProviderFactory.of((TypeToken<Object>) bindingTarget.getToken(), 
+		return ProviderInstancePojoFactory.of((TypeToken<Object>) bindingTarget.getToken(), 
 				() -> bindingTarget.injectMethod(resolver));
 	}
 	
@@ -68,7 +69,7 @@ public class PojoFactoryBindingTargetVisitor implements BindingTargetVisitor<IPo
 		if (pojoFactory == null) {
 			//linked binding was not found, thus create a new lazyPojo
 			//the same flow as for BeanTypeBindingTarget
-			return new PojoInjectionFactory<>(bindingKey.getToken());
+			return new BeanTypePojoFactory<>(bindingKey.getToken());
 		}
 
 		return pojoFactory; //ehm: TODO caching results

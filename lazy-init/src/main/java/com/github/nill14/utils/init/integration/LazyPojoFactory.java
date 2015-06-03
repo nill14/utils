@@ -1,15 +1,13 @@
 package com.github.nill14.utils.init.integration;
 
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
-import com.github.nill14.utils.init.impl.PojoFactoryAdapter;
-import com.github.nill14.utils.init.impl.PojoInjectionFactory;
+import com.github.nill14.utils.init.impl.ProviderTypePojoFactory;
+import com.github.nill14.utils.init.impl.BeanTypePojoFactory;
 import com.google.common.reflect.TypeToken;
 
 public /*non-final on purpose*/ class LazyPojoFactory<F> implements IPojoFactory<F> {
@@ -33,7 +31,7 @@ public /*non-final on purpose*/ class LazyPojoFactory<F> implements IPojoFactory
 
 
 	protected LazyPojoFactory(TypeToken<F> beanType) {
-		delegate = new PojoInjectionFactory<>(beanType);
+		delegate = new BeanTypePojoFactory<>(beanType);
 		factoryToken = beanType;
 		this.doubleFactory = false;
 	}
@@ -41,7 +39,7 @@ public /*non-final on purpose*/ class LazyPojoFactory<F> implements IPojoFactory
 	//class type F is here G - factory
 	@SuppressWarnings("unchecked")
 	protected <T, G extends Provider<T>> LazyPojoFactory(TypeToken<G> factoryType, Class<G> factoryClass) {
-		PojoFactoryAdapter<T, G> factoryAdapter = new PojoFactoryAdapter<T, G>(factoryType);
+		ProviderTypePojoFactory<T, G> factoryAdapter = new ProviderTypePojoFactory<T, G>(factoryType);
 		this.factoryToken = (TypeToken<F>) factoryType;
 		this.delegate = (IPojoFactory<F>) factoryAdapter;
 		this.doubleFactory = true;

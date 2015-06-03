@@ -36,7 +36,7 @@ public class PojoFactoriesTest {
 
 	@Test
 	public void nullFactoryTest() {
-		IPojoFactory<Integer> factory = PojoProviderFactory.nullFactory(Integer.class);
+		IPojoFactory<Integer> factory = BeanInstancePojoFactory.nullFactory(Integer.class);
 		assertEquals(TypeToken.of(Integer.class), factory.getType());
 		assertEquals(null, factory.newInstance(IPropertyResolver.empty()));
 	}
@@ -44,7 +44,7 @@ public class PojoFactoriesTest {
 	@Test
 	public void singletonFactoryTest() {
 		Impl singleton = new Impl();
-		IPojoFactory<IFace<List<String>>> factory = PojoProviderFactory.singleton(singleton);
+		IPojoFactory<IFace<List<String>>> factory = BeanInstancePojoFactory.singleton(singleton);
 		assertEquals(TypeToken.of(Impl.class), factory.getType());
 		assertEquals(singleton, factory.newInstance(IPropertyResolver.empty()));
 	}
@@ -60,7 +60,7 @@ public class PojoFactoriesTest {
 				return singleton;
 			}
 		};
-		IPojoFactory<IFace<List<String>>> factory = new PojoProviderFactory<>(provider);
+		IPojoFactory<IFace<List<String>>> factory = new ProviderInstancePojoFactory<>(provider);
 		assertEquals(expectedToken, factory.getType());
 		assertEquals(singleton, factory.newInstance( IPropertyResolver.empty()));
 	}
@@ -68,7 +68,7 @@ public class PojoFactoriesTest {
 	@Test
 	public void beanClassFactoryTest() {
 		TypeToken<Impl> typeToken = TypeToken.of(Impl.class);
-		IPojoFactory<Impl> factory = new PojoInjectionFactory<>(typeToken);
+		IPojoFactory<Impl> factory = new BeanTypePojoFactory<>(typeToken);
 		assertEquals(typeToken, factory.getType());
 		assertThat(factory.newInstance(IPropertyResolver.empty()), CoreMatchers.instanceOf(Impl.class));
 	}
@@ -77,7 +77,7 @@ public class PojoFactoriesTest {
 	public void factoryAdapterTest() {
 		TypeToken<Impl> typeToken = TypeToken.of(Impl.class);
 		TypeToken<ImplProvider> providerToken = TypeToken.of(ImplProvider.class);
-		PojoFactoryAdapter<Impl, ImplProvider> adapter = new PojoFactoryAdapter<>(providerToken);
+		ProviderTypePojoFactory<Impl, ImplProvider> adapter = new ProviderTypePojoFactory<>(providerToken);
 		IPojoFactory<Impl> factory = adapter;
 		assertEquals(typeToken, factory.getType());
 		assertThat(factory.newInstance( IPropertyResolver.empty()), CoreMatchers.instanceOf(Impl.class));

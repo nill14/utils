@@ -9,19 +9,10 @@ import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.github.nill14.utils.init.inject.ReflectionUtils;
 import com.google.common.reflect.TypeToken;
 
-public class PojoProviderFactory<T> implements IPojoFactory<T> {
-
-	@SuppressWarnings("unchecked")
-	public static <T> IPojoFactory<T> singleton(T singleton) {
-		return new PojoProviderFactory<T>((TypeToken<T>) TypeToken.of(singleton.getClass()), () -> singleton);
-	}
+public final class ProviderInstancePojoFactory<T> implements IPojoFactory<T> {
 	
-	public static <T> PojoProviderFactory<T> nullFactory(Class<T> nullType) {
-		return new PojoProviderFactory<T>(TypeToken.of(nullType), () -> null);
-	}
-	
-	public static <T> PojoProviderFactory<T> of(TypeToken<T> typeToken, Provider<T> provider) {
-		return new PojoProviderFactory<T>(typeToken, provider);
+	public static <T> ProviderInstancePojoFactory<T> of(TypeToken<T> typeToken, Provider<T> provider) {
+		return new ProviderInstancePojoFactory<T>(typeToken, provider);
 	}
 
 	private static final long serialVersionUID = 1L;	
@@ -39,7 +30,7 @@ public class PojoProviderFactory<T> implements IPojoFactory<T> {
      * @param provider
      * @param resolver
      */
-	public PojoProviderFactory(Provider<T> provider) {
+	public ProviderInstancePojoFactory(Provider<T> provider) {
 		this.typeToken = ReflectionUtils.getProviderReturnTypeToken(provider);
 		if (Object.class.equals(typeToken.getRawType())) {
 			throw new IllegalArgumentException(
@@ -51,12 +42,12 @@ public class PojoProviderFactory<T> implements IPojoFactory<T> {
 		this.provider = provider;
 	}
 	
-	public PojoProviderFactory(TypeToken<T> typeToken, Provider<T> provider) {
+	public ProviderInstancePojoFactory(TypeToken<T> typeToken, Provider<T> provider) {
 		this.typeToken = typeToken;
 		this.provider = provider;
 	}
 	
-	protected PojoProviderFactory(IBeanDescriptor<T> beanDescriptor, Provider<T> provider) {
+	protected ProviderInstancePojoFactory(IBeanDescriptor<T> beanDescriptor, Provider<T> provider) {
 		this.typeToken = beanDescriptor.getToken();
 		this.beanDescriptor = beanDescriptor;
 		this.provider = provider;

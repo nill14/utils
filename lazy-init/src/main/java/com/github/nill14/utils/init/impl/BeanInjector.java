@@ -18,15 +18,9 @@ public class BeanInjector implements IBeanInjector {
 		this.resolver = resolver;
 	}
 
-	
-	public void wire(Object bean) {
-		IPojoFactory<Object> pojoFactory = PojoProviderFactory.singleton(bean);
-		resolver.initializeBean(pojoFactory.getDescriptor(), bean);
-	}
-
 	@Override
 	public void injectMembers(Object bean) {
-		IPojoFactory<Object> pojoFactory = PojoProviderFactory.singleton(bean);
+		IPojoFactory<Object> pojoFactory = BeanInstancePojoFactory.singleton(bean);
 		resolver.initializeBean(pojoFactory.getDescriptor(), bean);
 	}
 

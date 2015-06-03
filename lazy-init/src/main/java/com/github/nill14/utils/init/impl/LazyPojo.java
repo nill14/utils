@@ -24,7 +24,7 @@ public final class LazyPojo<T> implements ILazyPojo<T> {
 	}
 	
 	public static <T> ILazyPojo<T> forSingleton(T singleton, IPropertyResolver resolver) {
-		IPojoFactory<T> pojoFactory = PojoProviderFactory.singleton(singleton);
+		IPojoFactory<T> pojoFactory = BeanInstancePojoFactory.singleton(singleton);
 		return new LazyPojo<T>(pojoFactory, resolver);
 	}
 	
@@ -33,7 +33,7 @@ public final class LazyPojo<T> implements ILazyPojo<T> {
 	}
 	
 	public static <T> ILazyPojo<T> forBean(Class<T> beanClass, IPropertyResolver resolver) {
-		IPojoFactory<T> factory = new PojoInjectionFactory<>(TypeToken.of(beanClass));
+		IPojoFactory<T> factory = new BeanTypePojoFactory<>(TypeToken.of(beanClass));
 		return new LazyPojo<>(factory, resolver);
 	}
 	
@@ -45,7 +45,7 @@ public final class LazyPojo<T> implements ILazyPojo<T> {
 			Class<F> providerClass, IPropertyResolver resolver) {
 		
 		TypeToken<F> providerType = TypeToken.of(providerClass);
-		PojoFactoryAdapter<T, F> factoryAdapter = new PojoFactoryAdapter<T, F>(providerType);
+		ProviderTypePojoFactory<T, F> factoryAdapter = new ProviderTypePojoFactory<T, F>(providerType);
 		return new LazyPojo<>(factoryAdapter, resolver);
 	}
 	
@@ -56,7 +56,7 @@ public final class LazyPojo<T> implements ILazyPojo<T> {
 	
 	public static <T> ILazyPojo<T> forProvider(TypeToken<T> returnType,
 			Provider<T> provider, IPropertyResolver resolver) {
-		IPojoFactory<T> pojoFactory = new PojoProviderFactory<>(returnType, provider);
+		IPojoFactory<T> pojoFactory = new ProviderInstancePojoFactory<>(returnType, provider);
 		return new LazyPojo<>(pojoFactory, resolver);
 	}
 	

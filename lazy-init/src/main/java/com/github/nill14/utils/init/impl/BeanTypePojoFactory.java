@@ -11,17 +11,17 @@ import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
 
-public class PojoInjectionFactory<T> implements IPojoFactory<T> {
+public class BeanTypePojoFactory<T> implements IPojoFactory<T> {
 	
 	private final IBeanDescriptor<T> beanDescriptor;
 	
-	public PojoInjectionFactory(TypeToken<T> typeToken) {
+	public BeanTypePojoFactory(TypeToken<T> typeToken) {
 		this.beanDescriptor = new PojoInjectionDescriptor<>(typeToken);
 		Preconditions.checkArgument(beanDescriptor.getConstructorDescriptors().size() == 1, 
 				typeToken + " does not have any suitable constructors! (expected exactly one)");
 	}
 	
-	public PojoInjectionFactory(IBeanDescriptor<T> beanDescriptor) {
+	public BeanTypePojoFactory(IBeanDescriptor<T> beanDescriptor) {
 		this.beanDescriptor = beanDescriptor;
 		Preconditions.checkArgument(beanDescriptor.getConstructorDescriptors().size() > 0);
 	}

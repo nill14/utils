@@ -130,7 +130,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	protected Object doPrototype(IParameterType type) {
 		IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
 		if (typeDescriptor.canBeInstantiated()) {
-			return new PojoInjectionFactory<>(typeDescriptor).newInstance(this);
+			return new BeanTypePojoFactory<>(typeDescriptor).newInstance(this);
 		}
 		return null;
 	}
