@@ -53,6 +53,9 @@ public final class TestBinder implements Binder {
 	
 	@Override
 	public IScope getScope(Class<? extends Annotation> annotationType) {
+		if (Singleton.class.equals(annotationType)) {
+			return SingletonScope.instance();
+		}
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
@@ -87,7 +90,7 @@ public Object resolve(Object pojo, IParameterType type) {
 	
 	
 	public IBeanInjector toBeanInjector() {
-		bindScope(Singleton.class, SingletonScope.instance());
+//		bindScope(Singleton.class, SingletonScope.instance());
 		
 		ImmutableList<BindingImpl<?>> bindings = freezeBindings();
 		
