@@ -79,7 +79,7 @@ public class SimplePropertyResolver implements IPropertyResolver {
 	private Object doPrototype(IParameterType type) {
 		IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
 		if (typeDescriptor.canBeInstantiated()) {
-			return new PojoInjectionFactory<>(typeDescriptor, this).newInstance();
+			return new PojoInjectionFactory<>(typeDescriptor).newInstance(this);
 		}
 		return null;
 	}
@@ -93,21 +93,16 @@ public class SimplePropertyResolver implements IPropertyResolver {
 	public void initializeBean(Object instance) {
 		IPropertyResolver resolver = this;
 		//TODO fix this hack
-		IPojoInitializer.standard().init(new IPojoFactory<Object>() {
+		IPojoInitializer.standard().init(resolver, new IPojoFactory<Object>() {
 
 			@Override
-			public Object newInstance() {
+			public Object newInstance(IPropertyResolver resolver) {
 				throw new UnsupportedOperationException();
 			}
 
 			@Override
 			public TypeToken<Object> getType() {
 				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public IPropertyResolver getResolver() {
-				return resolver;
 			}
 
 			@SuppressWarnings("unchecked")

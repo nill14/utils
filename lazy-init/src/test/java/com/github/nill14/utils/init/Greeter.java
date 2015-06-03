@@ -6,7 +6,6 @@ public class Greeter implements IGreeter {
 
 	public Greeter(String greeting) {
 		this.greeting = greeting;
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

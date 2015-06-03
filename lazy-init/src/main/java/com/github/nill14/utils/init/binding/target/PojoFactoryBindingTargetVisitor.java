@@ -34,30 +34,30 @@ public class PojoFactoryBindingTargetVisitor implements BindingTargetVisitor<IPo
 	
 	@Override
 	public IPojoFactory<?> visit(BeanInstanceBindingTarget<?> bindingTarget) {
-		return PojoProviderFactory.singleton(bindingTarget.getInstance(), resolver);
+		return PojoProviderFactory.singleton(bindingTarget.getInstance());
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public IPojoFactory<?> visit(ProviderInstanceBindingTarget<?> bindingTarget) {
-		return PojoProviderFactory.of((TypeToken<Object>) bindingTarget.getProviderToken(), (Provider<Object>) bindingTarget.getProvider(), resolver);
+		return PojoProviderFactory.of((TypeToken<Object>) bindingTarget.getProviderToken(), (Provider<Object>) bindingTarget.getProvider());
 	}
 
 	@Override
 	public IPojoFactory<?> visit(BeanTypeBindingTarget<?> bindingTarget) {
-		return new PojoInjectionFactory<>(bindingTarget.getToken(), resolver);
+		return new PojoInjectionFactory<>(bindingTarget.getToken());
 	}
 
 	@Override
 	public IPojoFactory<?> visit(ProviderTypeBindingTarget<?> bindingTarget) {
-		return new PojoFactoryAdapter<>(bindingTarget.getToken(), resolver);
+		return new PojoFactoryAdapter<>(bindingTarget.getToken());
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public IPojoFactory<?> visit(ProvidesMethodBindingTarget<?> bindingTarget) {
 		return PojoProviderFactory.of((TypeToken<Object>) bindingTarget.getToken(), 
-				() -> bindingTarget.injectMethod(resolver), resolver);
+				() -> bindingTarget.injectMethod(resolver));
 	}
 	
 	
@@ -68,7 +68,7 @@ public class PojoFactoryBindingTargetVisitor implements BindingTargetVisitor<IPo
 		if (pojoFactory == null) {
 			//linked binding was not found, thus create a new lazyPojo
 			//the same flow as for BeanTypeBindingTarget
-			return new PojoInjectionFactory<>(bindingKey.getToken(), resolver);
+			return new PojoInjectionFactory<>(bindingKey.getToken());
 		}
 
 		return pojoFactory; //ehm: TODO caching results

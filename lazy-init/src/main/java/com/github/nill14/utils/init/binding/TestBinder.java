@@ -3,6 +3,7 @@ package com.github.nill14.utils.init.binding;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Singleton;
@@ -22,10 +23,12 @@ import com.github.nill14.utils.init.scope.SingletonScope;
 import com.github.nill14.utils.init.util.Element;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
 public final class TestBinder implements Binder {
 	
+	private final Map<Class<? extends Annotation>, IScope> scopes = Maps.newHashMap();
 	private final ChainingPojoInitializer initializer = ChainingPojoInitializer.defaultInitializer();
 	private final ChainingPropertyResolver resolver = new ChainingPropertyResolver();
 
@@ -51,8 +54,7 @@ public final class TestBinder implements Binder {
 	
 	@Override
 	public void bindScope(Class<? extends Annotation> annotationType, IScope scope) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		scopes.put(annotationType, scope);
 	}
 	
 	@Override
@@ -60,8 +62,11 @@ public final class TestBinder implements Binder {
 		if (Singleton.class.equals(annotationType)) {
 			return SingletonScope.instance();
 		}
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		IScope scope = scopes.get(annotationType);
+		if (scope == null) {
+			throw new RuntimeException("Scope is missing: " + annotationType);
+		}
+		return scope;
 	}
 
 	public TestBinder withResolver(IPropertyResolver resolver) {

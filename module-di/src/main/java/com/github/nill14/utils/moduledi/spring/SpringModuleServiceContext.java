@@ -110,7 +110,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 	private final IPojoInitializer applicationContextInitializer = new IPojoInitializer() {
 		
 		@Override
-		public void init(IPojoFactory<?> pojoFactory, Object instance) {
+		public void init(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
 			if (ctxStarted.compareAndSet(false, true)) {
 				initApplicationContext(registry);
 				if (ctx != null) {
@@ -120,7 +120,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 		}
 		
 		@Override
-		public void destroy(IPojoFactory<?> pojoFactory, Object instance) {
+		public void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
 			// nothing to do
 		}
 	};

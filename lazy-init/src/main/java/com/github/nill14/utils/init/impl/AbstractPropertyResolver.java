@@ -126,7 +126,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	protected Object doPrototype(IParameterType type) {
 		IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
 		if (typeDescriptor.canBeInstantiated()) {
-			return new PojoInjectionFactory<>(typeDescriptor, this).newInstance();
+			return new PojoInjectionFactory<>(typeDescriptor).newInstance(this);
 		}
 		return null;
 	}
@@ -140,21 +140,16 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	public void initializeBean(Object instance) {
 		IPropertyResolver resolver = this;
 		//TODO fix this hack
-		IPojoInitializer.standard().init(new IPojoFactory<Object>() {
+		initializer.init(resolver, new IPojoFactory<Object>() {
 
 			@Override
-			public Object newInstance() {
+			public Object newInstance(IPropertyResolver resolver) {
 				throw new UnsupportedOperationException();
 			}
 
 			@Override
 			public TypeToken<Object> getType() {
 				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public IPropertyResolver getResolver() {
-				return resolver;
 			}
 
 			@SuppressWarnings("unchecked")

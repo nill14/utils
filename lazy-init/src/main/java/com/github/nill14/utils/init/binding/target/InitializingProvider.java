@@ -19,7 +19,7 @@ public class InitializingProvider<T> implements Provider<T> {
 	@Override
 	public T get() {
 		PojoFactoryBindingTargetVisitor bindingTargetVisitor = new PojoFactoryBindingTargetVisitor(resolver, key -> null);
-		return (T) target.accept(bindingTargetVisitor).newInstance();
+		return (T) target.accept(bindingTargetVisitor).newInstance(resolver);
 	}
 
 }

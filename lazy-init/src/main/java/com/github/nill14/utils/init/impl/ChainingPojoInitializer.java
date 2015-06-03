@@ -6,6 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
+import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.google.common.collect.ImmutableList;
 
 @SuppressWarnings("serial")
@@ -58,16 +59,16 @@ public class ChainingPojoInitializer implements IPojoInitializer {
 	}
 	
 	@Override
-	public void init(IPojoFactory<?> pojoFactory, Object instance) {
+	public void init(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
 		for (IPojoInitializer item : items) {
-			item.init(pojoFactory, instance);
+			item.init(resolver, pojoFactory, instance);
 		}
 	}
 
 	@Override
-	public void destroy(IPojoFactory<?> pojoFactory, Object instance) {
+	public void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
 		for (IPojoInitializer item : items) {
-			item.destroy(pojoFactory, instance);
+			item.destroy(resolver, pojoFactory, instance);
 		}
 	}
 	

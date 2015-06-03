@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
+import com.github.nill14.utils.init.api.IPropertyResolver;
 
 public final class EmptyPojoInitializer implements IPojoInitializer {
 
@@ -20,10 +21,10 @@ public final class EmptyPojoInitializer implements IPojoInitializer {
 	}
 	
 	@Override
-	public void init(IPojoFactory<?> pojoFactory, Object instance) { }
+	public void init(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) { }
 
 	@Override
-	public void destroy(IPojoFactory<?> pojoFactory, Object instance) { }
+	public void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) { }
 
 	private void writeObject(ObjectOutputStream stream) throws IOException { }
 

@@ -15,14 +15,13 @@ import com.github.nill14.utils.init.inject.ParameterTypeInjectionDescriptor;
 public class AnnotationInjectInitializer implements IPojoInitializer {
 
 	@Override
-	public void init(IPojoFactory<?> pojoFactory, Object instance) {
+	public void init(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
 		IBeanDescriptor<?> typeDescriptor = pojoFactory.getDescriptor();
-		IPropertyResolver resolver = pojoFactory.getResolver();
 		doInject(typeDescriptor, resolver, instance);
 	}
 
 	@Override
-	public void destroy(IPojoFactory<?> pojoFactory, Object instance) {
+	public void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
 		
 	}
 	

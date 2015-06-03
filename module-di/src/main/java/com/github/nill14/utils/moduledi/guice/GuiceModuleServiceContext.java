@@ -89,7 +89,7 @@ public class GuiceModuleServiceContext implements IServiceContext {
 	private final IPojoInitializer contextInitializer = new IPojoInitializer() {
 		
 		@Override
-		public void init(IPojoFactory<?> pojoFactory, Object instance) {
+		public void init(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
 			if (ctxStarted.compareAndSet(false, true)) {
 //				Injector injector = Guice.createInjector((Module) module);
 				Injector injector = new InternalInjectorCreator()
@@ -102,7 +102,7 @@ public class GuiceModuleServiceContext implements IServiceContext {
 		}
 		
 		@Override
-		public void destroy(IPojoFactory<?> pojoFactory, Object instance) {
+		public void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
 			// nothing to do
 		}
 	};

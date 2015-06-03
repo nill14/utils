@@ -14,28 +14,25 @@ import com.google.common.reflect.TypeToken;
 public class PojoInjectionFactory<T> implements IPojoFactory<T> {
 	
 	private final IBeanDescriptor<T> beanDescriptor;
-	private final IPropertyResolver resolver;
 	
-	public PojoInjectionFactory(TypeToken<T> typeToken, IPropertyResolver resolver) {
+	public PojoInjectionFactory(TypeToken<T> typeToken) {
 		this.beanDescriptor = new PojoInjectionDescriptor<>(typeToken);
-		this.resolver = resolver;
 		Preconditions.checkArgument(beanDescriptor.getConstructorDescriptors().size() == 1, 
 				typeToken + " does not have any suitable constructors! (expected exactly one)");
 	}
 	
-	public PojoInjectionFactory(IBeanDescriptor<T> beanDescriptor, IPropertyResolver resolver) {
+	public PojoInjectionFactory(IBeanDescriptor<T> beanDescriptor) {
 		this.beanDescriptor = beanDescriptor;
-		this.resolver = resolver;
 		Preconditions.checkArgument(beanDescriptor.getConstructorDescriptors().size() > 0);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T newInstance() {
+	public T newInstance(IPropertyResolver resolver) {
 		IMemberDescriptor injectionDescriptor = beanDescriptor.getConstructorDescriptors().get(0);
 		
 		try {
-			Object[] args = createArgs(injectionDescriptor.getParameterTypes());
+			Object[] args = createArgs(resolver, injectionDescriptor.getParameterTypes());
 			T instance = (T) injectionDescriptor.invoke(null, args);
 			resolver.initializeBean(instance);
 			return instance;
@@ -44,7 +41,7 @@ public class PojoInjectionFactory<T> implements IPojoFactory<T> {
 		}
 	}
 	
-	private Object[] createArgs(Collection<IParameterType> types) {
+	private Object[] createArgs(IPropertyResolver resolver, Collection<IParameterType> types) {
 		if (types.isEmpty()) {
 			return null;
 		}
@@ -74,11 +71,6 @@ public class PojoInjectionFactory<T> implements IPojoFactory<T> {
 				Integer.toHexString(System.identityHashCode(this)));
 	}
 
-	@Override
-	public IPropertyResolver getResolver() {
-		return resolver;
-	}
-		
 	@Override
 	public IBeanDescriptor<T> getDescriptor() {
 		return beanDescriptor;

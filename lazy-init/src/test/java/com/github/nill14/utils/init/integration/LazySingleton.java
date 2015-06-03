@@ -6,6 +6,8 @@ import java.util.concurrent.Future;
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.ILazyPojo;
+import com.github.nill14.utils.init.api.IPojoDestroyer;
+import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.impl.LazyPojo;
@@ -28,8 +30,8 @@ public class LazySingleton<T> implements ILazyPojo<T>, IExtraFactory<T> {
 
 	@SuppressWarnings("unchecked")
 	public static <T> ILazyPojo<T> lazyNull() {
-		PojoProviderFactory<Object> nullFactory = PojoProviderFactory.nullFactory(Object.class);
-		return (ILazyPojo<T>) LazyPojo.forFactory(nullFactory, IPojoInitializer.empty());
+		IPojoFactory<T> nullFactory = (PojoProviderFactory<T>) PojoProviderFactory.nullFactory(Object.class);
+		return (ILazyPojo<T>) LazyPojo.forFactory(nullFactory, IPropertyResolver.empty(), IPojoDestroyer.empty());
 	}
 
 	private final ILazyPojo<T> delegate;

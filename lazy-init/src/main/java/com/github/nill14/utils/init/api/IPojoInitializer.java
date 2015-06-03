@@ -7,7 +7,7 @@ import com.github.nill14.utils.init.impl.EmptyPojoInitializer;
 
 public interface IPojoInitializer extends IPojoDestroyer, Serializable {
 
-	void init(IPojoFactory<?> pojoFactory, Object instance);
+	void init(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance);
 	
 	
 	static <T> IPojoInitializer empty() {

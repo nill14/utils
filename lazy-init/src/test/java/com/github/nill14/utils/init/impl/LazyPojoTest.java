@@ -32,7 +32,7 @@ public class LazyPojoTest {
 	private volatile ILazyPojo<IGreeter> lazyPojo;
 
 	private volatile IPojoInitializer factoryInitializer;
-	private volatile AtomicInteger instances; 
+	private static final AtomicInteger instances = new AtomicInteger();
 			
 	class CountingPojoInitializer implements IPojoInitializer {
 		
@@ -43,7 +43,7 @@ public class LazyPojoTest {
 		}
 		
 		@Override
-		public void init(IPojoFactory<?> pojoFactory, Object instance) {
+		public void init(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
 			//instance could be also IGreeter
 			if (instance instanceof GreeterFactory) {
 				GreeterFactory factory = (GreeterFactory) instance;
@@ -54,7 +54,7 @@ public class LazyPojoTest {
 		}
 		
 		@Override
-		public void destroy(IPojoFactory<?> pojoFactory, Object instance) {
+		public void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
 			//instance could be also IGreeter
 			if (instance instanceof GreeterFactory) {
 				GreeterFactory factory = (GreeterFactory) instance;
@@ -67,7 +67,7 @@ public class LazyPojoTest {
 	
 	@BeforeMethod
 	public void init() {
-		instances = new AtomicInteger();
+		instances.set(0);
 		factoryInitializer = new CountingPojoInitializer(instances);
 		lazyPojo = LazyPojo.forProvider(GreeterFactory.class, IPropertyResolver.empty(), factoryInitializer);
 		assertEquals(0, instances.get());

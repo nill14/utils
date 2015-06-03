@@ -66,7 +66,7 @@ public final class ScopeContext {
 			}
 			
 			if (instance != null) {
-				destroyer.destroy(null, instance); //TODO null 
+				destroyer.destroy(null, null, instance); //TODO null 
 			}
 		}
 	}

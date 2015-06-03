@@ -6,13 +6,13 @@ import com.google.common.reflect.TypeToken;
 
 public interface IPojoFactory<T> extends Serializable {
 	
-	T newInstance();
+	T newInstance(IPropertyResolver resolver);
 	
 //	void destroyInstance(T instance);
 	
 	TypeToken<T> getType();
 	
-	IPropertyResolver getResolver();
+//	IPropertyResolver getResolver();
 	
 //	IPojoInitializer getInitializer();
 	

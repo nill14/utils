@@ -28,14 +28,14 @@ public class BeanInjector implements IBeanInjector {
 	}
 	
 	public void wire(Object bean) {
-		IPojoFactory<Object> pojoFactory = PojoProviderFactory.singleton(bean, resolver);
-		initializer.init(pojoFactory, bean);
+		IPojoFactory<Object> pojoFactory = PojoProviderFactory.singleton(bean);
+		initializer.init(resolver, pojoFactory, bean);
 	}
 
 	@Override
 	public void injectMembers(Object bean) {
-		IPojoFactory<Object> pojoFactory = PojoProviderFactory.singleton(bean, resolver);
-		initializer.init(pojoFactory, bean);
+		IPojoFactory<Object> pojoFactory = PojoProviderFactory.singleton(bean);
+		initializer.init(resolver, pojoFactory, bean);
 	}
 
 	private <T> T resolve(BindingKey<T> type) {

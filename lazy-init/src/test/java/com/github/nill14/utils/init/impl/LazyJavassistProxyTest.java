@@ -28,12 +28,12 @@ public class LazyJavassistProxyTest {
 	private static final IPojoInitializer initializer = new IPojoInitializer() {
 
 		@Override
-		public void init(IPojoFactory<?> pojoFactory, Object instance) {
+		public void init(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
 			instances.incrementAndGet();
 		}
 
 		@Override
-		public void destroy(IPojoFactory<?> pojoFactory, Object instance) {
+		public void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
 			instances.decrementAndGet();
 		}
 	};

@@ -16,10 +16,9 @@ public class EventBusPojoInitializer implements IPojoInitializer {
 	private static final Logger log = LoggerFactory.getLogger(EventBusPojoInitializer.class);
 	
 	@Override
-	public void init(IPojoFactory<?> pojoFactory, Object instance) {
+	public void init(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
 		EventBusSubscriber annotation = instance.getClass().getAnnotation(EventBusSubscriber.class);
 		if (annotation != null) {
-			IPropertyResolver resolver = pojoFactory.getResolver();
 			EventBus eventBus = (EventBus) resolver.resolve(IParameterType.of(EventBus.class));
 			if (eventBus != null) {
 				eventBus.register(instance);
@@ -30,10 +29,9 @@ public class EventBusPojoInitializer implements IPojoInitializer {
 	}
 
 	@Override
-	public void destroy(IPojoFactory<?> pojoFactory, Object instance) {
+	public void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
 		EventBusSubscriber annotation = instance.getClass().getAnnotation(EventBusSubscriber.class);
 		if (annotation != null) {
-			IPropertyResolver resolver = pojoFactory.getResolver();
 			EventBus eventBus = (EventBus) resolver.resolve(IParameterType.of(EventBus.class));
 			if (eventBus != null) {
 				eventBus.unregister(instance);

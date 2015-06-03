@@ -25,8 +25,8 @@ public final class LazyPojo<T> implements ILazyPojo<T> {
 	}
 	
 	public static <T> ILazyPojo<T> forSingleton(T singleton, IPropertyResolver resolver) {
-		IPojoFactory<T> pojoFactory = PojoProviderFactory.singleton(singleton, resolver);
-		return new LazyPojo<T>(pojoFactory, IPojoDestroyer.empty());
+		IPojoFactory<T> pojoFactory = PojoProviderFactory.singleton(singleton);
+		return new LazyPojo<T>(pojoFactory, resolver, IPojoDestroyer.empty());
 	}
 	
 	public static <T> ILazyPojo<T> forBean(Class<T> beanClass) {
@@ -34,8 +34,8 @@ public final class LazyPojo<T> implements ILazyPojo<T> {
 	}
 	
 	public static <T> ILazyPojo<T> forBean(Class<T> beanClass, IPropertyResolver resolver, IPojoDestroyer destroyer) {
-		IPojoFactory<T> factory = new PojoInjectionFactory<>(TypeToken.of(beanClass), resolver);
-		return new LazyPojo<>(factory, destroyer);
+		IPojoFactory<T> factory = new PojoInjectionFactory<>(TypeToken.of(beanClass));
+		return new LazyPojo<>(factory, resolver, destroyer);
 	}
 	
 	public static <T, F extends Provider<? extends T>> ILazyPojo<T> forProvider(Class<F> providerClass) {
@@ -46,8 +46,8 @@ public final class LazyPojo<T> implements ILazyPojo<T> {
 			Class<F> providerClass, IPropertyResolver resolver, IPojoDestroyer destroyer) {
 		
 		TypeToken<F> providerType = TypeToken.of(providerClass);
-		PojoFactoryAdapter<T, F> factoryAdapter = new PojoFactoryAdapter<T, F>(providerType, resolver);
-		return new LazyPojo<>(factoryAdapter, destroyer);
+		PojoFactoryAdapter<T, F> factoryAdapter = new PojoFactoryAdapter<T, F>(providerType);
+		return new LazyPojo<>(factoryAdapter, resolver, destroyer);
 	}
 	
 	public static <T> ILazyPojo<T> forProvider(TypeToken<T> returnType,
@@ -57,21 +57,23 @@ public final class LazyPojo<T> implements ILazyPojo<T> {
 	
 	public static <T> ILazyPojo<T> forProvider(TypeToken<T> returnType,
 			Provider<T> provider, IPropertyResolver resolver, IPojoDestroyer destroyer) {
-		IPojoFactory<T> pojoFactory = new PojoProviderFactory<>(returnType, provider, resolver);
-		return new LazyPojo<>(pojoFactory, destroyer);
+		IPojoFactory<T> pojoFactory = new PojoProviderFactory<>(returnType, provider);
+		return new LazyPojo<>(pojoFactory, resolver, destroyer);
 	}
 	
 	public static <T> ILazyPojo<T> forFactory(
-			IPojoFactory<T> pojoFactory, IPojoDestroyer destroyer) {
-		return new LazyPojo<>(pojoFactory, destroyer);
+			IPojoFactory<T> pojoFactory, IPropertyResolver resolver, IPojoDestroyer destroyer) {
+		return new LazyPojo<>(pojoFactory, resolver, destroyer);
 	}
 	
 	private final IPojoFactory<T> factory;
 	private final IPojoDestroyer destroyer;
 	private volatile transient T instance;
+	private final IPropertyResolver resolver;
 
-	public LazyPojo(IPojoFactory<T> factory, IPojoDestroyer destroyer) {
+	public LazyPojo(IPojoFactory<T> factory, IPropertyResolver resolver, IPojoDestroyer destroyer) {
 		this.factory = factory;
+		this.resolver = resolver;
 		this.destroyer = destroyer;
 	}
 	
@@ -89,7 +91,7 @@ public final class LazyPojo<T> implements ILazyPojo<T> {
 				instance = this.instance;
 				if (instance == null) {
 					
-					instance = factory.newInstance();
+					instance = factory.newInstance(resolver);
 					this.instance = instance;
 				}
 			}
@@ -108,7 +110,7 @@ public final class LazyPojo<T> implements ILazyPojo<T> {
 		}
 		
 		if (instance != null) {
-			destroyer.destroy(factory, instance);
+			destroyer.destroy(resolver, factory, instance);
 			released = true;
 		}
 		

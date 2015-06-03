@@ -12,22 +12,21 @@ import com.google.common.reflect.TypeToken;
 public class PojoProviderFactory<T> implements IPojoFactory<T> {
 
 	@SuppressWarnings("unchecked")
-	public static <T> IPojoFactory<T> singleton(T singleton, IPropertyResolver resolver) {
-		return new PojoProviderFactory<T>((TypeToken<T>) TypeToken.of(singleton.getClass()), () -> singleton, resolver);
+	public static <T> IPojoFactory<T> singleton(T singleton) {
+		return new PojoProviderFactory<T>((TypeToken<T>) TypeToken.of(singleton.getClass()), () -> singleton);
 	}
 	
 	public static <T> PojoProviderFactory<T> nullFactory(Class<T> nullType) {
-		return new PojoProviderFactory<T>(TypeToken.of(nullType), () -> null, IPropertyResolver.empty());
+		return new PojoProviderFactory<T>(TypeToken.of(nullType), () -> null);
 	}
 	
-	public static <T> PojoProviderFactory<T> of(TypeToken<T> typeToken, Provider<T> provider, IPropertyResolver resolver) {
-		return new PojoProviderFactory<T>(typeToken, provider, resolver);
+	public static <T> PojoProviderFactory<T> of(TypeToken<T> typeToken, Provider<T> provider) {
+		return new PojoProviderFactory<T>(typeToken, provider);
 	}
 
 	private static final long serialVersionUID = 1L;	
 	private final TypeToken<T> typeToken;
 	private final Provider<T> provider;
-	private final IPropertyResolver resolver;
 	
     /** Cache the beanDescriptor */
     private IBeanDescriptor<T> beanDescriptor; 
@@ -40,7 +39,7 @@ public class PojoProviderFactory<T> implements IPojoFactory<T> {
      * @param provider
      * @param resolver
      */
-	public PojoProviderFactory(Provider<T> provider, IPropertyResolver resolver) {
+	public PojoProviderFactory(Provider<T> provider) {
 		this.typeToken = ReflectionUtils.getProviderReturnTypeToken(provider);
 		if (Object.class.equals(typeToken.getRawType())) {
 			throw new IllegalArgumentException(
@@ -49,25 +48,22 @@ public class PojoProviderFactory<T> implements IPojoFactory<T> {
 					+ "Note that expression () -> new Integer(5) has as a return type Object"	);
 		}
 		
-		this.resolver = resolver;
 		this.provider = provider;
 	}
 	
-	public PojoProviderFactory(TypeToken<T> typeToken, Provider<T> provider, IPropertyResolver resolver) {
+	public PojoProviderFactory(TypeToken<T> typeToken, Provider<T> provider) {
 		this.typeToken = typeToken;
-		this.resolver = resolver;
 		this.provider = provider;
 	}
 	
-	protected PojoProviderFactory(IBeanDescriptor<T> beanDescriptor, Provider<T> provider, IPropertyResolver resolver) {
+	protected PojoProviderFactory(IBeanDescriptor<T> beanDescriptor, Provider<T> provider) {
 		this.typeToken = beanDescriptor.getToken();
 		this.beanDescriptor = beanDescriptor;
-		this.resolver = resolver;
 		this.provider = provider;
 	}
 	
 	@Override
-	public T newInstance() {
+	public T newInstance(IPropertyResolver resolver) {
 		T instance = provider.get();
 		resolver.initializeBean(instance);
 		return instance;
@@ -78,11 +74,6 @@ public class PojoProviderFactory<T> implements IPojoFactory<T> {
 		return typeToken;
 	}
 
-	@Override
-	public IPropertyResolver getResolver() {
-		return resolver;
-	}
-	
 	
 	@Override
 	public IBeanDescriptor<T> getDescriptor() {

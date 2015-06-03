@@ -17,23 +17,21 @@ public class PojoFactoryAdapter<T, F extends Provider<? extends T>> implements I
 
     /** Cache the beanDescriptor */
     private IBeanDescriptor<T> beanDescriptor;
-	private IPropertyResolver resolver;
 
-	public PojoFactoryAdapter(TypeToken<F> providerType, IPropertyResolver resolver) {
+	public PojoFactoryAdapter(TypeToken<F> providerType) {
 		this.typeToken = ReflectionUtils.getProviderReturnTypeToken(providerType);
-		this.pojoFactory = new PojoInjectionFactory<>(providerType, resolver);
+		this.pojoFactory = new PojoInjectionFactory<>(providerType);
 	}
     
 	@SuppressWarnings("unused")
 	private <P extends Provider<? extends T>> PojoFactoryAdapter(IPojoFactory<F> pojoFactory, TypeToken<T> typeToken, IPropertyResolver resolver) {
 		this.pojoFactory = pojoFactory;
 		this.typeToken = typeToken;
-		this.resolver = resolver;
 	}
 
 	@Override
-	public T newInstance() {
-		T instance = pojoFactory.newInstance().get();
+	public T newInstance(IPropertyResolver resolver) {
+		T instance = pojoFactory.newInstance(resolver).get();
 		resolver.initializeBean(instance);
 		return instance;
 	}
@@ -47,11 +45,6 @@ public class PojoFactoryAdapter<T, F extends Provider<? extends T>> implements I
 		return pojoFactory.getType();
 	}
 	
-	
-	@Override
-	public IPropertyResolver getResolver() {
-		return pojoFactory.getResolver();
-	}
 	
 	@Override
 	public IBeanDescriptor<T> getDescriptor() {
