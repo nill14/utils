@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
+import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
@@ -89,7 +90,7 @@ public class GuiceModuleServiceContext implements IServiceContext {
 	private final IPojoInitializer contextInitializer = new IPojoInitializer() {
 		
 		@Override
-		public void init(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
+		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
 			if (ctxStarted.compareAndSet(false, true)) {
 //				Injector injector = Guice.createInjector((Module) module);
 				Injector injector = new InternalInjectorCreator()
@@ -102,7 +103,7 @@ public class GuiceModuleServiceContext implements IServiceContext {
 		}
 		
 		@Override
-		public void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
+		public <T> void destroy(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
 			// nothing to do
 		}
 	};

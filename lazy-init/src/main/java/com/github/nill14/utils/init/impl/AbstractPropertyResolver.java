@@ -11,7 +11,6 @@ import javax.inject.Provider;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
-import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IQualifiedProvider;
@@ -20,7 +19,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.reflect.TypeToken;
 
 @SuppressWarnings("serial")
 public abstract class AbstractPropertyResolver implements IPropertyResolver {
@@ -139,25 +137,8 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	@Override
 	public void initializeBean(Object instance) {
 		IPropertyResolver resolver = this;
-		//TODO fix this hack
-		initializer.init(resolver, new IPojoFactory<Object>() {
-
-			@Override
-			public Object newInstance(IPropertyResolver resolver) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public TypeToken<Object> getType() {
-				throw new UnsupportedOperationException();
-			}
-
-			@SuppressWarnings("unchecked")
-			@Override
-			public IBeanDescriptor<Object> getDescriptor() {
-				return new PojoInjectionDescriptor<>((Class<Object>) instance.getClass());
-			}
-		}, instance);
+		IBeanDescriptor<Object> beanDescriptor = new PojoInjectionDescriptor<Object>(instance.getClass());
+		initializer.init(resolver, beanDescriptor, instance);
 		
 	}
 	

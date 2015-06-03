@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 
 import com.github.nill14.utils.init.Calculator;
 import com.github.nill14.utils.init.ICalculator;
+import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -25,12 +26,12 @@ public class LazyJdkProxyTest {
 
 	private static final IPojoInitializer initializer = new IPojoInitializer() {
 		@Override
-		public void init(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
+		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
 			instances.incrementAndGet();
 		}
 
 		@Override
-		public void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
+		public <T> void destroy(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
 			instances.decrementAndGet();
 		}
 	};

@@ -13,7 +13,6 @@ import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
-import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IScope;
@@ -26,7 +25,6 @@ import com.github.nill14.utils.init.impl.PojoInjectionFactory;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.reflect.TypeToken;
 
 @Experimental
 public class SimplePropertyResolver implements IPropertyResolver {
@@ -92,25 +90,8 @@ public class SimplePropertyResolver implements IPropertyResolver {
 	@Override
 	public void initializeBean(Object instance) {
 		IPropertyResolver resolver = this;
-		//TODO fix this hack
-		IPojoInitializer.standard().init(resolver, new IPojoFactory<Object>() {
-
-			@Override
-			public Object newInstance(IPropertyResolver resolver) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public TypeToken<Object> getType() {
-				throw new UnsupportedOperationException();
-			}
-
-			@SuppressWarnings("unchecked")
-			@Override
-			public IBeanDescriptor<Object> getDescriptor() {
-				return new PojoInjectionDescriptor<>((Class<Object>) instance.getClass());
-			}
-		}, instance);
+		IBeanDescriptor<Object> beanDescriptor = new PojoInjectionDescriptor<>(instance.getClass());
+		initializer.init(resolver, beanDescriptor, instance);
 	}
 
 	@Override

@@ -7,7 +7,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.BindingKey;
+import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IPojoDestroyer;
+import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.google.common.collect.Lists;
 
 public final class ScopeContext {
@@ -57,7 +59,7 @@ public final class ScopeContext {
 			return instance;
 		}
 		
-		private void destroy(IPojoDestroyer destroyer) {
+		private void destroy(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, IPojoDestroyer destroyer) {
 			T instance;
 			
 			synchronized (this) {
@@ -66,7 +68,7 @@ public final class ScopeContext {
 			}
 			
 			if (instance != null) {
-				destroyer.destroy(null, null, instance); //TODO null 
+				destroyer.destroy(resolver, beanDescriptor, instance);  
 			}
 		}
 	}
@@ -76,7 +78,7 @@ public final class ScopeContext {
 			List<ScopeProviderProxy<?>> providers = Lists.newArrayList(map.values());
 			map.clear();
 			for (ScopeProviderProxy<?> provider : providers) {
-				provider.destroy(destroyer);
+				provider.destroy(IPropertyResolver.empty(), null, destroyer);//FIXME parameters
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -59,16 +60,16 @@ public class ChainingPojoInitializer implements IPojoInitializer {
 	}
 	
 	@Override
-	public void init(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
+	public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
 		for (IPojoInitializer item : items) {
-			item.init(resolver, pojoFactory, instance);
+			item.init(resolver, beanDescriptor, instance);
 		}
 	}
 
 	@Override
-	public void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
+	public <T> void destroy(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
 		for (IPojoInitializer item : items) {
-			item.destroy(resolver, pojoFactory, instance);
+			item.destroy(resolver, beanDescriptor, instance);
 		}
 	}
 	

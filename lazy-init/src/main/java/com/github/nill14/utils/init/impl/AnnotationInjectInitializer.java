@@ -5,7 +5,6 @@ import java.util.Collection;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IMemberDescriptor;
 import com.github.nill14.utils.init.api.IParameterType;
-import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.inject.FieldInjectionDescriptor;
@@ -15,26 +14,21 @@ import com.github.nill14.utils.init.inject.ParameterTypeInjectionDescriptor;
 public class AnnotationInjectInitializer implements IPojoInitializer {
 
 	@Override
-	public void init(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
-		IBeanDescriptor<?> typeDescriptor = pojoFactory.getDescriptor();
-		doInject(typeDescriptor, resolver, instance);
-	}
-
-	@Override
-	public void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
-		
-	}
-	
-	private void doInject(IBeanDescriptor<?> typeDescriptor, IPropertyResolver resolver, Object instance) {
+	public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
 		//according to specification, fields are injected before methods
-		for (IMemberDescriptor fd : typeDescriptor.getFieldDescriptors()) {
+		for (IMemberDescriptor fd : beanDescriptor.getFieldDescriptors()) {
 			ParameterTypeInjectionDescriptor parameterType = ((FieldInjectionDescriptor) fd).getParameterType();
 			injectParam(resolver, instance, fd, parameterType);
 		}
 
-		for (IMemberDescriptor md : typeDescriptor.getMethodDescriptors()) {
+		for (IMemberDescriptor md : beanDescriptor.getMethodDescriptors()) {
 			injectMethod(resolver, instance, md);
 		}
+	}
+
+	@Override
+	public <T> void destroy(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
+		
 	}
 
 	private void injectParam(IPropertyResolver resolver, Object instance, IMemberDescriptor member, IParameterType parameterType) {

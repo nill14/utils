@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import com.github.nill14.utils.init.api.IPojoFactory;
+import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.inject.ReflectionUtils;
@@ -19,12 +19,12 @@ import com.github.nill14.utils.init.inject.ReflectionUtils;
 public class AnnotationLifecycleInitializer implements IPojoInitializer {
 
 	@Override
-	public void init(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
+	public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
 		doPostConstruct(instance);
 	}
 
 	@Override
-	public void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
+	public <T> void destroy(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
 		doPreDestroy(instance);
 		
 	}

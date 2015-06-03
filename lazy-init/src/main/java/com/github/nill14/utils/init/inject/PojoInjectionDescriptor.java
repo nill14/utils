@@ -35,8 +35,9 @@ public class PojoInjectionDescriptor<T> implements Serializable, IBeanDescriptor
 		this((TypeToken<T>) TypeToken.of(parameterType.getGenericType()));
 	}
 	
-	public PojoInjectionDescriptor(Class<T> pojoClazz) {
-		this(TypeToken.of(pojoClazz));
+	@SuppressWarnings("unchecked")
+	public PojoInjectionDescriptor(Class<? extends T> pojoClazz) {
+		this(TypeToken.of((Class<T>) pojoClazz));
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

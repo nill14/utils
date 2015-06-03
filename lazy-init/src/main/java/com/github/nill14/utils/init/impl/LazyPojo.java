@@ -110,7 +110,7 @@ public final class LazyPojo<T> implements ILazyPojo<T> {
 		}
 		
 		if (instance != null) {
-			destroyer.destroy(resolver, factory, instance);
+			destroyer.destroy(resolver, factory.getDescriptor(), instance);
 			released = true;
 		}
 		

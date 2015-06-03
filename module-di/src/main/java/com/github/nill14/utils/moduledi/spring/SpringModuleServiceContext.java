@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
@@ -110,7 +111,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 	private final IPojoInitializer applicationContextInitializer = new IPojoInitializer() {
 		
 		@Override
-		public void init(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
+		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
 			if (ctxStarted.compareAndSet(false, true)) {
 				initApplicationContext(registry);
 				if (ctx != null) {
@@ -120,7 +121,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 		}
 		
 		@Override
-		public void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
+		public <T> void destroy(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
 			// nothing to do
 		}
 	};

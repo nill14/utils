@@ -4,13 +4,13 @@ import java.io.Serializable;
 
 public interface IPojoDestroyer extends Serializable {
 
-	void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance);
+	<T> void destroy(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance);
 
 	static IPojoDestroyer empty() {
 		return new IPojoDestroyer() {
 			
 			@Override
-			public void destroy(IPropertyResolver resolver, IPojoFactory<?> pojoFactory, Object instance) {
+			public <T> void destroy(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
 				// TODO Auto-generated method stub
 				
 			}

@@ -26,8 +26,6 @@ public /*non-final on purpose*/ class LazyPojoFactory<F> implements IPojoFactory
 	
 	private static final long serialVersionUID = 1L;
 	
-	private final ReadWriteLock lock = new ReentrantReadWriteLock();
-	
 	
 	private final boolean doubleFactory;
 	private final IPojoFactory<F> delegate;
