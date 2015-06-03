@@ -54,8 +54,10 @@ public class LazyPojoTest {
 			if (instance instanceof GreeterFactory) {
 				GreeterFactory factory = (GreeterFactory) instance;
 				assertThat(factory.getGreeting(), not(GREETING));
-				instances.incrementAndGet();
 				factory.setGreeting(GREETING);
+			
+			} else if (instance instanceof IGreeter) {
+				instances.incrementAndGet();
 			}
 		}
 		
@@ -65,8 +67,10 @@ public class LazyPojoTest {
 			if (instance instanceof GreeterFactory) {
 				GreeterFactory factory = (GreeterFactory) instance;
 				assertThat(factory.getGreeting(), is(GREETING));
-				instances.decrementAndGet();
 				factory.setGreeting(DESTROYED);
+
+			} else if (instance instanceof IGreeter) {
+				instances.decrementAndGet();
 			}
 		}
 	};

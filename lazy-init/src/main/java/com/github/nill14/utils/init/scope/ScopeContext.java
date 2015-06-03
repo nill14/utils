@@ -9,6 +9,7 @@ import javax.inject.Provider;
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IPropertyResolver;
+import com.github.nill14.utils.init.binding.target.InitializingProvider;
 import com.google.common.collect.Lists;
 
 public final class ScopeContext {
@@ -21,8 +22,13 @@ public final class ScopeContext {
 
 	@SuppressWarnings("unchecked")
 	public <T> Provider<T> scope(BindingKey<T> type, Provider<T> unscoped) {
+		if (!(unscoped instanceof InitializingProvider)) {
+			throw new IllegalArgumentException();
+		}
+		
 		if (lifecycleTracker.get()) {
-			return (Provider<T>) map.computeIfAbsent(type, (t) -> new ScopeProviderProxy<>(unscoped));
+			return (Provider<T>) map.computeIfAbsent(type, (t) -> new ScopeProviderProxy<>(
+					(InitializingProvider<T>) unscoped));
 		
 		} else {
 			throw new RuntimeException("Cannot retrieve a bean from terminated scope");
@@ -33,10 +39,10 @@ public final class ScopeContext {
 	
 
 	private class ScopeProviderProxy<T> implements Provider<T> {
-		private final Provider<T> unscoped;
+		private final InitializingProvider<T> unscoped;
 		private volatile T instance;
 
-		public ScopeProviderProxy(Provider<T> unscoped) {
+		public ScopeProviderProxy(InitializingProvider<T> unscoped) {
 			this.unscoped = unscoped;
 		}
 
@@ -58,7 +64,7 @@ public final class ScopeContext {
 			return instance;
 		}
 		
-		private void destroy(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor) {
+		private void destroy() {
 			T instance;
 			
 			synchronized (this) {
@@ -67,6 +73,8 @@ public final class ScopeContext {
 			}
 			
 			if (instance != null) {
+				IBeanDescriptor<T> beanDescriptor = unscoped.getDescriptor();
+				IPropertyResolver resolver = unscoped.getResolver();
 				resolver.destroyBean(beanDescriptor, instance);
 			}
 		}
@@ -77,8 +85,7 @@ public final class ScopeContext {
 			List<ScopeProviderProxy<?>> providers = Lists.newArrayList(map.values());
 			map.clear();
 			for (ScopeProviderProxy<?> provider : providers) {
-				IPropertyResolver resolver = null; //FIXME
-				resolver.destroyBean(null, null);
+				provider.destroy();
 			}
 		}
 	}

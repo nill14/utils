@@ -1,5 +1,7 @@
 package com.github.nill14.utils.init.impl;
 
+import java.io.Serializable;
+
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.BindingKey;
@@ -9,7 +11,7 @@ import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.google.common.reflect.TypeToken;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "serial" })
 public class BeanInjector implements IBeanInjector {
 	
 	private final IPropertyResolver resolver;

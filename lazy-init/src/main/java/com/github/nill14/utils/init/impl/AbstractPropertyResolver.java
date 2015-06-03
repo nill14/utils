@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableSortedSet;
 @SuppressWarnings("serial")
 public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	
-	protected final IBeanInjector beanInjector = new BeanInjector(this);
+	private transient volatile IBeanInjector beanInjector;
 	private final ChainingPojoInitializer initializer = new ChainingPojoInitializer();
 	
 	public AbstractPropertyResolver() {
@@ -137,8 +137,13 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	
 	@Override
 	public IBeanInjector toBeanInjector() {
+		IBeanInjector beanInjector = this.beanInjector;
+		if (beanInjector == null) {
+			this.beanInjector = beanInjector = new BeanInjector(this);
+		}
 		return beanInjector;
 	}
+	
 	
 	@Override
 	public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance) {

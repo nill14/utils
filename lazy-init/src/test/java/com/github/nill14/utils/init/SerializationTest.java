@@ -76,6 +76,15 @@ public class SerializationTest {
 	}
 
 	@Test(timeOut=5000)
+	public void testLazyPojo() throws IOException, ClassNotFoundException {
+		IPropertyResolver resolver = Mockito.mock(IPropertyResolver.class);
+		doTest(resolver, IPropertyResolver.class);
+		ILazyPojo<Calculator> calcPojo = LazyPojo.forBean(Calculator.class, resolver);
+		calcPojo.getInstance().add(5, 3); //lazy Calc initialization
+		doTest(calcPojo, ILazyPojo.class);
+	}
+	
+	@Test(timeOut=5000)
 	public void testLazyProxy() throws IOException, ClassNotFoundException {
 		ICalculator lazyProxy = LazyJdkProxy.newProxy(ICalculator.class, Calculator.class);
 		lazyProxy.add(5, 3); //lazy Calc initialization
@@ -85,6 +94,7 @@ public class SerializationTest {
 	@Test(timeOut=5000)
 	public void testComplex() throws IOException, ClassNotFoundException {
 		IPropertyResolver resolver = Mockito.mock(IPropertyResolver.class);
+		doTest(resolver, IPropertyResolver.class);
 		ILazyPojo<Calculator> calcPojo = LazyPojo.forBean(Calculator.class, resolver);
 		ICalculator calc = LazyJdkProxy.newProxy(ICalculator.class, calcPojo);
 		calc.add(5, 3); //lazy Calc initialization
