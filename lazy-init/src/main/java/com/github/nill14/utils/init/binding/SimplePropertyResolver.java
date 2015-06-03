@@ -1,8 +1,12 @@
 package com.github.nill14.utils.init.binding;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Provider;
+
+import org.testng.collections.Maps;
 
 import com.github.nill14.utils.annotation.Experimental;
 import com.github.nill14.utils.init.api.BindingKey;
@@ -36,16 +40,21 @@ public class SimplePropertyResolver implements IPropertyResolver {
 
 	public SimplePropertyResolver(ImmutableList<BindingImpl<?>> bindings, ChainingPojoInitializer initializer) {
 		this.initializer = initializer;
-		ImmutableMap.Builder<BindingKey<?>, BindingImpl<?>> builder = ImmutableMap.builder();
+		
+		Map<BindingKey<?>, BindingImpl<?>> rawBindings = Maps.newHashMap();
+		Map<BindingKey<?>, BindingImpl<?>> map = Maps.newHashMap();
 		for (BindingImpl<?> binding : bindings) {
 			BindingKey<?> key = binding.getBindingKey();
-			builder.put(key, binding);
-			if (key.getQualifier() != null) {
-				builder.put(BindingKey.of(key.getToken()), binding);
-				//put also bindingKey without qualifier	
-			}
+			map.put(key, binding);
+			rawBindings.putIfAbsent(key.withQualifier(null), binding);
 		}
-		this.bindings = builder.build();
+		
+		//add raw/unqualified bindings if they are not already present
+		for (Entry<BindingKey<?>, BindingImpl<?>> entry : rawBindings.entrySet()) {
+			map.putIfAbsent(entry.getKey(), entry.getValue());
+		}
+		
+		this.bindings = ImmutableMap.copyOf(map);
 	}
 
 	@SuppressWarnings("unchecked")
