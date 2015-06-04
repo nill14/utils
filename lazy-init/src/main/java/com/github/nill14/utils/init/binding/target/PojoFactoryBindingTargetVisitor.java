@@ -27,8 +27,7 @@ public class PojoFactoryBindingTargetVisitor implements BindingTargetVisitor<IPo
 	 * @param lookupFunction A lookup function, may return null
 	 */
 	public PojoFactoryBindingTargetVisitor(IPropertyResolver resolver, 
-			Function<BindingKey<?>, 
-			IPojoFactory<?>> lookupFunction) {
+			Function<BindingKey<?>, IPojoFactory<?>> lookupFunction) {
 		this.resolver = resolver;
 		this.lookupFunction = lookupFunction;
 	}
@@ -63,15 +62,15 @@ public class PojoFactoryBindingTargetVisitor implements BindingTargetVisitor<IPo
 	
 	
 	@Override
-	public IPojoFactory<?> visit(LinkedBindingTarget<?> linkedBindingTarget) {
-		BindingKey<?> bindingKey = linkedBindingTarget.getBindingKey();
+	public IPojoFactory<?> visit(LinkedBindingTarget<?> bindingTarget) {
+		BindingKey<?> bindingKey = bindingTarget.getBindingKey();
 		IPojoFactory<?> pojoFactory = lookupFunction.apply(bindingKey);
 		if (pojoFactory == null) {
 			//linked binding was not found, thus create a new lazyPojo
 			//the same flow as for BeanTypeBindingTarget
 			return new BeanTypePojoFactory<>(bindingKey.getToken());
 		}
-
+		
 		return pojoFactory; //ehm: TODO caching results
 	}
 

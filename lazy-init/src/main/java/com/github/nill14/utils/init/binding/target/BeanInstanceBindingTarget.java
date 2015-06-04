@@ -20,4 +20,8 @@ public class BeanInstanceBindingTarget<T> implements BindingTarget<T> {
 		return bindingTargetVisitor.visit(this);
 	}
 
+	@Override
+	public String toString() {
+		return String.format("BindingTarget(%s)", instance);
+	}
 }

@@ -6,7 +6,7 @@ import com.github.nill14.utils.init.binding.impl.BindingTargetVisitor;
 
 public class LinkedBindingTarget<T> implements BindingTarget<T> {
 	
-	private BindingKey<T> targetType;
+	private final BindingKey<T> targetType;
 
 	public LinkedBindingTarget(BindingKey<T> targetType) {
 		this.targetType = targetType;
@@ -19,6 +19,12 @@ public class LinkedBindingTarget<T> implements BindingTarget<T> {
 	@Override
 	public <R> R accept(BindingTargetVisitor<R> bindingTargetVisitor) {
 		return bindingTargetVisitor.visit(this);
+	}
+	
+
+	@Override
+	public String toString() {
+		return String.format("BindingTarget(%s)", targetType.getRawType().getSimpleName());
 	}
 
 }

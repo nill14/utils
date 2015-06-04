@@ -35,7 +35,7 @@ public class AnnotatedElementBindingTargetVisitor implements BindingTargetVisito
 	
 	@Override
 	public AnnotatedElement visit(LinkedBindingTarget<?> bindingTarget) {
-		return null;
+		return bindingTarget.getBindingKey().getRawType();
 	}
 
 }

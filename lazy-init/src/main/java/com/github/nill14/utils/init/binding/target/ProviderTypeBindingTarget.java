@@ -22,5 +22,11 @@ public class ProviderTypeBindingTarget<T> implements BindingTarget<T> {
 	public <R> R accept(BindingTargetVisitor<R> bindingTargetVisitor) {
 		return bindingTargetVisitor.visit(this);
 	}
+	
+
+	@Override
+	public String toString() {
+		return String.format("BindingTarget(%s)", token.getRawType().getSimpleName());
+	}
 
 }

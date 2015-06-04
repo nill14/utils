@@ -15,12 +15,15 @@ import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.impl.BindingImpl;
 import com.github.nill14.utils.init.binding.impl.BindingTarget;
-import com.github.nill14.utils.init.binding.target.InitializingProvider;
+import com.github.nill14.utils.init.binding.target.UnscopedProvider;
 import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
 import com.github.nill14.utils.init.impl.ChainingPojoInitializer;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.reflect.TypeToken;
 
 @Experimental
 public class SimplePropertyResolver extends AbstractPropertyResolver implements IPropertyResolver {
@@ -28,6 +31,7 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 	private static final long serialVersionUID = 6151314354173527220L;
 	
 	private final ImmutableMap<BindingKey<?>, BindingImpl<?>> bindings;
+	private final Multimap<TypeToken<?>, BindingImpl<?>> typeBindings = ArrayListMultimap.create();
 	
 
 	public SimplePropertyResolver(ImmutableList<BindingImpl<?>> bindings, ChainingPojoInitializer initializer) {
@@ -37,7 +41,8 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 		Map<BindingKey<?>, BindingImpl<?>> map = Maps.newHashMap();
 		for (BindingImpl<?> binding : bindings) {
 			BindingKey<?> key = binding.getBindingKey();
-			map.put(key, binding);
+			typeBindings.put(key.getToken(), binding);
+			map.putIfAbsent(key, binding); //TODO scope?
 			rawBindings.putIfAbsent(key.withQualifier(null), binding);
 		}
 		
@@ -63,12 +68,17 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 
 	@Override
 	protected Collection<?> findAllByType(IParameterType type) {
-		// TODO Auto-generated method stub
-		Object simple = simple(type);
-		if (simple != null) {
-			return Collections.singleton(simple);
+		Collection<BindingImpl<?>> bindings = typeBindings.get(type.getToken());
+		ImmutableList.Builder<Object> builder = ImmutableList.builder();
+		for (BindingImpl<?> binding : bindings) {
+			IScope scope = binding.getScope();
+			
+			UnscopedProvider<Object> provider = new UnscopedProvider<>(this, 
+					(BindingTarget<Object>) binding.getBindingTarget());
+			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) binding.getBindingKey(), provider);
+			builder.add(scopedProvider.get());
 		}
-		return Collections.emptyList();
+		return builder.build();
 	}
 
 	@Override
@@ -84,7 +94,7 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 			BindingImpl<?> binding = bindings.get(bindingKey);
 			IScope scope = binding.getScope();
 			
-			InitializingProvider<Object> provider = new InitializingProvider<>(this, 
+			UnscopedProvider<Object> provider = new UnscopedProvider<>(this, 
 					(BindingTarget<Object>) binding.getBindingTarget());
 			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) bindingKey, provider);
 			

@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions;
 
 public final class BindingImpl<T> {
 	
-	private final BindingKey<T> BindingKey;
+	private final BindingKey<T> bindingKey;
 	private final BindingTarget<? extends T> target;
 	private final Object source;
 	private final IScope scope;
@@ -16,7 +16,7 @@ public final class BindingImpl<T> {
 		Preconditions.checkNotNull(scope);
 		Preconditions.checkNotNull(target);
 		Preconditions.checkNotNull(source);
-		this.BindingKey = key;
+		this.bindingKey = key;
 		this.target = target;
 		this.scope = scope;
 		this.source = source;
@@ -28,7 +28,7 @@ public final class BindingImpl<T> {
 	}
 	
 	public BindingKey<T> getBindingKey() {
-		return BindingKey;
+		return bindingKey;
 	}
   
 //	public TypeToken<T> getValueToken() {
@@ -41,6 +41,12 @@ public final class BindingImpl<T> {
 	
 	public IScope getScope() {
 		return scope;
+	}
+	
+
+	@Override
+	public String toString() {
+		return String.format("Binding(%s -> %s, %s)", bindingKey, target, scope);
 	}
 	
 }

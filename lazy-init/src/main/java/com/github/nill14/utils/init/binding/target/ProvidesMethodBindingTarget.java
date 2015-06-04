@@ -81,5 +81,11 @@ public class ProvidesMethodBindingTarget<T> implements BindingTarget<T> {
 		}
 		return args;
 	}
+	
+
+	@Override
+	public String toString() {
+		return String.format("BindingTarget(%s)", m);
+	}
 
 }

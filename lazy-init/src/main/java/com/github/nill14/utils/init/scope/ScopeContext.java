@@ -9,26 +9,26 @@ import javax.inject.Provider;
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IPropertyResolver;
-import com.github.nill14.utils.init.binding.target.InitializingProvider;
+import com.github.nill14.utils.init.binding.target.UnscopedProvider;
 import com.google.common.collect.Lists;
 
 public final class ScopeContext {
 
 	private final AtomicBoolean lifecycleTracker = new AtomicBoolean(true);
-	private final ConcurrentHashMap<BindingKey<?>, ScopeProviderProxy<?>> map = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<BindingKey<?>, ScopedProvider<?>> map = new ConcurrentHashMap<>();
 	
 	public ScopeContext() {
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T> Provider<T> scope(BindingKey<T> type, Provider<T> unscoped) {
-		if (!(unscoped instanceof InitializingProvider)) {
+		if (!(unscoped instanceof UnscopedProvider)) {
 			throw new IllegalArgumentException();
 		}
 		
 		if (lifecycleTracker.get()) {
-			return (Provider<T>) map.computeIfAbsent(type, (t) -> new ScopeProviderProxy<>(
-					(InitializingProvider<T>) unscoped));
+			return (Provider<T>) map.computeIfAbsent(type, (t) -> new ScopedProvider<>(
+					(UnscopedProvider<T>) unscoped));
 		
 		} else {
 			throw new RuntimeException("Cannot retrieve a bean from terminated scope");
@@ -38,11 +38,11 @@ public final class ScopeContext {
 	
 	
 
-	private class ScopeProviderProxy<T> implements Provider<T> {
-		private final InitializingProvider<T> unscoped;
+	private class ScopedProvider<T> implements Provider<T> {
+		private final UnscopedProvider<T> unscoped;
 		private volatile T instance;
 
-		public ScopeProviderProxy(InitializingProvider<T> unscoped) {
+		public ScopedProvider(UnscopedProvider<T> unscoped) {
 			this.unscoped = unscoped;
 		}
 
@@ -82,9 +82,9 @@ public final class ScopeContext {
 	
 	public void terminate() {
 		if (lifecycleTracker.compareAndSet(true, false)) {
-			List<ScopeProviderProxy<?>> providers = Lists.newArrayList(map.values());
+			List<ScopedProvider<?>> providers = Lists.newArrayList(map.values());
 			map.clear();
-			for (ScopeProviderProxy<?> provider : providers) {
+			for (ScopedProvider<?> provider : providers) {
 				provider.destroy();
 			}
 		}
