@@ -1,10 +1,7 @@
 package com.github.nill14.utils.init.binding.target;
 
-import java.util.function.Function;
-
 import javax.inject.Provider;
 
-import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -12,8 +9,8 @@ import com.github.nill14.utils.init.binding.impl.BindingTargetVisitor;
 import com.github.nill14.utils.init.impl.BeanInstancePojoFactory;
 import com.github.nill14.utils.init.impl.BeanTypePojoFactory;
 import com.github.nill14.utils.init.impl.LazyPojo;
-import com.github.nill14.utils.init.impl.ProviderTypePojoFactory;
 import com.github.nill14.utils.init.impl.ProviderInstancePojoFactory;
+import com.github.nill14.utils.init.impl.ProviderTypePojoFactory;
 import com.google.common.reflect.TypeToken;
 
 @Deprecated
@@ -21,7 +18,6 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 
 	
 	private final IPropertyResolver resolver;
-	private final Function<BindingKey<?>, ILazyPojo<?>> lookupFunction;
 
 	/**
 	 * 
@@ -29,11 +25,8 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 	 * @param initializer
 	 * @param lookupFunction A lookup function, may return null
 	 */
-	public LazyPojoBindingTargetVisitor(IPropertyResolver resolver, 
-			Function<BindingKey<?>, 
-			ILazyPojo<?>> lookupFunction) {
+	public LazyPojoBindingTargetVisitor(IPropertyResolver resolver) {
 		this.resolver = resolver;
-		this.lookupFunction = lookupFunction;
 	}
 	
 	@Override
@@ -78,16 +71,7 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 	
 	@Override
 	public ILazyPojo<?> visit(LinkedBindingTarget<?> linkedBindingTarget) {
-		BindingKey<?> bindingKey = linkedBindingTarget.getBindingKey();
-		ILazyPojo<?> lazyPojo = lookupFunction.apply(bindingKey);
-		if (lazyPojo == null) {
-			//linked binding was not found, thus create a new lazyPojo
-			//the same flow as for BeanTypeBindingTarget
-			IPojoFactory<?> pojoFactory = new BeanTypePojoFactory<>(bindingKey.getToken());
-			return LazyPojo.forFactory(pojoFactory, resolver);
-		}
-
-		return lazyPojo;
+		throw new IllegalStateException("Should not get here");
 	}
 
 }

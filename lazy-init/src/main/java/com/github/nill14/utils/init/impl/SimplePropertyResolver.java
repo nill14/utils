@@ -41,7 +41,7 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 		Map<BindingKey<?>, BindingImpl<?>> map = Maps.newHashMap();
 		for (BindingImpl<?> binding : bindings) {
 			BindingKey<?> key = binding.getBindingKey();
-			boolean occupied = map.putIfAbsent(key, binding) != null; //TODO scopes?
+			boolean occupied = map.putIfAbsent(key, binding) != null; //TODO scopes? (identical key, different scope - not possible now)
 			
 			if (occupied && key.getQualifier() != null) {
 				throw new RuntimeException(String.format("Duplicate key: %s", key));
