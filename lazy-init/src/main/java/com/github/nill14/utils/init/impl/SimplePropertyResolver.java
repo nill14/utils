@@ -40,7 +40,10 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 			BindingKey<?> key = binding.getBindingKey();
 			boolean occupied = map.putIfAbsent(key, binding) != null; //TODO scope?
 			
-			if (occupied) {
+			if (occupied && key.getQualifier() != null) {
+				throw new RuntimeException(String.format("Duplicate key: %s", key));
+				
+			} else if (occupied) {
 				binding = binding.keyWithQualifier(CounterImpl.next());
 				key = binding.getBindingKey();
 				boolean error = map.putIfAbsent(key, binding) != null;
@@ -80,6 +83,7 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 		for (BindingImpl<?> binding : bindings) {
 			IScope scope = binding.getScope();
 			
+			//TODO provide scope with info about "calling" scope
 			UnscopedProvider<Object> provider = new UnscopedProvider<>(this, 
 					(BindingTarget<Object>) binding.getBindingTarget());
 			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) binding.getBindingKey(), provider);

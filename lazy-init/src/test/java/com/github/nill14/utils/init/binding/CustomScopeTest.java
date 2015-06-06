@@ -10,6 +10,8 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Scope;
 
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -89,7 +91,34 @@ public class CustomScopeTest {
 		Assert.assertEquals(instances.get(), 5);
 		Assert.assertEquals(beans.size(), 5);
 		Assert.assertEquals(instances.get(), 5);
+		
+		MatcherAssert.assertThat(beans.get(0), CoreMatchers.instanceOf(Bean.class));
+		MatcherAssert.assertThat(beans.get(1), CoreMatchers.instanceOf(Bean.class));
+		MatcherAssert.assertThat(beans.get(2), CoreMatchers.instanceOf(Bean.class));
+		MatcherAssert.assertThat(beans.get(3), CoreMatchers.instanceOf(Bean2.class));
+		MatcherAssert.assertThat(beans.get(4), CoreMatchers.instanceOf(Bean2.class));
+		Assert.assertNotEquals(beans.get(3), beans.get(4));
+		Assert.assertNotEquals(beans.get(1), beans.get(2));
+		
+		scope.destroy();
+		Assert.assertEquals(instances.get(), 1); //prototype scope
 	}
+	
+	@Test(expectedExceptions={RuntimeException.class})
+	public void testQualifierClash() {
+		TestBinder b = new TestBinder();
+		
+		
+		b.bind(IBean.class)
+			.annotatedWith(Annotations.named("qualified"))
+			.to(Bean.class);
+		
+		b.bind(IBean.class)
+			.annotatedWith(Annotations.named("qualified"))
+			.to(Bean2.class);		
+		
+		beanInjector = b.toBeanInjector();
+	}	
 	
 	private interface IBean {
 		
