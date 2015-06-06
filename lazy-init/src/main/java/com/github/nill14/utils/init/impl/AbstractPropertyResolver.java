@@ -161,7 +161,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	}
 	
 	@Override
-	public void appendInitializer(IPojoInitializer extraInitializer) {
+	public void appendInitializer(IPojoInitializer initializer) {
 		this.initializer.append(initializer);
 	}
 	
