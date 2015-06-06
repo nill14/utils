@@ -244,7 +244,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	private class ServiceRegistryPropertyResolver extends AbstractPropertyResolver {
 		
 		public ServiceRegistryPropertyResolver() {
-			super(IPojoInitializer.standard());
+			super();
 		}
 
 		@Override

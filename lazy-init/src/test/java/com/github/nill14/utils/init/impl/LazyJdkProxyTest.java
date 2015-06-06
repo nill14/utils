@@ -23,7 +23,7 @@ public class LazyJdkProxyTest {
 	private ICalculator calcProxy;
 	private ILazyPojo<Calculator> lazyObject;
 	private static AtomicInteger instances = new AtomicInteger();
-	private final EmptyPropertyResolver resolver = EmptyPropertyResolver.empty(initializer);
+	private EmptyPropertyResolver resolver;
 
 	private static final IPojoInitializer initializer = new IPojoInitializer() {
 		@Override
@@ -39,6 +39,8 @@ public class LazyJdkProxyTest {
 	
 	@BeforeClass
 	public void setUp() {
+		resolver = EmptyPropertyResolver.empty();
+		resolver.appendInitializer(initializer);
 		lazyObject = LazyPojo.forBean(Calculator.class, resolver);
 		calcProxy = LazyJdkProxy.newProxy(ICalculator.class, lazyObject);
 	}

@@ -12,15 +12,10 @@ import com.github.nill14.utils.init.api.IPropertyResolver;
 public final class EmptyPropertyResolver extends AbstractPropertyResolver implements IPropertyResolver {
 
 	public static EmptyPropertyResolver empty() {
-		return new EmptyPropertyResolver(IPojoInitializer.standard());
+		return new EmptyPropertyResolver();
 	}
 	
-	public static EmptyPropertyResolver empty(IPojoInitializer pojoInitializer) {
-		return new EmptyPropertyResolver(pojoInitializer);
-	}
-	
-	private EmptyPropertyResolver(IPojoInitializer pojoInitializer) {
-		insertInitializer(pojoInitializer);
+	private EmptyPropertyResolver() {
 	}
 	
 	@Override
@@ -46,10 +41,12 @@ public final class EmptyPropertyResolver extends AbstractPropertyResolver implem
 		return null;
 	}
 	
+	@Override
 	public void insertInitializer(IPojoInitializer initializer) {
 		super.insertInitializer(initializer);
 	}
 	
+	@Override
 	public void appendInitializer(IPojoInitializer extraInitializer) {
 		super.appendInitializer(extraInitializer);
 	}

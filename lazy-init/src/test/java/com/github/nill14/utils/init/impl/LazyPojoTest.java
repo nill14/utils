@@ -38,7 +38,7 @@ public class LazyPojoTest {
 
 	private static final AtomicInteger instances = new AtomicInteger();
 	private static final IPojoInitializer factoryInitializer = new CountingPojoInitializer(instances);
-	private final EmptyPropertyResolver resolver = EmptyPropertyResolver.empty(factoryInitializer);
+	private EmptyPropertyResolver resolver;
 			
 	static class CountingPojoInitializer implements IPojoInitializer {
 		
@@ -77,6 +77,8 @@ public class LazyPojoTest {
 	
 	@BeforeMethod
 	public void init() {
+		resolver = EmptyPropertyResolver.empty();
+		resolver.appendInitializer(factoryInitializer);
 		instances.set(0);
 		
 		lazyPojo = LazyPojo.forProvider(GreeterFactory.class, resolver);

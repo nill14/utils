@@ -24,13 +24,14 @@ import com.google.common.collect.ImmutableSortedSet;
 public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	
 	private transient volatile IBeanInjector beanInjector;
-	private final ChainingPojoInitializer initializer = new ChainingPojoInitializer();
+	private final ChainingPojoInitializer initializer;
 	
 	public AbstractPropertyResolver() {
+		initializer = ChainingPojoInitializer.defaultInitializer();
 	}
 	
-	public AbstractPropertyResolver(IPojoInitializer initializer) {
-		this.initializer.insert(initializer);
+	public AbstractPropertyResolver(ChainingPojoInitializer initializer) {
+		this.initializer = initializer;
 	}
 	
 	@Override

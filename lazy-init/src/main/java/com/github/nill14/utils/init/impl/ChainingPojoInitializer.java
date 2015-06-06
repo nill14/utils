@@ -48,11 +48,21 @@ public class ChainingPojoInitializer implements IPojoInitializer {
 	 * @param extraInitializer The first initializer to execute
 	 */
 	public void insert(IPojoInitializer extraInitializer) {
-		items.add(0, extraInitializer);
+		if (extraInitializer instanceof ChainingPojoInitializer) {
+			throw new IllegalArgumentException();
+		}
+		if (!items.contains(extraInitializer)) {
+			items.add(0, extraInitializer);
+		}
 	}
 	
 	public void append(IPojoInitializer extraInitializer) {
-		items.add(extraInitializer);
+		if (extraInitializer instanceof ChainingPojoInitializer) {
+			throw new IllegalArgumentException();
+		}
+		if (!items.contains(extraInitializer)) {
+			items.add(extraInitializer);
+		}
 	}
 	
 	public void remove(IPojoInitializer extraInitializer) {
