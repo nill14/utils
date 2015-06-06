@@ -19,6 +19,7 @@ import com.github.nill14.utils.init.binding.impl.BindingImpl;
 import com.github.nill14.utils.init.binding.target.AnnotatedElementBindingTargetVisitor;
 import com.github.nill14.utils.init.impl.ChainingPojoInitializer;
 import com.github.nill14.utils.init.impl.ChainingPropertyResolver;
+import com.github.nill14.utils.init.impl.SimplePropertyResolver;
 import com.github.nill14.utils.init.meta.AnnotationScanner;
 import com.github.nill14.utils.init.scope.SingletonScope;
 import com.github.nill14.utils.init.util.Element;
@@ -137,8 +138,7 @@ public Object resolve(Object pojo, IParameterType type) {
 		if (bindingKey.getQualifier() == null) {
 			AnnotatedElement annotatedElement = binding.getBindingTarget().accept(targetVisitor);
 			Annotation qualifier = AnnotationScanner.findQualifier(annotatedElement).orElse(null);
-			return new BindingImpl<>(bindingKey.withQualifier(qualifier), 
-					binding.getBindingTarget(), binding.getScope(), binding.getSource());
+			return binding.keyWithQualifier(qualifier);
 		}
 		
 		return binding;

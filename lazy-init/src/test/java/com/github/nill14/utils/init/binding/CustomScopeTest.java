@@ -86,7 +86,7 @@ public class CustomScopeTest {
 		
 		Assert.assertNotEquals(qualified, named);
 		Assert.assertNotEquals(qualified, bean);
-		Assert.assertEquals(instances.get(), 4);
+		Assert.assertEquals(instances.get(), 5);
 		Assert.assertEquals(beans.size(), 5);
 		Assert.assertEquals(instances.get(), 5);
 	}

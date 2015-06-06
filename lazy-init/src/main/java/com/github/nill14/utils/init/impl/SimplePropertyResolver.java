@@ -1,8 +1,7 @@
-package com.github.nill14.utils.init.binding;
+package com.github.nill14.utils.init.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -16,8 +15,6 @@ import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.impl.BindingImpl;
 import com.github.nill14.utils.init.binding.impl.BindingTarget;
 import com.github.nill14.utils.init.binding.target.UnscopedProvider;
-import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
-import com.github.nill14.utils.init.impl.ChainingPojoInitializer;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -37,17 +34,27 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 	public SimplePropertyResolver(ImmutableList<BindingImpl<?>> bindings, ChainingPojoInitializer initializer) {
 		super(initializer);
 		
-		Map<BindingKey<?>, BindingImpl<?>> rawBindings = Maps.newHashMap();
+		Map<BindingKey<?>, BindingImpl<?>> rawBindingCandidates = Maps.newHashMap();
 		Map<BindingKey<?>, BindingImpl<?>> map = Maps.newHashMap();
 		for (BindingImpl<?> binding : bindings) {
 			BindingKey<?> key = binding.getBindingKey();
+			boolean occupied = map.putIfAbsent(key, binding) != null; //TODO scope?
+			
+			if (occupied) {
+				binding = binding.keyWithQualifier(CounterImpl.next());
+				key = binding.getBindingKey();
+				boolean error = map.putIfAbsent(key, binding) != null;
+				if (error) {
+					throw new RuntimeException("Duplicate key: " + binding);
+				}
+			}
+			
 			typeBindings.put(key.getToken(), binding);
-			map.putIfAbsent(key, binding); //TODO scope?
-			rawBindings.putIfAbsent(key.withQualifier(null), binding);
+			rawBindingCandidates.putIfAbsent(key.withQualifier(null), binding);
 		}
 		
 		//add raw/unqualified bindings if they are not already present
-		for (Entry<BindingKey<?>, BindingImpl<?>> entry : rawBindings.entrySet()) {
+		for (Entry<BindingKey<?>, BindingImpl<?>> entry : rawBindingCandidates.entrySet()) {
 			map.putIfAbsent(entry.getKey(), entry.getValue());
 		}
 		

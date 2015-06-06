@@ -2,13 +2,14 @@ package com.github.nill14.utils.init.impl;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 /*package*/ final class CounterImpl implements Counter, Serializable {
 
 	private final long value;
 
-	public CounterImpl(long value) {
+	private CounterImpl(long value) {
 		this.value = value;
 	}
 
@@ -44,4 +45,10 @@ import java.lang.annotation.Annotation;
 	}
 
 	private static final long serialVersionUID = 0;
+	
+	private static final AtomicLong counter = new AtomicLong();
+	
+	public static Counter next() {
+		return new CounterImpl(counter.incrementAndGet());
+	}
 }

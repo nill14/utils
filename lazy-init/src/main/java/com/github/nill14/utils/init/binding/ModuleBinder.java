@@ -104,8 +104,7 @@ public final class ModuleBinder implements Binder {
 		if (bindingKey.getQualifier() == null) {
 			AnnotatedElement annotatedElement = binding.getBindingTarget().accept(targetVisitor);
 			Annotation qualifier = AnnotationScanner.findQualifier(annotatedElement).orElse(null);
-			return new BindingImpl<>(bindingKey.withQualifier(qualifier), 
-					binding.getBindingTarget(), binding.getScope(), binding.getSource());
+			return binding.keyWithQualifier(qualifier);
 		}
 		
 		return binding;

@@ -1,5 +1,7 @@
 package com.github.nill14.utils.init.binding.impl;
 
+import java.lang.annotation.Annotation;
+
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IScope;
 import com.google.common.base.Preconditions;
@@ -47,6 +49,12 @@ public final class BindingImpl<T> {
 	@Override
 	public String toString() {
 		return String.format("Binding(%s -> %s, %s)", bindingKey, target, scope);
+	}
+	
+	
+	
+	public BindingImpl<T> keyWithQualifier(Annotation qualifier) {
+		return new BindingImpl<>(bindingKey.withQualifier(qualifier), target, scope, source);
 	}
 	
 }
