@@ -17,6 +17,7 @@ package com.github.nill14.utils.init.meta;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import javax.inject.Named;
 
@@ -25,6 +26,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.Reflection;
 
 
@@ -46,6 +48,85 @@ public class Annotations {
 				"%s is not all default methods", annotationType);
 		return (T) cache.getUnchecked(annotationType);
 	}
+	
+	
+	/**
+	 * Generates an Annotation with value for the annotation class. 
+	 * All other values are defaults.
+	 */
+	public static <T extends Annotation> T withValue(Class<T> annotationType, String value) {
+		return withValue0(annotationType, value);
+	}
+	
+	/**
+	 * Generates an Annotation with value for the annotation class. 
+	 * All other values are defaults.
+	 */
+	public static <T extends Annotation> T withValue(Class<T> annotationType, int value) {
+		return withValue0(annotationType, value);
+	}	
+	
+	/**
+	 * Generates an Annotation with value for the annotation class. 
+	 * All other values are defaults.
+	 */
+	public static <T extends Annotation> T withValue(Class<T> annotationType, Class<?> value) {
+		return withValue0(annotationType, value);
+	}	
+	
+	public static <T extends Annotation, E extends Enum<E>> T withValue(Class<T> annotationType, E value) {
+		return withValue0(annotationType, value);
+	}
+	
+	/**
+	 * Generates an Annotation with value for the annotation class. 
+	 * All other values are defaults.
+	 */
+	public static <T extends Annotation> T withValue(Class<T> annotationType, float value) {
+		return withValue0(annotationType, value);
+	}	
+	
+	/**
+	 * Generates an Annotation with value for the annotation class. 
+	 * All other values are defaults.
+	 */
+	public static <T extends Annotation> T withValue(Class<T> annotationType, double value) {
+		return withValue0(annotationType, value);
+	}	
+	
+	/**
+	 * Generates an Annotation with value for the annotation class. 
+	 * All other values are defaults.
+	 */
+	public static <T extends Annotation> T withValue(Class<T> annotationType, long value) {
+		return withValue0(annotationType, value);
+	}		
+	
+	
+	/**
+	 * Generates an Annotation with value for the annotation class. 
+	 * All other values are defaults.
+	 */
+	private static <T extends Annotation> T withValue0(Class<T> annotationType, Object value) {
+		Preconditions.checkState(isAllDefaultMethodsExceptValue(annotationType),
+				"%s is not all default methods", annotationType);
+		
+		return Reflection.newProxy(annotationType, 
+				new AnnotationInvocationHandler<>(annotationType, definedValue(value)));
+	}		
+	
+	private static Map<String, Object> definedValue(Object value) {
+		return ImmutableMap.of("value", value);
+	}
+	
+	private static boolean isAllDefaultMethodsExceptValue(Class<? extends Annotation> annotationType) {
+		for (Method m : annotationType.getDeclaredMethods()) {
+			if (m.getDefaultValue() == null && !"value".equals(m.getName())) {
+				return false;
+			}
+		}
+		return true;
+	}
   
 	private static boolean isAllDefaultMethods(Class<? extends Annotation> annotationType) {
 		for (Method m : annotationType.getDeclaredMethods()) {
@@ -61,9 +142,11 @@ public class Annotations {
 			.build(new CacheLoader<Class<? extends Annotation>, Annotation>() {
 				@Override
 				public Annotation load(Class<? extends Annotation> annotationType) {
-					return Reflection.newProxy(annotationType,new AnnotationInvocationHandler<>(annotationType));
+					return Reflection.newProxy(annotationType, new AnnotationInvocationHandler<>(annotationType));
 				}
 			});
+
+
   
 
 }

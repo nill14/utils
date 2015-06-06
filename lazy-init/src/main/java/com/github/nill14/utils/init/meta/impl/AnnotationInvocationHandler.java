@@ -20,6 +20,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 
 import com.google.common.base.Function;
@@ -33,10 +34,17 @@ public class AnnotationInvocationHandler<T extends Annotation> implements
 
 	private final Class<T> annotationType;
 	private final ImmutableMap<String, Object> members;
+	
 
 	public AnnotationInvocationHandler(Class<T> annotationType) {
 		this.annotationType = annotationType;
-		members = resolveMembers(annotationType);
+		members = resolveMembers(annotationType, Collections.emptyMap());
+	}
+
+
+	public AnnotationInvocationHandler(Class<T> annotationType, Map<String, Object> definedValues) {
+		this.annotationType = annotationType;
+		members = resolveMembers(annotationType, definedValues);
 	}
 
 	@Override
@@ -61,10 +69,11 @@ public class AnnotationInvocationHandler<T extends Annotation> implements
 	}
 
 	private static ImmutableMap<String, Object> resolveMembers(
-			Class<? extends Annotation> annotationType) {
+			Class<? extends Annotation> annotationType, Map<String, Object> definedValues) {
 		ImmutableMap.Builder<String, Object> result = ImmutableMap.builder();
 		for (Method method : annotationType.getDeclaredMethods()) {
-			result.put(method.getName(), method.getDefaultValue());
+			Object value = definedValues.getOrDefault(method.getName(), method.getDefaultValue());
+			result.put(method.getName(), value);
 		}
 		return result.build();
 	}

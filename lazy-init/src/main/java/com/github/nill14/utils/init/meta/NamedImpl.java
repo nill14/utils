@@ -7,7 +7,7 @@ import java.lang.annotation.Annotation;
 
 import javax.inject.Named;
 
-class NamedImpl implements Named, Serializable {
+/*package*/ final class NamedImpl implements Named, Serializable {
 
 	private final String value;
 
