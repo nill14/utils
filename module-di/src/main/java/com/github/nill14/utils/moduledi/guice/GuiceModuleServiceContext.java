@@ -1,6 +1,8 @@
 package com.github.nill14.utils.moduledi.guice;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -12,11 +14,11 @@ import org.aopalliance.intercept.MethodInvocation;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
-import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
+import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
 import com.github.nill14.utils.moduledi.IModule;
 import com.google.inject.Binder;
 import com.google.inject.Injector;
@@ -42,7 +44,7 @@ public class GuiceModuleServiceContext implements IServiceContext {
 	
 	
 	@Override
-	public Optional<IPropertyResolver> getCustomResolver() {
+	public Optional<AbstractPropertyResolver> getCustomResolver() {
 		return Optional.of(contextResolver);
 	}
 	
@@ -53,7 +55,7 @@ public class GuiceModuleServiceContext implements IServiceContext {
 	
 
 	
-	private final IPropertyResolver contextResolver = new IPropertyResolver() {
+	private final AbstractPropertyResolver contextResolver = new AbstractPropertyResolver() {
 
 		@Override
 		public Object resolve(IParameterType type) {
@@ -103,6 +105,30 @@ public class GuiceModuleServiceContext implements IServiceContext {
 		public void appendInitializer(IPojoInitializer extraInitializer) {
 			// TODO Auto-generated method stub
 			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		protected Object findByName(String name, IParameterType type) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		protected Object findByType(IParameterType type) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		protected Collection<?> findAllByType(IParameterType type) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		protected Object findByQualifier(IParameterType type, Annotation qualifier) {
+			// TODO Auto-generated method stub
+			return null;
 		}		
 	};
 

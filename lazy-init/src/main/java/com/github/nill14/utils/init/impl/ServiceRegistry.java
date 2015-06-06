@@ -67,7 +67,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	
 	
 	private <T> IPropertyResolver getResolver(IServiceContext context) {
-		Optional<IPropertyResolver> customResolver = context.getCustomResolver();
+		Optional<AbstractPropertyResolver> customResolver = context.getCustomResolver();
 		if (customResolver.isPresent()) {
 			return new ChainingPropertyResolver(customResolver.get(), resolver);
 		} else {

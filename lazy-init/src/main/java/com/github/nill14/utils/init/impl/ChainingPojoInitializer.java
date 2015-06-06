@@ -5,13 +5,12 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
-import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.google.common.collect.ImmutableList;
 
 @SuppressWarnings("serial")
-public class ChainingPojoInitializer implements IPojoInitializer {
+public final class ChainingPojoInitializer implements IPojoInitializer {
 	
 	private final CopyOnWriteArrayList<IPojoInitializer> items;
 	

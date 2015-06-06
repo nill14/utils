@@ -77,15 +77,6 @@ public final class ModuleBinder implements Binder {
 		return scope;
 	}
 
-	public ModuleBinder withResolver(IPropertyResolver resolver) {
-		this.resolver.insert(resolver);
-		return this;
-	}
-	
-	public ModuleBinder withInitializer(IPojoInitializer initializer) {
-		this.resolver.appendInitializer(initializer);
-		return this;
-	}
 	
 	public IPropertyResolver toResolver() {
 		

@@ -1,52 +1,38 @@
 package com.github.nill14.utils.init.impl;
 
+import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import org.mockito.Mockito;
 
-import com.github.nill14.utils.init.api.IBeanDescriptor;
-import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
-import com.github.nill14.utils.init.api.IPojoInitializer;
-import com.github.nill14.utils.init.api.IPropertyResolver;
 
-public class MockitoFallbackResolver implements IPropertyResolver {
+public class MockitoFallbackResolver extends AbstractPropertyResolver {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public Object resolve(IParameterType type) {
+	public Object findByType(IParameterType type) {
 		return Mockito.mock(type.getRawType(), Mockito.RETURNS_DEEP_STUBS);
 	}
 
 	@Override
-	public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance) {
-	}
-	
-	@Override
-	public <T> void destroyBean(IBeanDescriptor<T> beanDescriptor, Object instance) {
-		
-	}
-	
-	@Override
-	public IBeanInjector toBeanInjector() {
-		return new BeanInjector(this);
+	protected Object findByName(String name, IParameterType type) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public List<IPojoInitializer> getInitializers() {
+	protected Collection<?> findAllByType(IParameterType type) {
 		return Collections.emptyList();
 	}
 
 	@Override
-	public void insertInitializer(IPojoInitializer initializer) {
-		throw new UnsupportedOperationException();
+	protected Object findByQualifier(IParameterType type, Annotation qualifier) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	@Override
-	public void appendInitializer(IPojoInitializer extraInitializer) {
-		throw new UnsupportedOperationException();
-	}
 	
 }

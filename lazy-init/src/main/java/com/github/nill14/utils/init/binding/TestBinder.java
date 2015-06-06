@@ -17,6 +17,7 @@ import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.impl.BindingBuilder;
 import com.github.nill14.utils.init.binding.impl.BindingImpl;
 import com.github.nill14.utils.init.binding.target.AnnotatedElementBindingTargetVisitor;
+import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
 import com.github.nill14.utils.init.impl.ChainingPojoInitializer;
 import com.github.nill14.utils.init.impl.ChainingPropertyResolver;
 import com.github.nill14.utils.init.impl.SimplePropertyResolver;
@@ -70,7 +71,7 @@ public final class TestBinder implements Binder {
 		return scope;
 	}
 
-	public TestBinder withResolver(IPropertyResolver resolver) {
+	public TestBinder withResolver(AbstractPropertyResolver resolver) {
 		this.resolver.insert(resolver);
 		return this;
 	}
@@ -93,7 +94,7 @@ public Object resolve(Object pojo, IParameterType type) {
 	 * </pre>
 	 * 
 	 */
-	public TestBinder withFallbackResolver(IPropertyResolver resolver) {
+	public TestBinder withFallbackResolver(AbstractPropertyResolver resolver) {
 		this.resolver.append(resolver);
 		return this;
 	}

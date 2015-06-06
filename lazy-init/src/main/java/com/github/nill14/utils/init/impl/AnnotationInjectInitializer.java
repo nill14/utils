@@ -11,7 +11,7 @@ import com.github.nill14.utils.init.inject.FieldInjectionDescriptor;
 import com.github.nill14.utils.init.inject.ParameterTypeInjectionDescriptor;
 
 @SuppressWarnings("serial")
-public class AnnotationInjectInitializer implements IPojoInitializer {
+public final class AnnotationInjectInitializer implements IPojoInitializer {
 
 	@Override
 	public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
@@ -77,5 +77,15 @@ public class AnnotationInjectInitializer implements IPojoInitializer {
 			args[i++] = arg;
 		}
 		return args;
+	}
+	
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof AnnotationInjectInitializer;
 	}
 }

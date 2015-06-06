@@ -16,7 +16,7 @@ import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.inject.ReflectionUtils;
 
 @SuppressWarnings("serial")
-public class AnnotationLifecycleInitializer implements IPojoInitializer {
+public final class AnnotationLifecycleInitializer implements IPojoInitializer {
 
 	@Override
 	public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
@@ -74,5 +74,15 @@ public class AnnotationLifecycleInitializer implements IPojoInitializer {
 			invoke(instance, method, null);
 		}
 	}
+	
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof AnnotationLifecycleInitializer;
+	}	
 
 }

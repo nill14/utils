@@ -5,14 +5,13 @@ import org.slf4j.LoggerFactory;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IParameterType;
-import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.meta.EventBusSubscriber;
 import com.google.common.eventbus.EventBus;
 
 @SuppressWarnings("serial")
-public class EventBusPojoInitializer implements IPojoInitializer {
+public final class EventBusPojoInitializer implements IPojoInitializer {
 
 	private static final Logger log = LoggerFactory.getLogger(EventBusPojoInitializer.class);
 	
@@ -40,6 +39,16 @@ public class EventBusPojoInitializer implements IPojoInitializer {
 				log.warn("EventBus is not resolved.");
 			}
 		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof EventBusPojoInitializer;
 	}
 
 }
