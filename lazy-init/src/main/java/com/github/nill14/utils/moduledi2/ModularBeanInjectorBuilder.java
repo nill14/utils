@@ -15,6 +15,7 @@ import com.github.nill14.parsers.dependency.impl.ModuleRankingsPrinter;
 import com.github.nill14.parsers.graph.CyclicGraphException;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.binding.ModuleBinder;
+import com.github.nill14.utils.init.binding.TestBinder;
 import com.github.nill14.utils.init.binding.impl.BindingImpl;
 import com.github.nill14.utils.init.impl.ServiceRegistry;
 import com.github.nill14.utils.java8.stream.ExecutorUtils;
@@ -74,7 +75,7 @@ public final class ModularBeanInjectorBuilder {
 			throws InterruptedException, ExecutionException {
 		
 		List<ModuleBinder> binders = ExecutorUtils.parallelExecution(executor, units, u -> {
-			ModuleBinder binder = new ModuleBinder(registry, u);
+			ModuleBinder binder = new ModuleBinder(new TestBinder(), u); //Hack
 			u.configure(binder);
 			binder.build();
 			return binder;

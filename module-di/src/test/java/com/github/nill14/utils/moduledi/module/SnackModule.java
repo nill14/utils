@@ -3,9 +3,9 @@ package com.github.nill14.utils.moduledi.module;
 import org.testng.Assert;
 
 import com.github.nill14.parsers.dependency.IDependencyDescriptorBuilder;
-import com.github.nill14.utils.init.api.IServiceRegistry;
+import com.github.nill14.utils.init.api.IBeanInjector;
+import com.github.nill14.utils.init.binding.Binder;
 import com.github.nill14.utils.moduledi.IModule;
-import com.github.nill14.utils.moduledi.IServiceBuilder;
 import com.github.nill14.utils.moduledi.service.IBreadService;
 import com.github.nill14.utils.moduledi.service.ISnackService;
 import com.github.nill14.utils.moduledi.service.SnackService;
@@ -19,16 +19,16 @@ public class SnackModule extends AbstractModule implements IModule {
 	}
 
 	@Override
-	public void buildServices(IServiceBuilder builder) {
-		builder.addBean(SnackService.class, ISnackService.class);
+	public void buildServices(Binder binder) {
+		binder.bind(ISnackService.class).to(SnackService.class);
 	}
 
 	@Override
-	public void startModule(IServiceRegistry registry) {
-		IBreadService breadService = registry.getService(IBreadService.class);
+	public void startModule(IBeanInjector beanInjector) {
+		IBreadService breadService = beanInjector.getInstance(IBreadService.class);
 		Assert.assertNotNull(breadService);
 		
-		ISnackService snackService = registry.getService(ISnackService.class);
+		ISnackService snackService = beanInjector.getInstance(ISnackService.class);
 		Assert.assertNotNull(snackService);
 		Assert.assertNotNull(snackService.getBreadService());
 	}

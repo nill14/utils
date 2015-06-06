@@ -5,15 +5,15 @@ import java.util.Optional;
 import org.testng.Assert;
 
 import com.github.nill14.parsers.dependency.IDependencyDescriptorBuilder;
-import com.github.nill14.utils.init.api.IServiceRegistry;
+import com.github.nill14.utils.init.api.IBeanInjector;
+import com.github.nill14.utils.init.binding.Binder;
 import com.github.nill14.utils.moduledi.IModule;
-import com.github.nill14.utils.moduledi.IServiceBuilder;
 import com.github.nill14.utils.moduledi.bean.customer.ITaskService;
 
 public class ActivationModule implements IModule {
 
 	@Override
-	public void buildServices(IServiceBuilder builder) {
+	public void buildServices(Binder binder) {
 		
 	}
 	
@@ -22,10 +22,11 @@ public class ActivationModule implements IModule {
 		builder.uses(CustomerModule.class);
 	}
 	
+
 	@Override
-	public void startModule(IServiceRegistry registry) {
+	public void startModule(IBeanInjector beanInjector) {
 		
-		ITaskService taskService = registry.getService(ITaskService.class);
+		ITaskService taskService = beanInjector.getInstance(ITaskService.class);
 		Assert.assertEquals(taskService.getReporter(), Optional.of("reporter"));
 		Assert.assertEquals(taskService.getAssignee(), Optional.empty());
 		

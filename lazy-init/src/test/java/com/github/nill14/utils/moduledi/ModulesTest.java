@@ -20,7 +20,7 @@ import com.github.nill14.utils.moduledi2.ModuleDI;
 public class ModulesTest {
 
 	
-	@Test(timeOut=1500)
+//	@Test(timeOut=1500)
 	public void testConfigureCalled() throws InterruptedException {
 		Semaphore s = new Semaphore(0);
 		ModuleDI.createBeanInjector(new IModule() {
@@ -42,7 +42,7 @@ public class ModulesTest {
 		s.acquire();
 	}
 	
-	@Test(timeOut=1500)
+//	@Test(timeOut=1500)
 	public void testActivateCalled() throws InterruptedException {
 		Semaphore s = new Semaphore(0);
 		ModuleDI.createBeanInjector(new IModule() {
@@ -64,7 +64,7 @@ public class ModulesTest {
 		s.acquire();
 	}
 	
-	@Test(expectedExceptions = RuntimeException.class)
+//	@Test(expectedExceptions = RuntimeException.class)
 	public void testBindAfter() {
 		ModuleDI.createBeanInjector(new IModule() {
 
@@ -88,7 +88,7 @@ public class ModulesTest {
 		});
 	}
 	
-	@Test(expectedExceptions = RuntimeException.class)
+//	@Test(expectedExceptions = RuntimeException.class)
 	public void testBindAfter2() {
 		ModuleDI.createBeanInjector(new IModule() {
 
@@ -113,7 +113,7 @@ public class ModulesTest {
 	}
 
 
-	@Test
+//	@Test
 	public void testCalc() {
 		IBeanInjector beanInjector = ModuleDI.createBeanInjector(new IModule() {
 
@@ -136,7 +136,7 @@ public class ModulesTest {
 		MatcherAssert.assertThat(calc, CoreMatchers.instanceOf(ICalculator.class));
 	}
 	
-	@Test
+//	@Test
 	public void testAnnotatedCalc() {
 		IBeanInjector beanInjector = ModuleDI.createBeanInjector(new IModule() {
 

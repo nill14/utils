@@ -3,38 +3,44 @@ package com.github.nill14.utils.init.binding;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.inject.Singleton;
+
 import com.github.nill14.utils.init.api.BindingKey;
-import com.github.nill14.utils.init.api.ILazyPojo;
+import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.impl.BindingBuilder;
 import com.github.nill14.utils.init.binding.impl.BindingImpl;
 import com.github.nill14.utils.init.binding.target.AnnotatedElementBindingTargetVisitor;
-import com.github.nill14.utils.init.binding.target.LazyPojoBindingTargetVisitor;
 import com.github.nill14.utils.init.impl.ChainingPojoInitializer;
 import com.github.nill14.utils.init.impl.ChainingPropertyResolver;
-import com.github.nill14.utils.init.impl.ServiceRegistry;
+import com.github.nill14.utils.init.impl.SimplePropertyResolver;
 import com.github.nill14.utils.init.meta.AnnotationScanner;
+import com.github.nill14.utils.init.scope.SingletonScope;
 import com.github.nill14.utils.init.util.Element;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
 public final class ModuleBinder implements Binder {
 	
-	private final List<Element<BindingImpl<?>>> elements = Lists.newArrayList();
-	private final ChainingPropertyResolver resolver;
-	private final Object source;
-	private final ServiceRegistry serviceRegistry;
-	private final AtomicBoolean configurationLocker = new AtomicBoolean(false);
+	private final Map<Class<? extends Annotation>, IScope> scopes = Maps.newHashMap();
+	private final ChainingPropertyResolver resolver = new ChainingPropertyResolver();
 
-	public ModuleBinder(ServiceRegistry serviceRegistry, Object source) {
-		this.serviceRegistry = serviceRegistry;
+	private final List<Element<BindingImpl<?>>> elements = Lists.newArrayList();
+	private final AtomicBoolean configurationLocker = new AtomicBoolean(false);	
+	
+	private final Object source;
+	private final Binder parent;
+
+	public ModuleBinder(Binder parent, Object source) {
+		this.parent = parent;
 		this.source = source;
-		resolver = new ChainingPropertyResolver(serviceRegistry.toResolver());
 	}
 
 	private Element<BindingImpl<?>> newElement() {
@@ -53,16 +59,22 @@ public final class ModuleBinder implements Binder {
 		return new BindingBuilder<T>(this, newElement(), source, TypeToken.of(type));
 	}
 	
+	
 	@Override
 	public void bindScope(Class<? extends Annotation> annotationType, IScope scope) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		scopes.put(annotationType, scope);
 	}
 	
 	@Override
 	public IScope getScope(Class<? extends Annotation> annotationType) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		if (Singleton.class.equals(annotationType)) {
+			return SingletonScope.instance();
+		}
+		IScope scope = scopes.get(annotationType);
+		if (scope == null) {
+			throw new RuntimeException("Scope is missing: " + annotationType);
+		}
+		return scope;
 	}
 
 	public ModuleBinder withResolver(IPropertyResolver resolver) {
@@ -75,24 +87,39 @@ public final class ModuleBinder implements Binder {
 		return this;
 	}
 	
+	public IPropertyResolver toResolver() {
+		
+		ImmutableList<BindingImpl<?>> bindings = freezeBindings();
+		
+		
+		return new SimplePropertyResolver(bindings, 
+				new ChainingPojoInitializer(resolver.getInitializers()));
+	}
 	
-	public void build() {
+	public ImmutableList<BindingImpl<?>> freezeBindings() {
 		configurationLocker.set(true);
+		
 		ImmutableList<BindingImpl<?>> bindings = ImmutableList.copyOf(
 				elements.stream().map(Element::getValue).map(this::scanQualifier).iterator());
+		return bindings;
+	}	
+	
+	public IBeanInjector toBeanInjector() {
+//		bindScope(Singleton.class, SingletonScope.instance());
+		
+		ImmutableList<BindingImpl<?>> bindings = freezeBindings();
 		
 		
-		LazyPojoBindingTargetVisitor bindingTargetVisitor = new LazyPojoBindingTargetVisitor(
-				resolver, (binding) -> null); // we do not support linked bindings at the moment
+		SimplePropertyResolver propertyResolver = new SimplePropertyResolver(bindings, 
+				new ChainingPojoInitializer(resolver.getInitializers()));
 		
 		
-		for (BindingImpl<?> binding : bindings) {
-			BindingKey<?> BindingKey = binding.getBindingKey();
-			
-			ILazyPojo<?> lazyPojo = binding.getBindingTarget().accept(bindingTargetVisitor);
-			
-			serviceRegistry.addBinding(BindingKey, lazyPojo); //TODO add access check
-		}
+		
+		return propertyResolver.toBeanInjector();
+	}
+	
+	public void build() {
+		toBeanInjector();
 		
 //		return serviceRegistry.toBeanInjector();
 		
