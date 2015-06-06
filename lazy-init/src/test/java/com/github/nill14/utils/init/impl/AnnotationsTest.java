@@ -40,6 +40,27 @@ public class AnnotationsTest {
 		Assert.assertTrue(instance2.equals(instance1));
 	}	
 	
+	@Test
+	public void testLongValue2Cache()  {
+		TestValue counter1 = new TestValueImpl(25L);
+		TestValue counter2 = Annotations.withValue(TestValue.class, 25L);
+		
+		Assert.assertEquals(counter1, counter2);
+		Assert.assertEquals(counter1.hashCode(), counter2.hashCode());
+		Assert.assertTrue(counter1.equals(counter2));
+		Assert.assertTrue(counter2.equals(counter1));
+	}	
+	
+	@Test
+	public void testEnumValue2Cache()  {
+		TestEnumValue instance1 = new TestEnumValueImpl(TestEnum.ABC);
+		TestEnumValue instance2 = Annotations.withValue(TestEnumValue.class, TestEnum.ABC);
+		
+		Assert.assertEquals(instance1, instance2);
+		Assert.assertEquals(instance1.hashCode(), instance2.hashCode());
+		Assert.assertTrue(instance1.equals(instance2));
+		Assert.assertTrue(instance2.equals(instance1));
+	}		
 	
 
 	@Qualifier

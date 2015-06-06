@@ -46,7 +46,7 @@ public class Annotations {
 	public static <T extends Annotation> T annotation(Class<T> annotationType) {
 		Preconditions.checkState(isAllDefaultMethods(annotationType),
 				"%s is not all default methods", annotationType);
-		return (T) cache.getUnchecked(annotationType);
+		return (T) cache0.getUnchecked(annotationType);
 	}
 	
 	
@@ -107,15 +107,15 @@ public class Annotations {
 	 * Generates an Annotation with value for the annotation class. 
 	 * All other values are defaults.
 	 */
+	@SuppressWarnings("unchecked")
 	private static <T extends Annotation> T withValue0(Class<T> annotationType, Object value) {
 		Preconditions.checkState(isAllDefaultMethodsExceptValue(annotationType),
 				"%s is not all default methods", annotationType);
 		
-		return Reflection.newProxy(annotationType, 
-				new AnnotationInvocationHandler<>(annotationType, definedValue(value)));
+		return (T) cache1.getUnchecked(new KeyWithValues<>(annotationType, definedValue(value)));
 	}		
 	
-	private static Map<String, Object> definedValue(Object value) {
+	private static ImmutableMap<String, Object> definedValue(Object value) {
 		return ImmutableMap.of("value", value);
 	}
 	
@@ -137,7 +137,7 @@ public class Annotations {
 		return true;
 	}
   
-	private static final LoadingCache<Class<? extends Annotation>, Annotation> cache = CacheBuilder.newBuilder()
+	private static final LoadingCache<Class<? extends Annotation>, Annotation> cache0 = CacheBuilder.newBuilder()
 			.weakKeys()
 			.build(new CacheLoader<Class<? extends Annotation>, Annotation>() {
 				@Override
@@ -145,8 +145,26 @@ public class Annotations {
 					return Reflection.newProxy(annotationType, new AnnotationInvocationHandler<>(annotationType));
 				}
 			});
+	
+	private static final LoadingCache<KeyWithValues<? extends Annotation>, Annotation> cache1 = CacheBuilder.newBuilder()
+			.weakKeys()
+			.build(new CacheLoader<KeyWithValues<? extends Annotation>, Annotation>() {
+				@Override
+				public Annotation load(KeyWithValues<? extends Annotation> key) {
+					return Reflection.newProxy(key.annotationType, 
+							new AnnotationInvocationHandler<>(key.annotationType, key.values));
+				}
+			});	
 
 
-  
+	private static final class KeyWithValues<T extends Annotation> {
+		final Class<T> annotationType;
+		final ImmutableMap<String, Object> values;
+
+		public KeyWithValues(Class<T> annotationType, ImmutableMap<String, Object> values) {
+			this.annotationType = annotationType;
+			this.values = values;
+		}
+	}
 
 }
