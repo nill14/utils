@@ -24,7 +24,7 @@ public class BeanTypeBindingTarget<T> implements BindingTarget<T> {
 
 	@Override
 	public String toString() {
-		return String.format("BindingTarget(%s)", token.getRawType().getSimpleName());
+		return String.format("BeanTypeBindingTarget(%s)", token.getRawType().getSimpleName());
 	}
 
 }

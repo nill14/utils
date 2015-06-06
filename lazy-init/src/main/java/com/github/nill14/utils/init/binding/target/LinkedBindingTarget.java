@@ -8,6 +8,10 @@ public class LinkedBindingTarget<T> implements BindingTarget<T> {
 	
 	private final BindingKey<T> targetType;
 
+	public static <T> LinkedBindingTarget<T> create(BindingKey<T> targetType) {
+		return new LinkedBindingTarget<>(targetType);
+	}
+	
 	public LinkedBindingTarget(BindingKey<T> targetType) {
 		this.targetType = targetType;
 	}
@@ -24,7 +28,7 @@ public class LinkedBindingTarget<T> implements BindingTarget<T> {
 
 	@Override
 	public String toString() {
-		return String.format("BindingTarget(%s)", targetType.getRawType().getSimpleName());
+		return String.format("LinkedBindingTarget(%s)", targetType.getRawType().getSimpleName());
 	}
 
 }

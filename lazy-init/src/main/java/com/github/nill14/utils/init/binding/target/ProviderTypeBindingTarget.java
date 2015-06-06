@@ -26,7 +26,7 @@ public class ProviderTypeBindingTarget<T> implements BindingTarget<T> {
 
 	@Override
 	public String toString() {
-		return String.format("BindingTarget(%s)", token.getRawType().getSimpleName());
+		return String.format("ProviderTypeBindingTarget(%s)", token.getRawType().getSimpleName());
 	}
 
 }

@@ -22,6 +22,6 @@ public class BeanInstanceBindingTarget<T> implements BindingTarget<T> {
 
 	@Override
 	public String toString() {
-		return String.format("BindingTarget(%s)", instance);
+		return String.format("BeanInstanceBindingTarget(%s)", instance);
 	}
 }

@@ -113,10 +113,11 @@ public final class BindingKey<T> {
 
 	@Override
 	public String toString() {
+		String name = typeToken.getRawType().getSimpleName();
 		if (qualifier != null) {
-			return String.format("@%s %s", qualifier.annotationType().getSimpleName(), typeToken.toString());
+			return String.format("BindingKey(@%s %s)", qualifier.annotationType().getSimpleName(), name);
 		}
-		return typeToken.toString();
+		return name;
 	}
 
 

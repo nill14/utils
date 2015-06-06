@@ -85,7 +85,7 @@ public class ProvidesMethodBindingTarget<T> implements BindingTarget<T> {
 
 	@Override
 	public String toString() {
-		return String.format("BindingTarget(%s)", m);
+		return String.format("ProvidesMethodBindingTarget(%s)", m);
 	}
 
 }

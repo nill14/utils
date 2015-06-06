@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nullable;
 import javax.inject.Provider;
 
 import com.github.nill14.utils.annotation.Experimental;
@@ -14,6 +15,8 @@ import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.impl.BindingImpl;
 import com.github.nill14.utils.init.binding.impl.BindingTarget;
+import com.github.nill14.utils.init.binding.target.BeanTypeBindingTarget;
+import com.github.nill14.utils.init.binding.target.LinkedBindingTarget;
 import com.github.nill14.utils.init.binding.target.UnscopedProvider;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
@@ -38,7 +41,7 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 		Map<BindingKey<?>, BindingImpl<?>> map = Maps.newHashMap();
 		for (BindingImpl<?> binding : bindings) {
 			BindingKey<?> key = binding.getBindingKey();
-			boolean occupied = map.putIfAbsent(key, binding) != null; //TODO scope?
+			boolean occupied = map.putIfAbsent(key, binding) != null; //TODO scopes?
 			
 			if (occupied && key.getQualifier() != null) {
 				throw new RuntimeException(String.format("Duplicate key: %s", key));
@@ -61,6 +64,7 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 			map.putIfAbsent(entry.getKey(), entry.getValue());
 		}
 		
+		map = replaceLinkedBindings(map);
 		this.bindings = ImmutableMap.copyOf(map);
 	}
 
@@ -103,16 +107,64 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 		
 		if (bindings.containsKey(bindingKey)) {
 			BindingImpl<?> binding = bindings.get(bindingKey);
+			binding = findLinkedBinding(binding);
 			IScope scope = binding.getScope();
 			
 			UnscopedProvider<Object> provider = new UnscopedProvider<>(this, 
 					(BindingTarget<Object>) binding.getBindingTarget());
-			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) bindingKey, provider);
+			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) binding.getBindingKey(), provider);
 			
 			return scopedProvider.get();
 		} else {
 			return doPrototype(type);
 		}
 	}
+	
+	private BindingImpl<?> findLinkedBinding(BindingImpl<?> binding) {
+		IScope scope = binding.getScope();
+		
+		if (binding.getBindingTarget() instanceof LinkedBindingTarget) {
+			BindingKey<?> bindingKey2 = ((LinkedBindingTarget<?>) binding.getBindingTarget()).getBindingKey();
+			BindingImpl<?> binding2 = bindings.get(bindingKey2);
+			if (binding2 != null && binding2.getScope() == scope) {
+//				return findLinkedBinding(binding2);
+				return binding2;
+			}
+			else {
+				throw new RuntimeException(String.format("LinkedBinding %s without target %s", binding, bindingKey2));
+			}
+		}
+		return binding;
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private Map<BindingKey<?>, BindingImpl<?>> replaceLinkedBindings(Map<BindingKey<?>, BindingImpl<?>> map) {
+		
+		Collection<BindingImpl<?>> bindings = map.values();
+		for (BindingImpl<?> binding : bindings) {
+			BindingKey targetKey = findLinkedKey(map, binding);
+			if (targetKey != binding.getBindingKey()) {
+				binding = binding.withLinkedBinding(targetKey);
+				map.put(binding.getBindingKey(), binding);
+			}
+		}
+		
+		return map;
+	}
 
+	
+	private BindingKey<?> findLinkedKey(Map<BindingKey<?>, BindingImpl<?>> map, BindingImpl<?> binding) {
+		if (binding.getBindingTarget() instanceof BeanTypeBindingTarget) {
+			TypeToken<?> token = ((BeanTypeBindingTarget<?>) binding.getBindingTarget()).getToken();
+			BindingKey<?> bindingKey = BindingKey.of(token);
+			BindingImpl<?> linkedBinding = map.get(bindingKey);
+			if (binding != linkedBinding && linkedBinding != null && linkedBinding.getScope() == binding.getScope()) {
+				return findLinkedKey(map, linkedBinding);
+			}
+		
+		} else if (binding.getBindingTarget() instanceof LinkedBindingTarget) {
+			return ((LinkedBindingTarget<?>) binding.getBindingTarget()).getBindingKey();
+		}
+		return binding.getBindingKey();
+	}	
 }

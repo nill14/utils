@@ -31,7 +31,7 @@ public class ProviderInstanceBindingTarget<T> implements BindingTarget<T> {
 
 	@Override
 	public String toString() {
-		return String.format("BindingTarget(%s)", provider);
+		return String.format("ProviderInstanceBindingTarget(%s)", provider);
 	}
 
 }

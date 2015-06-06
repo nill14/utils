@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IScope;
+import com.github.nill14.utils.init.binding.target.LinkedBindingTarget;
 import com.google.common.base.Preconditions;
 
 public final class BindingImpl<T> {
@@ -55,6 +56,10 @@ public final class BindingImpl<T> {
 	
 	public BindingImpl<T> keyWithQualifier(Annotation qualifier) {
 		return new BindingImpl<>(bindingKey.withQualifier(qualifier), target, scope, source);
+	}
+	
+	public BindingImpl<T> withLinkedBinding(BindingKey<? extends T> targetType) {
+		return new BindingImpl<>(bindingKey, LinkedBindingTarget.create(targetType), scope, source);
 	}
 	
 }
