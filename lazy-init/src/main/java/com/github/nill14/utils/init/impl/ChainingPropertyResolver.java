@@ -2,22 +2,23 @@ package com.github.nill14.utils.init.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
-import com.google.common.collect.ImmutableList;
 
 @SuppressWarnings("serial")
 public final class ChainingPropertyResolver extends AbstractPropertyResolver {
 	
 	private final CopyOnWriteArrayList<AbstractPropertyResolver> items;
 	
-	public ChainingPropertyResolver(AbstractPropertyResolver... resolvers) {
-		items = new CopyOnWriteArrayList<>(resolvers);
+	public ChainingPropertyResolver() {
+		items = new CopyOnWriteArrayList<>();
 	}
 	
-	public ChainingPropertyResolver(ImmutableList<AbstractPropertyResolver> resolvers) {
+	public ChainingPropertyResolver(List<AbstractPropertyResolver> resolvers, ChainingPojoInitializer initializer) {
+		super(initializer);
 		items = new CopyOnWriteArrayList<>(resolvers);
 	}
 	
@@ -66,7 +67,7 @@ public final class ChainingPropertyResolver extends AbstractPropertyResolver {
 	protected Collection<?> findAllByType(IParameterType type) {
 		for (AbstractPropertyResolver resolver : items) {
 			Collection<?> result = resolver.findAllByType(type);
-			if (result != null) {
+			if (!result.isEmpty()) {
 				return result;
 			}
 		}

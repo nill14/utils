@@ -32,7 +32,8 @@ import com.google.common.reflect.TypeToken;
 public final class TestBinder implements Binder {
 	
 	private final Map<Class<? extends Annotation>, IScope> scopes = Maps.newHashMap();
-	private final ChainingPropertyResolver resolver = new ChainingPropertyResolver();
+	private final List<AbstractPropertyResolver> extraResolvers = Lists.newArrayList();
+	private final ChainingPojoInitializer initializer = ChainingPojoInitializer.defaultInitializer();
 
 	private final List<Element<BindingImpl<?>>> elements = Lists.newArrayList();
 	private final AtomicBoolean configurationLocker = new AtomicBoolean(false);
@@ -71,13 +72,8 @@ public final class TestBinder implements Binder {
 		return scope;
 	}
 
-	public TestBinder withResolver(AbstractPropertyResolver resolver) {
-		this.resolver.insert(resolver);
-		return this;
-	}
-	
 	public TestBinder withInitializer(IPojoInitializer initializer) {
-		this.resolver.appendInitializer(initializer);
+		this.initializer.append(initializer);
 		return this;
 	}
 	
@@ -95,7 +91,7 @@ public Object resolve(Object pojo, IParameterType type) {
 	 * 
 	 */
 	public TestBinder withFallbackResolver(AbstractPropertyResolver resolver) {
-		this.resolver.append(resolver);
+		this.extraResolvers.add(resolver);
 		return this;
 	}
 	
@@ -107,7 +103,7 @@ public Object resolve(Object pojo, IParameterType type) {
 		
 		
 		return new SimplePropertyResolver(bindings, 
-				new ChainingPojoInitializer(resolver.getInitializers()));
+				new ChainingPojoInitializer(initializer.getItems()));
 	}
 	
 	
@@ -118,11 +114,16 @@ public Object resolve(Object pojo, IParameterType type) {
 		
 		
 		SimplePropertyResolver propertyResolver = new SimplePropertyResolver(bindings, 
-				new ChainingPojoInitializer(resolver.getInitializers()));
+				new ChainingPojoInitializer(initializer.getItems()));
 		
+		if (extraResolvers.isEmpty()) {
+			return propertyResolver.toBeanInjector();
 		
-		
-		return propertyResolver.toBeanInjector();
+		} else {
+			ChainingPropertyResolver resolver = new ChainingPropertyResolver(extraResolvers, initializer);
+			resolver.insert(propertyResolver);
+			return resolver.toBeanInjector();
+		}
 	}
 
 	public ImmutableList<BindingImpl<?>> freezeBindings() {

@@ -16,7 +16,7 @@ public final class ChainingPojoInitializer implements IPojoInitializer {
 	
 	
 	@SafeVarargs
-	public ChainingPojoInitializer(IPojoInitializer... initializers) {
+	private ChainingPojoInitializer(IPojoInitializer... initializers) {
 		items = new CopyOnWriteArrayList<IPojoInitializer>(initializers);
 	}
 
