@@ -116,7 +116,8 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 			
 			return scopedProvider.get();
 		} else {
-			return doPrototype(type);
+//			return doPrototype(type);
+			return null; //prototyping might be eventually done by ChainingPropertyResolver
 		}
 	}
 	
