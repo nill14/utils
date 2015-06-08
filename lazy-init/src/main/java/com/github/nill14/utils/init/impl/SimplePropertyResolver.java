@@ -94,7 +94,7 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 			IScope scope = binding.getScope();
 			
 			//TODO provide scope with info about "calling" scope
-			UnscopedProvider<Object> provider = new UnscopedProvider<>(this, 
+			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, 
 					(BindingTarget<Object>) binding.getBindingTarget());
 			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) binding.getBindingKey(), provider);
 			builder.add(scopedProvider.get());
@@ -116,7 +116,7 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 			binding = findLinkedBinding(binding);
 			IScope scope = binding.getScope();
 			
-			UnscopedProvider<Object> provider = new UnscopedProvider<>(this, 
+			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, 
 					(BindingTarget<Object>) binding.getBindingTarget());
 			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) binding.getBindingKey(), provider);
 			

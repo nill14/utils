@@ -25,7 +25,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	
 	private transient volatile IBeanInjector beanInjector;
 	private final ChainingPojoInitializer initializer;
-	private final IPropertyResolver resolver;
+	protected final IPropertyResolver resolver;
 	
 	public AbstractPropertyResolver() {
 		initializer = ChainingPojoInitializer.defaultInitializer();

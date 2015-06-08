@@ -26,6 +26,9 @@ public final class ChainingPropertyResolver extends AbstractPropertyResolver {
 		if (extraResolver instanceof ChainingPropertyResolver) {
 			throw new IllegalArgumentException();
 		}
+		if (extraResolver.resolver != this) {
+			throw new IllegalStateException();
+		}
 		items.add(0, extraResolver);
 	}
 
@@ -33,6 +36,9 @@ public final class ChainingPropertyResolver extends AbstractPropertyResolver {
 		if (extraResolver instanceof ChainingPropertyResolver) {
 			throw new IllegalArgumentException();
 		}
+//		if (extraResolver.resolver != this) {
+//			throw new IllegalStateException();
+//		}
 		items.add(extraResolver);
 	}
 	
