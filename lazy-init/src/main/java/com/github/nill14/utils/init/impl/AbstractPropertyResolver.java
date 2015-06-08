@@ -25,14 +25,22 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	
 	private transient volatile IBeanInjector beanInjector;
 	private final ChainingPojoInitializer initializer;
+	private final IPropertyResolver resolver;
 	
 	public AbstractPropertyResolver() {
 		initializer = ChainingPojoInitializer.defaultInitializer();
+		resolver = this; 
 	}
 	
 	public AbstractPropertyResolver(ChainingPojoInitializer initializer) {
 		this.initializer = initializer;
+		this.resolver = this;
 	}
+	
+	public AbstractPropertyResolver(ChainingPropertyResolver parent) {
+		this.resolver = parent;
+		this.initializer = parent.getInitializer();
+	}	
 	
 	@Override
 	public Object resolve(IParameterType type) {
@@ -71,10 +79,10 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			return toBeanInjector();
 		
 		} else if (IQualifiedProvider.class.equals(rawType)) {
-			return new QualifiedProvider(type.getFirstParamToken(), this);
+			return new QualifiedProvider(type.getFirstParamToken(), resolver);
 		
 		} else if (Provider.class.equals(rawType)) {
-			return new LazyResolvingProvider<>(this, type.getFirstParamType());
+			return new LazyResolvingProvider<>(resolver, type.getFirstParamType());
 		}
 		
 		Optional<String> named = type.getNamed();
@@ -131,7 +139,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	protected Object doPrototype(IParameterType type) {
 		IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
 		if (typeDescriptor.canBeInstantiated()) {
-			return new BeanTypePojoFactory<>(typeDescriptor).newInstance(this);
+			return new BeanTypePojoFactory<>(typeDescriptor).newInstance(resolver);
 		}
 		return null;
 	}
@@ -140,7 +148,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	public IBeanInjector toBeanInjector() {
 		IBeanInjector beanInjector = this.beanInjector;
 		if (beanInjector == null) {
-			this.beanInjector = beanInjector = new BeanInjector(this);
+			this.beanInjector = beanInjector = new BeanInjector(resolver);
 		}
 		return beanInjector;
 	}
@@ -148,12 +156,12 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	
 	@Override
 	public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance) {
-		initializer.init(this, beanDescriptor, instance);
+		initializer.init(resolver, beanDescriptor, instance);
 	}
 
 	@Override
 	public <T> void destroyBean(IBeanDescriptor<T> beanDescriptor, Object instance) {
-		initializer.destroy(this, beanDescriptor, instance);
+		initializer.destroy(resolver, beanDescriptor, instance);
 	}
 	
 	@Override
@@ -170,5 +178,9 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	@Override
 	public List<IPojoInitializer> getInitializers() {
 		return initializer.getItems();
+	}
+	
+	protected ChainingPojoInitializer getInitializer() {
+		return initializer;
 	}
 }

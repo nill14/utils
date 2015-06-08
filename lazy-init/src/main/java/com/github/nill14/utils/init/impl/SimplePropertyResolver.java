@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.Nullable;
 import javax.inject.Provider;
 
 import com.github.nill14.utils.annotation.Experimental;
@@ -36,7 +35,16 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 
 	public SimplePropertyResolver(ImmutableList<BindingImpl<?>> bindings, ChainingPojoInitializer initializer) {
 		super(initializer);
-		
+		this.bindings = prepareBindings(bindings);
+	}
+
+	
+	public SimplePropertyResolver(ImmutableList<BindingImpl<?>> bindings, ChainingPropertyResolver parent) {
+		super(parent);
+		this.bindings = prepareBindings(bindings);
+	}
+
+	private final ImmutableMap<BindingKey<?>, BindingImpl<?>> prepareBindings(ImmutableList<BindingImpl<?>> bindings)  {
 		Map<BindingKey<?>, BindingImpl<?>> rawBindingCandidates = Maps.newHashMap();
 		Map<BindingKey<?>, BindingImpl<?>> map = Maps.newHashMap();
 		for (BindingImpl<?> binding : bindings) {
@@ -65,10 +73,8 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 		}
 		
 		map = replaceLinkedBindings(map);
-		this.bindings = ImmutableMap.copyOf(map);
+		return ImmutableMap.copyOf(map);
 	}
-
-
 
 	@Override
 	protected Object findByName(String name, IParameterType type) {

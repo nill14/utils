@@ -113,14 +113,15 @@ public Object resolve(Object pojo, IParameterType type) {
 		ImmutableList<BindingImpl<?>> bindings = freezeBindings();
 		
 		
-		SimplePropertyResolver propertyResolver = new SimplePropertyResolver(bindings, 
-				new ChainingPojoInitializer(initializer.getItems()));
 		
 		if (extraResolvers.isEmpty()) {
+			SimplePropertyResolver propertyResolver = new SimplePropertyResolver(bindings, 
+					new ChainingPojoInitializer(initializer.getItems()));
 			return propertyResolver.toBeanInjector();
 		
 		} else {
 			ChainingPropertyResolver resolver = new ChainingPropertyResolver(extraResolvers, initializer);
+			SimplePropertyResolver propertyResolver = new SimplePropertyResolver(bindings, resolver);
 			resolver.insert(propertyResolver);
 			return resolver.toBeanInjector();
 		}
