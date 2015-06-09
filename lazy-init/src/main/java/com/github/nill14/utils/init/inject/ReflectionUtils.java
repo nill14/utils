@@ -60,7 +60,11 @@ public enum ReflectionUtils {
 		
 		List<BindingImpl<?>> result = Lists.newArrayList();
 		Class<?> moduleClass = module.getClass();
-		for (Method m : moduleClass.getDeclaredMethods()) {
+		Stream<Method> stream = ReflectionUtils.getSuperClasses(moduleClass.getClass())
+			.flatMap(cls -> Stream.of(cls.getDeclaredMethods()));
+		
+		Iterable<Method> iterable = stream::iterator;
+		for (Method m : iterable) {
 			
 			if (m.isAnnotationPresent(Provides.class) || (isGuicePresent && OptionalGuiceDependency.isGuiceProvidesPresent(m))) {
 				TypeToken typeToken = TypeToken.of(m.getGenericReturnType());
