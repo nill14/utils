@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Singleton;
@@ -22,16 +23,16 @@ import com.github.nill14.utils.init.impl.ChainingPojoInitializer;
 import com.github.nill14.utils.init.impl.ChainingPropertyResolver;
 import com.github.nill14.utils.init.impl.SimplePropertyResolver;
 import com.github.nill14.utils.init.meta.AnnotationScanner;
+import com.github.nill14.utils.init.scope.PrototypeScope;
 import com.github.nill14.utils.init.scope.SingletonScope;
 import com.github.nill14.utils.init.util.Element;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
 public final class TestBinder implements Binder {
 	
-	private final Map<Class<? extends Annotation>, IScope> scopes = Maps.newHashMap();
+	private final Map<Class<? extends Annotation>, IScope> scopes = new ConcurrentHashMap<>(); //does not allow nulls
 	private final List<AbstractPropertyResolver> extraResolvers = Lists.newArrayList();
 	private final ChainingPojoInitializer initializer = ChainingPojoInitializer.defaultInitializer();
 
@@ -131,17 +132,31 @@ public Object resolve(Object pojo, IParameterType type) {
 		configurationLocker.set(true);
 		
 		ImmutableList<BindingImpl<?>> bindings = ImmutableList.copyOf(
-				elements.stream().map(Element::getValue).map(this::scanQualifier).iterator());
+				elements.stream().map(Element::getValue).map(this::scanQualifierAndScope).iterator());
 		return bindings;
 	}
 	
-	private <T> BindingImpl<T> scanQualifier(BindingImpl<T> binding) {
+	private <T> BindingImpl<T> scanQualifierAndScope(BindingImpl<T> binding) {
 		AnnotatedElementBindingTargetVisitor targetVisitor = new AnnotatedElementBindingTargetVisitor();
 		BindingKey<T> bindingKey = binding.getBindingKey();
-		if (bindingKey.getQualifier() == null) {
+		boolean isPrototypeScope = binding.getScope() == PrototypeScope.instance();
+		//TODO make the prototype check safer
+		
+		if (bindingKey.getQualifier() == null || isPrototypeScope) {
 			AnnotatedElement annotatedElement = binding.getBindingTarget().accept(targetVisitor);
-			Annotation qualifier = AnnotationScanner.findQualifier(annotatedElement).orElse(null);
-			return binding.keyWithQualifier(qualifier);
+			
+			if (bindingKey.getQualifier() == null) {
+				Annotation qualifier = AnnotationScanner.findQualifier(annotatedElement).orElse(null);
+				binding = binding.keyWithQualifier(qualifier);
+			}
+			
+			if (isPrototypeScope) {
+				Annotation scopeAnnotation = AnnotationScanner.findScope(annotatedElement).orElse(null);
+				if (scopeAnnotation != null) {
+					IScope scope = getScope(scopeAnnotation.annotationType());
+					binding = binding.withScope(scope);
+				}
+			}
 		}
 		
 		return binding;

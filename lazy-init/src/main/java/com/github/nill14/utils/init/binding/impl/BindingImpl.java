@@ -62,4 +62,8 @@ public final class BindingImpl<T> {
 		return new BindingImpl<>(bindingKey, LinkedBindingTarget.create(targetType), scope, source);
 	}
 	
+	public BindingImpl<T> withScope(IScope scope) {
+		return new BindingImpl<>(bindingKey, target, scope, source);
+	}	
+	
 }
