@@ -1,6 +1,7 @@
 package com.github.nill14.utils.init.inject;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +19,6 @@ import com.github.nill14.utils.init.meta.Provides;
 import com.github.nill14.utils.init.scope.PrototypeScope;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
-import com.google.common.reflect.TypeToken.TypeSet;
 
 public enum ReflectionUtils {
 	;
@@ -55,12 +55,14 @@ public enum ReflectionUtils {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static List<BindingImpl<?>> scanProvidesBindings(Binder binder, Object module) {
+		//avoid confusion with importing the wrong import
+		boolean isGuiceProvidesPresent = ReflectionUtils.isClassPresent("com.google.inject.Provides");
 		
 		List<BindingImpl<?>> result = Lists.newArrayList();
 		Class<?> moduleClass = module.getClass();
 		for (Method m : moduleClass.getDeclaredMethods()) {
 			
-			if (m.isAnnotationPresent(Provides.class)) {
+			if (m.isAnnotationPresent(Provides.class) || (isGuiceProvidesPresent && OptionalGuiceDependency.isGuiceProvidesPresent(m))) {
 				TypeToken typeToken = TypeToken.of(m.getGenericReturnType());
 				ProvidesMethodBindingTarget<Object> target = new ProvidesMethodBindingTarget<>(m, module);
 				
@@ -92,4 +94,11 @@ public enum ReflectionUtils {
 				.filter(t -> !Object.class.equals(t.getRawType()))
 				.map(t -> t.getRawType());
 	}
+	
+	private static final class OptionalGuiceDependency {
+		
+		public static boolean isGuiceProvidesPresent(AnnotatedElement element) {
+			return element.isAnnotationPresent(com.google.inject.Provides.class);
+		}
+	}	
 }
