@@ -56,13 +56,13 @@ public enum ReflectionUtils {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static List<BindingImpl<?>> scanProvidesBindings(Binder binder, Object module) {
 		//avoid confusion with importing the wrong import
-		boolean isGuiceProvidesPresent = ReflectionUtils.isClassPresent("com.google.inject.Provides");
+		boolean isGuicePresent = ReflectionUtils.isClassPresent("com.google.inject.Provides");
 		
 		List<BindingImpl<?>> result = Lists.newArrayList();
 		Class<?> moduleClass = module.getClass();
 		for (Method m : moduleClass.getDeclaredMethods()) {
 			
-			if (m.isAnnotationPresent(Provides.class) || (isGuiceProvidesPresent && OptionalGuiceDependency.isGuiceProvidesPresent(m))) {
+			if (m.isAnnotationPresent(Provides.class) || (isGuicePresent && OptionalGuiceDependency.isGuiceProvidesPresent(m))) {
 				TypeToken typeToken = TypeToken.of(m.getGenericReturnType());
 				ProvidesMethodBindingTarget<Object> target = new ProvidesMethodBindingTarget<>(m, module);
 				
