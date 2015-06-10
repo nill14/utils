@@ -32,7 +32,9 @@ public final class ProviderTypePojoFactory<T, F extends Provider<? extends T>> i
 	@Override
 	public T newInstance(IPropertyResolver resolver) {
 		T instance = pojoFactory.newInstance(resolver).get();
-		resolver.initializeBean(getDescriptor(), instance);
+		if (instance != null) {
+			resolver.initializeBean(getDescriptor(), instance);
+		}
 		return instance;
 	}
 

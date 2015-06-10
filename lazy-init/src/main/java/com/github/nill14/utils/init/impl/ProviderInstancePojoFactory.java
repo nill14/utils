@@ -56,7 +56,9 @@ public final class ProviderInstancePojoFactory<T> implements IPojoFactory<T> {
 	@Override
 	public T newInstance(IPropertyResolver resolver) {
 		T instance = provider.get();
-		resolver.initializeBean(getDescriptor(), instance);
+		if (instance != null) {
+			resolver.initializeBean(getDescriptor(), instance);
+		}
 		return instance;
 	}
 
