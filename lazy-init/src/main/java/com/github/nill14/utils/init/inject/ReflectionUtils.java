@@ -59,8 +59,7 @@ public enum ReflectionUtils {
 		boolean isGuicePresent = ReflectionUtils.isClassPresent("com.google.inject.Provides");
 		
 		List<BindingImpl<?>> result = Lists.newArrayList();
-		Class<?> moduleClass = module.getClass();
-		Stream<Method> stream = ReflectionUtils.getSuperClasses(moduleClass.getClass())
+		Stream<Method> stream = ReflectionUtils.getSuperClasses(module.getClass())
 			.flatMap(cls -> Stream.of(cls.getDeclaredMethods()));
 		
 		Iterable<Method> iterable = stream::iterator;
