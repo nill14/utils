@@ -3,9 +3,7 @@ package com.github.nill14.utils.init.impl;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -30,9 +28,7 @@ public final class AnnotationLifecycleInitializer implements IPojoInitializer {
 	}
 	
 	private Optional<Method> getMethod(Object instance, Class<? extends Annotation> annotationClass) {
-		return ReflectionUtils.getSuperClasses(instance.getClass())
-			.flatMap(cls -> Stream.of(cls.getDeclaredMethods()))
-			.filter(m -> !Modifier.isStatic(m.getModifiers()))
+		return ReflectionUtils.getInstanceMethods(instance.getClass())
 			.filter(m -> m.isAnnotationPresent(annotationClass))
 			.findFirst();
 	}	
@@ -43,7 +39,7 @@ public final class AnnotationLifecycleInitializer implements IPojoInitializer {
 		} catch (IllegalAccessException | IllegalArgumentException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e.getTargetException());
+			throw new RuntimeException(String.format("Exception in %s", method), e.getTargetException());
 		}
 	}
 	

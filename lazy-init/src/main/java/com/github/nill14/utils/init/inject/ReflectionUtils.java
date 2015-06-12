@@ -3,6 +3,7 @@ package com.github.nill14.utils.init.inject;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -59,8 +60,7 @@ public enum ReflectionUtils {
 		boolean isGuicePresent = ReflectionUtils.isClassPresent("com.google.inject.Provides");
 		
 		List<BindingImpl<?>> result = Lists.newArrayList();
-		Stream<Method> stream = ReflectionUtils.getSuperClasses(module.getClass())
-			.flatMap(cls -> Stream.of(cls.getDeclaredMethods()));
+		Stream<Method> stream = ReflectionUtils.getInstanceMethods(module.getClass());
 		
 		Iterable<Method> iterable = stream::iterator;
 		for (Method m : iterable) {
@@ -97,6 +97,22 @@ public enum ReflectionUtils {
 				.filter(t -> !Object.class.equals(t.getRawType()))
 				.map(t -> t.getRawType());
 	}
+	
+	
+	/**
+	 * Stream of non-static methods declared on the class or it's super-classes.
+	 * Methods declared on Object are excluded unless they are overridden.
+	 * Methods are ordered from subclass to superclass
+	 * @param clazz
+	 * @return Stream of non-static methods declared on the class or it's super-classes (excluding Object-declared methods).
+	 */
+	public static <T> Stream<Method> getInstanceMethods(Class<T> clazz) {
+		return getSuperClasses(clazz)
+				.flatMap(cls -> Stream.of(cls.getDeclaredMethods()))
+				.filter(m -> !Modifier.isStatic(m.getModifiers()));
+	}
+	
+
 	
 	private static final class OptionalGuiceDependency {
 		
