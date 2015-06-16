@@ -1,32 +1,20 @@
 package com.github.nill14.utils.init.binding.target;
 
-import java.util.function.Function;
-
 import javax.inject.Provider;
 
-import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IPojoFactory;
-import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.binding.impl.BindingTargetVisitor;
 import com.github.nill14.utils.init.impl.BeanInstancePojoFactory;
 import com.github.nill14.utils.init.impl.BeanTypePojoFactory;
-import com.github.nill14.utils.init.impl.ProviderTypePojoFactory;
 import com.github.nill14.utils.init.impl.ProviderInstancePojoFactory;
+import com.github.nill14.utils.init.impl.ProviderTypePojoFactory;
+import com.github.nill14.utils.init.impl.MethodPojoFactory;
 import com.google.common.reflect.TypeToken;
 
 public class PojoFactoryBindingTargetVisitor implements BindingTargetVisitor<IPojoFactory<?>> {
 
 	
-	private final IPropertyResolver resolver;
-
-	/**
-	 * 
-	 * @param resolver
-	 * @param initializer
-	 * @param lookupFunction A lookup function, may return null
-	 */
-	public PojoFactoryBindingTargetVisitor(IPropertyResolver resolver) {
-		this.resolver = resolver;
+	public PojoFactoryBindingTargetVisitor() {
 	}
 	
 	@Override
@@ -53,8 +41,8 @@ public class PojoFactoryBindingTargetVisitor implements BindingTargetVisitor<IPo
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public IPojoFactory<?> visit(ProvidesMethodBindingTarget<?> bindingTarget) {
-		return ProviderInstancePojoFactory.of((TypeToken<Object>) bindingTarget.getToken(), 
-				() -> bindingTarget.injectMethod(resolver));
+		return MethodPojoFactory.of((TypeToken<Object>) bindingTarget.getToken(), 
+				bindingTarget.getMethod(), bindingTarget.getInstance());
 	}
 	
 	

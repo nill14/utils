@@ -15,7 +15,7 @@ public final class UnscopedProvider<T> implements Provider<T> {
 	@SuppressWarnings("unchecked")
 	public UnscopedProvider(IPropertyResolver resolver, BindingTarget<T> target) {
 		this.resolver = resolver;
-		PojoFactoryBindingTargetVisitor bindingTargetVisitor = new PojoFactoryBindingTargetVisitor(resolver); 
+		PojoFactoryBindingTargetVisitor bindingTargetVisitor = new PojoFactoryBindingTargetVisitor(); 
 		pojoFactory = (IPojoFactory<T>) target.accept(bindingTargetVisitor);
 	}
 

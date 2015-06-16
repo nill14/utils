@@ -48,41 +48,6 @@ public class ProvidesMethodBindingTarget<T> implements BindingTarget<T> {
 		return bindingTargetVisitor.visit(this);
 	}
 	
-	
-	public Object injectMethod(IPropertyResolver resolver) {
-		MethodInjectionDescriptor member = new MethodInjectionDescriptor(m, m.getDeclaringClass());
-		Object[] args = createArgs(resolver, member.getParameterTypes());
-		
-		try {
-			Object object = member.invoke(instance, args);
-//			IPojoInitializer.standard().init(null, pojoFactory, object);
-			//TODO inject members
-			return object;
-		} catch (ReflectiveOperationException e) {
-			throw new RuntimeException(String.format(
-					"Cannot inject %s", member), e);
-		}
-			
-	}	
-	
-	private Object[] createArgs(IPropertyResolver resolver, Collection<IParameterType> types) {
-		if (types.isEmpty()) {
-			return null;
-		}
-		
-		Object[] args = new Object[types.size()];
-		int i = 0;
-		for (IParameterType type : types) {
-			Object arg = resolver.resolve(type);
-			if (null == arg && !type.isNullable()) {
-				throw new RuntimeException(String.format("Cannot resolve property %s", type.getToken()));
-			}
-			args[i++] = arg;
-		}
-		return args;
-	}
-	
-
 	@Override
 	public String toString() {
 		return String.format("ProvidesMethodBindingTarget(%s)", m);

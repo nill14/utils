@@ -9,6 +9,7 @@ import com.github.nill14.utils.init.binding.impl.BindingTargetVisitor;
 import com.github.nill14.utils.init.impl.BeanInstancePojoFactory;
 import com.github.nill14.utils.init.impl.BeanTypePojoFactory;
 import com.github.nill14.utils.init.impl.LazyPojo;
+import com.github.nill14.utils.init.impl.MethodPojoFactory;
 import com.github.nill14.utils.init.impl.ProviderInstancePojoFactory;
 import com.github.nill14.utils.init.impl.ProviderTypePojoFactory;
 import com.google.common.reflect.TypeToken;
@@ -58,13 +59,8 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 	@Override
 	public ILazyPojo<?> visit(ProvidesMethodBindingTarget<?> bindingTarget) {
 		
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		IPojoFactory<?> pojoFactory = new ProviderInstancePojoFactory(bindingTarget.getToken(), new Provider<Object>() {
-			@Override
-			public Object get() {
-				return bindingTarget.injectMethod(resolver);
-			}
-		});
+		IPojoFactory<?> pojoFactory = MethodPojoFactory.of(bindingTarget.getToken(), 
+				bindingTarget.getMethod(), bindingTarget.getInstance());
 		return LazyPojo.forFactory(pojoFactory, resolver);
 	}
 	
