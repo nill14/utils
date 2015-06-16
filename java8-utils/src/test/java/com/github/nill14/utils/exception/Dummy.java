@@ -6,6 +6,6 @@ public class Dummy {
 	}
 	
 	public static String another(int level) {
-		return StackTraceParser.getCalledMethod(level);
+		return StackTraceParser.getCalledMethod(new RuntimeException(), level);
 	}
 }

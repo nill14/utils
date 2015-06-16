@@ -10,9 +10,8 @@ public enum StackTraceParser {
 	 * @param level The caller className level, must be bigger than zero
 	 * @return e.g. "(Dummy.java:9): getCalledMethod()" for level=1
 	 */
-	public static String getCalledMethod(int level) {
-		RuntimeException e = new RuntimeException();
-		StackTraceElement[] stackTrace = e.getStackTrace();
+	public static String getCalledMethod(Exception exception, int level) {
+		StackTraceElement[] stackTrace = exception.getStackTrace();
 		
 		int index = findNthFilename(stackTrace, level);
 		
