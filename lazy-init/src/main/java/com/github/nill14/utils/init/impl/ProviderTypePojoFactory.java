@@ -58,5 +58,9 @@ public final class ProviderTypePojoFactory<T, F extends Provider<? extends T>> i
 		}
 		return h;
 	}
+	
+	public IPojoFactory<F> getNestedPojoFactory() {
+		return pojoFactory;
+	}
 
 }

@@ -5,18 +5,15 @@ import javax.inject.Provider;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
-import com.github.nill14.utils.init.binding.impl.BindingTarget;
 
 public final class UnscopedProvider<T> implements Provider<T> {
 	
 	private final IPropertyResolver resolver;
 	private final IPojoFactory<T> pojoFactory;
 
-	@SuppressWarnings("unchecked")
-	public UnscopedProvider(IPropertyResolver resolver, BindingTarget<T> target) {
+	public UnscopedProvider(IPropertyResolver resolver, IPojoFactory<T> pojoFactory) {
 		this.resolver = resolver;
-		PojoFactoryBindingTargetVisitor bindingTargetVisitor = new PojoFactoryBindingTargetVisitor(); 
-		pojoFactory = (IPojoFactory<T>) target.accept(bindingTargetVisitor);
+		this.pojoFactory = pojoFactory;
 	}
 
 	@Override

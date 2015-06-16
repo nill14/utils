@@ -4,24 +4,29 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Provider;
 
 import com.github.nill14.utils.annotation.Experimental;
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IParameterType;
+import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.impl.BindingImpl;
 import com.github.nill14.utils.init.binding.impl.BindingTarget;
 import com.github.nill14.utils.init.binding.target.BeanTypeBindingTarget;
 import com.github.nill14.utils.init.binding.target.LinkedBindingTarget;
+import com.github.nill14.utils.init.binding.target.PojoFactoryBindingTargetVisitor;
 import com.github.nill14.utils.init.binding.target.UnscopedProvider;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 
 @Experimental
@@ -31,18 +36,40 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 	
 	private final ImmutableMap<BindingKey<?>, BindingImpl<?>> bindings;
 	private final Multimap<TypeToken<?>, BindingImpl<?>> typeBindings = ArrayListMultimap.create();
+	private final ImmutableMap<BindingTarget<?>, IPojoFactory<?>> bindingFactories;
 	
 
 	public SimplePropertyResolver(ImmutableList<BindingImpl<?>> bindings, ChainingPojoInitializer initializer) {
 		super(initializer);
 		this.bindings = prepareBindings(bindings);
+		this.bindingFactories = prepareFactories(this.bindings.values());
 	}
 
 	
 	public SimplePropertyResolver(ImmutableList<BindingImpl<?>> bindings, ChainingPropertyResolver parent) {
 		super(parent);
 		this.bindings = prepareBindings(bindings);
+		this.bindingFactories = prepareFactories(this.bindings.values());
 	}
+
+	private ImmutableMap<BindingTarget<?>, IPojoFactory<?>> prepareFactories(
+			Collection<BindingImpl<?>> bindings) {
+		
+		Set<BindingTarget<?>> targets = bindings.stream()
+			.map(b -> b.getBindingTarget())
+			.filter(t -> !(t instanceof LinkedBindingTarget))
+			.collect(Collectors.toSet());
+		
+		ImmutableMap.Builder<BindingTarget<?>, IPojoFactory<?>> builder = ImmutableMap.builder();
+		PojoFactoryBindingTargetVisitor bindingTargetVisitor = new PojoFactoryBindingTargetVisitor(); 
+		for (BindingTarget<?> target : targets) {
+			IPojoFactory<?> pojoFactory = target.accept(bindingTargetVisitor);
+			builder.put(target, pojoFactory);
+		}
+		
+		return builder.build();
+	}
+
 
 	private final ImmutableMap<BindingKey<?>, BindingImpl<?>> prepareBindings(ImmutableList<BindingImpl<?>> bindings)  {
 		Map<BindingKey<?>, BindingImpl<?>> rawBindingCandidates = Maps.newHashMap();
@@ -86,18 +113,22 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 		return simple(type);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected Collection<?> findAllByType(IParameterType type) {
 		Collection<BindingImpl<?>> bindings = typeBindings.get(type.getToken());
 		ImmutableList.Builder<Object> builder = ImmutableList.builder();
 		for (BindingImpl<?> binding : bindings) {
 			IScope scope = binding.getScope();
+			IPojoFactory<Object> pojoFactory = (IPojoFactory<Object>) bindingFactories.get(binding.getBindingTarget());
 			
 			//TODO provide scope with info about "calling" scope
-			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, 
-					(BindingTarget<Object>) binding.getBindingTarget());
+			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, pojoFactory); 
 			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) binding.getBindingKey(), provider);
-			builder.add(scopedProvider.get());
+			Object element = scopedProvider.get();
+			if (element != null) {
+				builder.add(element);
+			}
 		}
 		return builder.build();
 	}
@@ -115,15 +146,15 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 			BindingImpl<?> binding = bindings.get(bindingKey);
 			binding = findLinkedBinding(binding);
 			IScope scope = binding.getScope();
+			IPojoFactory<Object> pojoFactory = (IPojoFactory<Object>) bindingFactories.get(binding.getBindingTarget());
 			
-			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, 
-					(BindingTarget<Object>) binding.getBindingTarget());
+			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, pojoFactory);
 			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) binding.getBindingKey(), provider);
 			
 			return scopedProvider.get();
 		} else {
 //			return doPrototype(type);
-			return null; //prototyping might be eventually done by ChainingPropertyResolver
+			return null; //prototyping might eventually be done by ChainingPropertyResolver
 		}
 	}
 	
@@ -174,4 +205,48 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 		}
 		return binding.getBindingKey();
 	}	
+	
+	
+	@SuppressWarnings("rawtypes")
+	private static void mergeDependencies(Set<TypeToken<?>> requiredDependencies, Set<TypeToken<?>> optionalDependencies, IPojoFactory<?> pojoFactory) {
+		
+		Map<TypeToken<?>, Boolean> pojoDependencies = pojoFactory.getDescriptor().collectDependencies();
+		for (Entry<TypeToken<?>, Boolean> dep : pojoDependencies.entrySet()) {
+			boolean isRequired = dep.getValue();
+			if (isRequired) {
+				requiredDependencies.add(dep.getKey());
+			} else {
+				optionalDependencies.add(dep.getKey());
+			}
+			
+			if (pojoFactory instanceof ProviderTypePojoFactory) {
+				IPojoFactory<?> nestedPojoFactory = ((ProviderTypePojoFactory) pojoFactory).getNestedPojoFactory();
+				mergeDependencies(requiredDependencies, optionalDependencies, nestedPojoFactory);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @return a map where key is a dependency (e.g. @Inject) and value is whether the dependency is required. 
+	 */
+	public Map<TypeToken<?>, Boolean> collectDependencies() {
+		Set<TypeToken<?>> requiredDependencies = Sets.newHashSet();
+		Set<TypeToken<?>> optionalDependencies = Sets.newHashSet();
+		
+		for (IPojoFactory<?> pojoFactory : bindingFactories.values()) {
+			mergeDependencies(requiredDependencies, optionalDependencies, pojoFactory);
+		}
+		
+		optionalDependencies = Sets.difference(requiredDependencies, optionalDependencies);
+		ImmutableMap.Builder<TypeToken<?>, Boolean> builder = ImmutableMap.builder(); 
+		for (TypeToken<?> token : optionalDependencies) {
+			builder.put(token, false);
+		}
+		for (TypeToken<?> token : requiredDependencies) {
+			builder.put(token, true);
+		}
+		
+		return builder.build();
+	}
 }
