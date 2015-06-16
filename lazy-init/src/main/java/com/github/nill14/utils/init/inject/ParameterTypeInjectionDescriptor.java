@@ -20,8 +20,7 @@ import com.google.common.reflect.TypeToken;
 public class ParameterTypeInjectionDescriptor implements IParameterType {
 	
 	
-	private static final boolean isGuiceInjectPresent = ReflectionUtils.isClassPresent("com.google.inject.Inject");
-	private static final boolean isGuiceNamedPresent = ReflectionUtils.isClassPresent("com.google.inject.name.Named");
+	private static final boolean isGuicePresent = ReflectionUtils.isClassPresent("com.google.inject.Inject");
 	
 	private final Type type;
 	private final TypeToken<?> typeToken;
@@ -30,6 +29,7 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 	private final @Nullable Annotation qualifier;
 	private final ImmutableMap<Class<? extends Annotation>, Annotation> annotations;
 	private final boolean optional;
+	private final boolean collection; 
 	private final boolean nullable;
 	private final Class<?> declaringClass;
 	
@@ -57,7 +57,7 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 		Annotation qualifier = null;
 		ImmutableMap<Class<? extends Annotation>, Annotation> annotations2 = ImmutableMap.copyOf(AnnotationScanner.indexAnnotations(annotations));
 		Stream<Annotation> stream = Stream.of(annotations).filter(a -> a.annotationType().isAnnotationPresent(javax.inject.Qualifier.class));
-		if (isGuiceInjectPresent) {
+		if (isGuicePresent) {
 			stream = OptionalGuiceDependency.appendNamed(stream, annotations2);
 		}
 		
@@ -77,7 +77,7 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 		
 		} else {
 			//see Names.named(String)
-			optionalNamed = isGuiceNamedPresent ? OptionalGuiceDependency.getOptionalNamed(annotations2): Optional.empty();
+			optionalNamed = isGuicePresent ? OptionalGuiceDependency.getOptionalNamed(annotations2): Optional.empty();
 		}
 	
 		return new ParameterTypeInjectionDescriptor(type, TypeToken.of(type), optionalNamed, qualifier, annotations2, declaringClass);
@@ -103,10 +103,12 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 		if (nullable != null) {
 			this.nullable = true;
 		} else {
-			Optional<Boolean> googleInject = isGuiceInjectPresent ? 
+			Optional<Boolean> googleInject = isGuicePresent ? 
 				OptionalGuiceDependency.isOptionalInject(annotations) : null;
 				this.nullable = googleInject != null && googleInject.get() == true;
 		}
+		
+		collection = Iterable.class.isAssignableFrom(typeToken.getRawType());
 		
 	}
 
@@ -196,6 +198,11 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 	@Override
 	public boolean isOptional() {
 		return optional;
+	}
+	
+	@Override
+	public boolean isCollection() {
+		return collection;
 	}
 
 	@Override

@@ -45,7 +45,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	@Override
 	public Object resolve(IParameterType type) {
 		
-		boolean isCollection = isCollection(type);
+		boolean isCollection = type.isCollection();
 		if (isCollection || type.isOptional()) { 
 			Class<?> baseType = type.getRawType();
 			IParameterType paramType = type.getFirstParamType();
@@ -131,10 +131,6 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	protected abstract Collection<?> findAllByType(IParameterType type);
 
 	protected abstract @Nullable Object findByQualifier(IParameterType type, Annotation qualifier);
-	
-	protected boolean isCollection(IParameterType type) {
-		return Iterable.class.isAssignableFrom(type.getRawType());
-	}
 	
 	protected Object doPrototype(IParameterType type) {
 		IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);

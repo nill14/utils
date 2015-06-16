@@ -38,6 +38,12 @@ public interface IParameterType {
 
 	boolean isOptional();
 	
+	/**
+	 * 
+	 * @return if is subclass of Iterable
+	 */
+	boolean isCollection();
+	
 	boolean isNullable();
 
 	Optional<String> getNamed();
