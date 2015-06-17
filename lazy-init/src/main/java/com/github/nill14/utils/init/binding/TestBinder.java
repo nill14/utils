@@ -22,6 +22,7 @@ import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
 import com.github.nill14.utils.init.impl.ChainingPojoInitializer;
 import com.github.nill14.utils.init.impl.ChainingPropertyResolver;
 import com.github.nill14.utils.init.impl.SimplePropertyResolver;
+import com.github.nill14.utils.init.inject.ReflectionUtils;
 import com.github.nill14.utils.init.meta.AnnotationScanner;
 import com.github.nill14.utils.init.scope.PrototypeScope;
 import com.github.nill14.utils.init.scope.SingletonScope;
@@ -162,4 +163,11 @@ public Object resolve(Object pojo, IParameterType type) {
 		return binding;
 	}
 	
+	public void scanProvidesBindings(Object module) {
+		List<BindingImpl<?>> list = ReflectionUtils.scanProvidesBindings(this, module);
+		for (final BindingImpl<?> binding : list) {
+			final Element<BindingImpl<?>> element = newElement();
+			element.update(binding);
+		}
+	}
 }

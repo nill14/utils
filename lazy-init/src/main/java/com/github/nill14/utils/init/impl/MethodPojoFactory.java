@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
+import com.github.nill14.utils.init.api.IMemberDescriptor;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -23,13 +24,13 @@ public final class MethodPojoFactory<T> implements IPojoFactory<T> {
     /** Cache the beanDescriptor */
     private IBeanDescriptor<T> beanDescriptor;
 
-    private final Method method;
-	private final Object instance; 
+	private final Object instance;
+	private MethodInjectionDescriptor member; 
 	
 	public MethodPojoFactory(TypeToken<T> typeToken, Method m, Object instance) {
 		this.typeToken = typeToken;
-		this.method = m;
 		this.instance = instance;
+		member = new MethodInjectionDescriptor(m, m.getDeclaringClass());
 	}
 	
 	
@@ -49,7 +50,7 @@ public final class MethodPojoFactory<T> implements IPojoFactory<T> {
 
 	
 	@Override
-	public IBeanDescriptor<T> getDescriptor() {
+	public IBeanDescriptor<T> getDescriptor() { 
 		//avoiding synchronization on purpose
 		IBeanDescriptor<T> h = beanDescriptor;
 		if (h == null) {
@@ -59,10 +60,14 @@ public final class MethodPojoFactory<T> implements IPojoFactory<T> {
 		return h;
 	}
 	
+	public IMemberDescriptor getMethodDescriptor() {
+		return member;
+	}
+	
 	
 	@SuppressWarnings("unchecked")
 	public T injectMethod(IPropertyResolver resolver) {
-		MethodInjectionDescriptor member = new MethodInjectionDescriptor(method, method.getDeclaringClass());
+		
 		try {
 			Object[] args = createArgs(resolver, member.getParameterTypes());
 			return (T) member.invoke(instance, args);

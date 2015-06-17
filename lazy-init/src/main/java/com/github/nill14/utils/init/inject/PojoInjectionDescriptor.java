@@ -9,20 +9,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
-import com.github.nill14.utils.init.api.IMemberDescriptor;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
 
@@ -160,41 +154,6 @@ public class PojoInjectionDescriptor<T> implements Serializable, IBeanDescriptor
 		return !clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers()) && !constructors.isEmpty();
 	}	
 
-	@Override
-	public Map<TypeToken<?>, Boolean> collectDependencies() {
-		return ImmutableMap.copyOf(transformDependencies(collectDependencyTypes()));
-	}
-	
-	
-	private List<IParameterType> collectDependencyTypes() {
-		Stream<IMemberDescriptor> members = Stream.concat(fields.stream(), 
-				Stream.concat(methods.stream(), constructors.stream()));
-		return members
-				.flatMap(f -> f.getParameterTypes().stream())
-				.collect(Collectors.toList());
-	}
-	
-	private static Map<TypeToken<?>, Boolean> transformDependencies(Collection<IParameterType> types) {
-		Map<TypeToken<?>, Boolean> result = Maps.newHashMap();
-		
-		for (IParameterType type : types) {
-			boolean isRequired = !type.isCollection() && !type.isOptional() && !type.isNullable();
-			
-			if (type.isCollection() || type.isOptional()) { 
-				type = type.getFirstParamType();
-			} 
-			
-			Boolean prevRequired = result.get(type.getToken());
-			// if value is not stored yet
-			// or prev value is false and current is true then result is true
-			if (prevRequired == null || (isRequired && !prevRequired)) {
-				result.put(type.getToken(), isRequired);
-			}
-		}
-
-		return result;
-	}
-	
 	@Override
 	public String toString() {
 		return typeToken.toString();

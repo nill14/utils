@@ -11,9 +11,12 @@ import javax.inject.Provider;
 
 import com.github.nill14.utils.annotation.Experimental;
 import com.github.nill14.utils.init.api.BindingKey;
+import com.github.nill14.utils.init.api.IBeanDescriptor;
+import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
+import com.github.nill14.utils.init.api.IQualifiedProvider;
 import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.impl.BindingImpl;
 import com.github.nill14.utils.init.binding.impl.BindingTarget;
@@ -21,6 +24,8 @@ import com.github.nill14.utils.init.binding.target.BeanTypeBindingTarget;
 import com.github.nill14.utils.init.binding.target.LinkedBindingTarget;
 import com.github.nill14.utils.init.binding.target.PojoFactoryBindingTargetVisitor;
 import com.github.nill14.utils.init.binding.target.UnscopedProvider;
+import com.github.nill14.utils.init.inject.DependencyUtils;
+import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -205,27 +210,61 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 		}
 		return binding.getBindingKey();
 	}	
+
 	
-	
-	@SuppressWarnings("rawtypes")
-	private static void mergeDependencies(Set<TypeToken<?>> requiredDependencies, Set<TypeToken<?>> optionalDependencies, IPojoFactory<?> pojoFactory) {
+	private void mergeDependencies(Set<TypeToken<?>> requiredDependencies, Set<TypeToken<?>> optionalDependencies, Map<IParameterType, Boolean> pojoDependencies, boolean parentRequired) {
 		
-		Map<TypeToken<?>, Boolean> pojoDependencies = pojoFactory.getDescriptor().collectDependencies();
-		for (Entry<TypeToken<?>, Boolean> dep : pojoDependencies.entrySet()) {
-			boolean isRequired = dep.getValue();
-			if (isRequired) {
-				requiredDependencies.add(dep.getKey());
-			} else {
-				optionalDependencies.add(dep.getKey());
-			}
+		for (Entry<IParameterType, Boolean> dep : pojoDependencies.entrySet()) {
+			boolean isRequired = parentRequired && dep.getValue();
+			IParameterType type = dep.getKey();
+			TypeToken<?> token = type.getToken();
 			
-			if (pojoFactory instanceof ProviderTypePojoFactory) {
-				IPojoFactory<?> nestedPojoFactory = ((ProviderTypePojoFactory) pojoFactory).getNestedPojoFactory();
-				mergeDependencies(requiredDependencies, optionalDependencies, nestedPojoFactory);
+			if (!isExcludedFromDependencies(token)) {
+				if (isRequired) {
+					requiredDependencies.add(token);
+				} else {
+					optionalDependencies.add(token);
+				}
+			}
+
+			BindingImpl<?> binding = bindings.get(type.getBindingKey());
+			if (binding == null) {
+				IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
+				if (typeDescriptor.canBeInstantiated()) {
+					//TODO transitive optional -> required == optional
+					Map<IParameterType, Boolean> pojoDependencies2 = DependencyUtils.collectDependencies(typeDescriptor);
+					mergeDependencies(requiredDependencies, optionalDependencies, pojoDependencies2, isRequired);
+				}
 			}
 		}
 	}
 	
+	
+	@SuppressWarnings("rawtypes")
+	private void mergeDependencies(Set<TypeToken<?>> requiredDependencies, Set<TypeToken<?>> optionalDependencies, IPojoFactory<?> pojoFactory) {
+		
+		if (pojoFactory instanceof ProviderTypePojoFactory) {
+			IPojoFactory<?> nestedPojoFactory = ((ProviderTypePojoFactory) pojoFactory).getNestedPojoFactory();
+			mergeDependencies(requiredDependencies, optionalDependencies, nestedPojoFactory);
+		
+		} else if (pojoFactory instanceof MethodPojoFactory) {
+			Map<IParameterType, Boolean> collectDependencies = DependencyUtils.collectDependencies(
+					((MethodPojoFactory) pojoFactory).getMethodDescriptor()); 
+			mergeDependencies(requiredDependencies, optionalDependencies, collectDependencies, true);
+		}
+		
+		Map<IParameterType, Boolean> pojoDependencies = DependencyUtils.collectDependencies(pojoFactory.getDescriptor());
+		mergeDependencies(requiredDependencies, optionalDependencies, pojoDependencies, true);
+	}
+	
+	private static boolean isExcludedFromDependencies(TypeToken<?> token) {
+		Class<?> rawType = token.getRawType();
+		return IBeanInjector.class.equals(rawType) || 
+			   IQualifiedProvider.class.equals(rawType) || 
+			   Provider.class.equals(rawType);
+	}
+
+
 	/**
 	 * 
 	 * @return a map where key is a dependency (e.g. @Inject) and value is whether the dependency is required. 
@@ -238,7 +277,7 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 			mergeDependencies(requiredDependencies, optionalDependencies, pojoFactory);
 		}
 		
-		optionalDependencies = Sets.difference(requiredDependencies, optionalDependencies);
+		optionalDependencies.removeAll(requiredDependencies);
 		ImmutableMap.Builder<TypeToken<?>, Boolean> builder = ImmutableMap.builder(); 
 		for (TypeToken<?> token : optionalDependencies) {
 			builder.put(token, false);
