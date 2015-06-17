@@ -1,17 +1,26 @@
 package com.github.nill14.utils.init.inject;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import javax.inject.Provider;
 
+import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IMemberDescriptor;
 import com.github.nill14.utils.init.api.IParameterType;
+import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IQualifiedProvider;
+import com.github.nill14.utils.init.impl.MethodPojoFactory;
+import com.github.nill14.utils.init.impl.ProviderTypePojoFactory;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 
 public enum DependencyUtils {
@@ -66,5 +75,93 @@ public enum DependencyUtils {
 	
 	private static boolean isQualifiedProvider(IParameterType type) {
 		return IQualifiedProvider.class.equals(type.getRawType());
+	}
+	
+	private static boolean isBeanInjector(IParameterType type) {
+		return IBeanInjector.class.equals(type.getRawType());
+	}
+	
+	
+	private static void mergeDependencies(Set<TypeToken<?>> requiredDependencies, Set<TypeToken<?>> optionalDependencies, 
+			Map<IParameterType, Boolean> pojoDependencies, Predicate<BindingKey<?>> requiresAnalyse, boolean parentRequired) {
+		
+		for (Entry<IParameterType, Boolean> dep : pojoDependencies.entrySet()) {
+			boolean isRequired = parentRequired && dep.getValue();
+			IParameterType type = dep.getKey();
+			TypeToken<?> token = type.getToken();
+			
+			if (!isExcludedFromDependencies(type)) {
+				if (isRequired) {
+					requiredDependencies.add(token);
+				} else {
+					optionalDependencies.add(token);
+				}
+			}
+
+			if (requiresAnalyse.test(type.getBindingKey())) {
+				IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
+				Map<IParameterType, Boolean> pojoDependencies2 = DependencyUtils.collectDependencies(typeDescriptor);
+				mergeDependencies(requiredDependencies, optionalDependencies, pojoDependencies2, requiresAnalyse, isRequired);
+			}
+		}
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	private static void mergeDependencies(Set<TypeToken<?>> requiredDependencies, Set<TypeToken<?>> optionalDependencies, Predicate<BindingKey<?>> requiresAnalyse, IPojoFactory<?> pojoFactory) {
+		
+		if (pojoFactory instanceof ProviderTypePojoFactory) {
+			IPojoFactory<?> nestedPojoFactory = ((ProviderTypePojoFactory) pojoFactory).getNestedPojoFactory();
+			mergeDependencies(requiredDependencies, optionalDependencies, requiresAnalyse, nestedPojoFactory);
+		
+		} else if (pojoFactory instanceof MethodPojoFactory) {
+			Map<IParameterType, Boolean> collectDependencies = DependencyUtils.collectDependencies(
+					((MethodPojoFactory) pojoFactory).getMethodDescriptor()); 
+			mergeDependencies(requiredDependencies, optionalDependencies, collectDependencies, requiresAnalyse, true);
+		}
+		
+		Map<IParameterType, Boolean> pojoDependencies = DependencyUtils.collectDependencies(pojoFactory.getDescriptor());
+		mergeDependencies(requiredDependencies, optionalDependencies, pojoDependencies, requiresAnalyse, true);
+	}
+	
+	private static boolean isExcludedFromDependencies(IParameterType type) {
+		return isBeanInjector(type) || isQualifiedProvider(type) || isProvider(type);
+	}
+	
+	/**
+	 * 
+	 * @return a map where key is a dependency (e.g. @Inject) and value is whether the dependency is required. 
+	 */
+	public static Map<TypeToken<?>, Boolean> collectDependencies(Collection<IPojoFactory<?>> pojoFactories, Predicate<BindingKey<?>> requiresAnalyse) {
+		Set<TypeToken<?>> requiredDependencies = Sets.newHashSet();
+		Set<TypeToken<?>> optionalDependencies = Sets.newHashSet();
+		
+		for (IPojoFactory<?> pojoFactory : pojoFactories) {
+			mergeDependencies(requiredDependencies, optionalDependencies, requiresAnalyse, pojoFactory);
+		}
+		
+		optionalDependencies.removeAll(requiredDependencies);
+		ImmutableMap.Builder<TypeToken<?>, Boolean> builder = ImmutableMap.builder(); 
+		for (TypeToken<?> token : optionalDependencies) {
+			builder.put(token, false);
+		}
+		for (TypeToken<?> token : requiredDependencies) {
+			builder.put(token, true);
+		}
+		
+		return builder.build();
+	}
+	
+	public void splitDependencies(Map<TypeToken<?>, Boolean> dependencies, Set<Class<?>> requiredDependencies, Set<Class<?>> optionalDependencies) {
+		
+		for (Entry<TypeToken<?>, Boolean> dep : dependencies.entrySet()) {
+			boolean isRequired = dep.getValue();
+			TypeToken<?> token = dep.getKey();
+			if (isRequired) {
+				requiredDependencies.add(token.getRawType());
+			} else {
+				optionalDependencies.add(token.getRawType());
+			}
+		}
 	}
 }
