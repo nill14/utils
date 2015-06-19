@@ -25,7 +25,7 @@ public interface IPropertyResolver extends Serializable {
 //		return AbstractPropertyResolver.nullProvider();
 //	}
 	
-	IBeanInjector toBeanInjector();
+	IBeanInjector toBeanInjector(ICallerContext context);
 	
 	
 	<T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context);

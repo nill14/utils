@@ -36,7 +36,7 @@ public interface IServiceRegistry {
 
 	IPropertyResolver toResolver();
 
-	IBeanInjector toBeanInjector();
+	IBeanInjector toBeanInjector(ICallerContext context);
 
 
 	static IServiceRegistry newRegistry() {

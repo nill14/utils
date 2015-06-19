@@ -1,7 +1,5 @@
 package com.github.nill14.utils.init.impl;
 
-import java.io.Serializable;
-
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.BindingKey;
@@ -10,27 +8,28 @@ import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
-import com.github.nill14.utils.init.api.IScope;
 import com.google.common.reflect.TypeToken;
 
 @SuppressWarnings({ "unchecked", "serial" })
 public class BeanInjector implements IBeanInjector {
 	
 	private final IPropertyResolver resolver;
+	private final ICallerContext context;
 
-	public BeanInjector(IPropertyResolver resolver) {
+	public BeanInjector(IPropertyResolver resolver, ICallerContext context) {
 		this.resolver = resolver;
+		this.context = context;
 	}
 
 	@Override
 	public void injectMembers(Object bean) {
 		IPojoFactory<Object> pojoFactory = BeanInstancePojoFactory.singleton(bean);
-		resolver.initializeBean(pojoFactory.getDescriptor(), bean, ICallerContext.prototype());
+		resolver.initializeBean(pojoFactory.getDescriptor(), bean, context);
 	}
 
 	private <T> T resolve(BindingKey<T> type) {
 		IParameterType parameterType = IParameterType.of(type);
-		T bean = (T) resolver.resolve(parameterType, ICallerContext.prototype());
+		T bean = (T) resolver.resolve(parameterType, context);
 		if (bean == null) {
 			throw new RuntimeException(String.format(
 					"Injection of bean %s failed!", type));
@@ -69,19 +68,19 @@ public class BeanInjector implements IBeanInjector {
 	@Override
 	public <T> Provider<T> getProvider(Class<T> beanClass) {
 		IParameterType type = IParameterType.of(BindingKey.of(beanClass));
-		return new LazyResolvingProvider<>(resolver, type, ICallerContext.prototype());
+		return new LazyResolvingProvider<>(resolver, type, context);
 	}
 
 	@Override
 	public <T> Provider<T> getProvider(TypeToken<T> typeToken) {
 		IParameterType type = IParameterType.of(BindingKey.of(typeToken));
-		return new LazyResolvingProvider<>(resolver, type, ICallerContext.prototype());
+		return new LazyResolvingProvider<>(resolver, type, context);
 	}
 
 	@Override
 	public <T> Provider<T> getProvider(BindingKey<T> BindingKey) {
 		IParameterType type = IParameterType.of(BindingKey);
-		return new LazyResolvingProvider<>(resolver, type, ICallerContext.prototype());
+		return new LazyResolvingProvider<>(resolver, type, context);
 	}
 
 

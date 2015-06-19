@@ -77,7 +77,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		Class<?> rawType = type.getRawType();
 		
 		if (IBeanInjector.class.equals(rawType)) {
-			return toBeanInjector();
+			return toBeanInjector(context);
 		
 		} else if (IQualifiedProvider.class.equals(rawType)) {
 			return new QualifiedProvider(type.getFirstParamToken(), resolver);
@@ -142,10 +142,10 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	}
 	
 	@Override
-	public IBeanInjector toBeanInjector() {
+	public IBeanInjector toBeanInjector(ICallerContext context) {
 		IBeanInjector beanInjector = this.beanInjector;
 		if (beanInjector == null) {
-			this.beanInjector = beanInjector = new BeanInjector(resolver);
+			this.beanInjector = beanInjector = new BeanInjector(resolver, context);
 		}
 		return beanInjector;
 	}

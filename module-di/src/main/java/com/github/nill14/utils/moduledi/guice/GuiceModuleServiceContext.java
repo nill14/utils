@@ -67,9 +67,9 @@ public class GuiceModuleServiceContext implements IServiceContext {
 		}
 
 		@Override
-		public IBeanInjector toBeanInjector() {
+		public IBeanInjector toBeanInjector(ICallerContext context) {
 			if (propertyResolver != null) {
-				return propertyResolver.toBeanInjector();
+				return propertyResolver.toBeanInjector(context);
 			}
 			return null;
 		}

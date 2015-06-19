@@ -12,6 +12,7 @@ import javax.inject.Singleton;
 import com.github.nill14.utils.annotation.Experimental;
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanInjector;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IScope;
@@ -119,13 +120,13 @@ public Object resolve(Object pojo, IParameterType type) {
 		if (extraResolvers.isEmpty()) {
 			SimplePropertyResolver propertyResolver = new SimplePropertyResolver(bindings, 
 					new ChainingPojoInitializer(initializer.getItems()));
-			return propertyResolver.toBeanInjector();
+			return propertyResolver.toBeanInjector(ICallerContext.prototype());
 		
 		} else {
 			ChainingPropertyResolver resolver = new ChainingPropertyResolver(extraResolvers, initializer);
 			SimplePropertyResolver propertyResolver = new SimplePropertyResolver(bindings, resolver);
 			resolver.insert(propertyResolver);
-			return resolver.toBeanInjector();
+			return resolver.toBeanInjector(ICallerContext.prototype());
 		}
 	}
 

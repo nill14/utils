@@ -1,6 +1,5 @@
 package com.github.nill14.utils.init.impl;
 
-import java.io.ObjectInputStream.GetField;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Map;
@@ -26,6 +25,7 @@ import com.github.nill14.utils.init.binding.target.PojoFactoryBindingTargetVisit
 import com.github.nill14.utils.init.binding.target.UnscopedProvider;
 import com.github.nill14.utils.init.inject.DependencyUtils;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
+import com.github.nill14.utils.init.scope.PrototypeScope;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -75,6 +75,7 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private final ImmutableMap<BindingKey<?>, BindingImpl<?>> prepareBindings(ImmutableList<BindingImpl<?>> bindings)  {
 		Map<BindingKey<?>, BindingImpl<?>> rawBindingCandidates = Maps.newHashMap();
 		Map<BindingKey<?>, BindingImpl<?>> map = Maps.newHashMap();
@@ -100,7 +101,13 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 		
 		//add raw/unqualified bindings if they are not already present
 		for (Entry<BindingKey<?>, BindingImpl<?>> entry : rawBindingCandidates.entrySet()) {
-			map.putIfAbsent(entry.getKey(), entry.getValue());
+			BindingKey<?> rawBindingKey = entry.getKey();
+			if (!map.containsKey(rawBindingKey)) {
+				BindingImpl<?> binding = entry.getValue();
+				BindingKey<?> qualifiedKey = binding.getBindingKey();
+				binding = binding.withLinkedBinding((BindingKey) qualifiedKey).keyWithQualifier(null);
+				map.put(rawBindingKey, binding);
+			}
 		}
 		
 		map = replaceLinkedBindings(map);
@@ -123,7 +130,8 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 		Collection<BindingImpl<?>> bindings = typeBindings.get(type.getToken());
 		ImmutableList.Builder<Object> builder = ImmutableList.builder();
 		for (BindingImpl<?> binding : bindings) {
-			IScope scope = binding.getScope();
+			binding = getLinkedBinding(binding);
+			IScope scope = context.resolveScope(binding.getScope());
 			IPojoFactory<Object> pojoFactory = (IPojoFactory<Object>) bindingFactories.get(binding.getBindingTarget());
 			
 			//TODO provide scope with info about "calling" scope
@@ -148,8 +156,8 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 		
 		if (bindings.containsKey(bindingKey)) {
 			BindingImpl<?> binding = bindings.get(bindingKey);
-			binding = findLinkedBinding(binding);
-			IScope scope = binding.getScope();
+			binding = getLinkedBinding(binding);
+			IScope scope = context.resolveScope(binding.getScope());
 			IPojoFactory<Object> pojoFactory = (IPojoFactory<Object>) bindingFactories.get(binding.getBindingTarget());
 			
 			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, pojoFactory, context);
@@ -162,14 +170,17 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 		}
 	}
 	
-	private BindingImpl<?> findLinkedBinding(BindingImpl<?> binding) {
+	protected BindingImpl<?> getLinkedBinding(BindingImpl<?> binding) {
 		IScope scope = binding.getScope();
 		
 		if (binding.getBindingTarget() instanceof LinkedBindingTarget) {
 			BindingKey<?> bindingKey2 = ((LinkedBindingTarget<?>) binding.getBindingTarget()).getBindingKey();
 			BindingImpl<?> binding2 = bindings.get(bindingKey2);
 			if (binding2 != null && binding2.getScope() == scope) {
-//				return findLinkedBinding(binding2);
+				if (binding2.getBindingTarget() instanceof LinkedBindingTarget) {
+					return getLinkedBinding(binding2);
+				}
+				
 				return binding2;
 			}
 			else {
@@ -184,9 +195,9 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 		
 		Collection<BindingImpl<?>> bindings = map.values();
 		for (BindingImpl<?> binding : bindings) {
-			BindingKey targetKey = findLinkedKey(map, binding);
-			if (targetKey != binding.getBindingKey()) {
-				binding = binding.withLinkedBinding(targetKey);
+			BindingImpl targetBinding = scanLinkedBinding(map, binding);
+			if (targetBinding.getBindingKey() != binding.getBindingKey()) {
+				binding = binding.withLinkedBinding(targetBinding.getBindingKey()).withScope(targetBinding.getScope());
 				map.put(binding.getBindingKey(), binding);
 			}
 		}
@@ -195,19 +206,20 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	
-	private BindingKey<?> findLinkedKey(Map<BindingKey<?>, BindingImpl<?>> map, BindingImpl<?> binding) {
+	private BindingImpl<?> scanLinkedBinding(Map<BindingKey<?>, BindingImpl<?>> map, BindingImpl<?> binding) {
 		if (binding.getBindingTarget() instanceof BeanTypeBindingTarget) {
 			TypeToken<?> token = ((BeanTypeBindingTarget<?>) binding.getBindingTarget()).getToken();
 			BindingKey<?> bindingKey = BindingKey.of(token);
 			BindingImpl<?> linkedBinding = map.get(bindingKey);
-			if (binding != linkedBinding && linkedBinding != null && linkedBinding.getScope() == binding.getScope()) {
-				return findLinkedKey(map, linkedBinding);
+			if (binding != linkedBinding && linkedBinding != null && 
+					(linkedBinding.getScope() == binding.getScope() || binding.getScope() == PrototypeScope.instance())) {
+				return scanLinkedBinding(map, linkedBinding);
 			}
 		
 		} else if (binding.getBindingTarget() instanceof LinkedBindingTarget) {
-			return ((LinkedBindingTarget<?>) binding.getBindingTarget()).getBindingKey();
+			return map.get(((LinkedBindingTarget<?>) binding.getBindingTarget()).getBindingKey());
 		}
-		return binding.getBindingKey();
+		return binding;
 	}	
 
 

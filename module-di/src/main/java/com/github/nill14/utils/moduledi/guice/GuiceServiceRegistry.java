@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceContext;
@@ -157,7 +158,7 @@ public class GuiceServiceRegistry implements IServiceRegistry {
 	}
 
 	@Override
-	public IBeanInjector toBeanInjector() {
+	public IBeanInjector toBeanInjector(ICallerContext context) {
 		return new GuiceBeanInjector(injector);
 	}
 	

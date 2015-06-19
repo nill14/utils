@@ -92,12 +92,12 @@ public class SpringModuleServiceContext implements IServiceContext {
 		}
 		
 		@Override
-		public IBeanInjector toBeanInjector() {
+		public IBeanInjector toBeanInjector(ICallerContext context) {
 			if (springPropertyResolver == null) {
 				//TODO this might be eventually the case when calling resolver from PojoFactory
 				throw new IllegalStateException("Wrong order, first must be called initializer");
 			}
-			return springPropertyResolver.toBeanInjector();
+			return springPropertyResolver.toBeanInjector(context);
 		}
 		
 		@Override

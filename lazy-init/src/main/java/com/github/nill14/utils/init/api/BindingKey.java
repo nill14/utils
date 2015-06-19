@@ -115,7 +115,9 @@ public final class BindingKey<T> {
 	public String toString() {
 		String name = typeToken.getRawType().getSimpleName();
 		if (qualifier != null) {
-			return String.format("BindingKey(@%s %s)", qualifier.annotationType().getSimpleName(), name);
+			String packageName = qualifier.annotationType().getPackage().getName();
+			String qName = qualifier.toString().replace(packageName + ".", "");
+			return String.format("BindingKey(%s %s)", qName, name);
 		}
 		return name;
 	}

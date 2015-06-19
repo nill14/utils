@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 
 public class WireTest {
@@ -18,21 +19,21 @@ public class WireTest {
 	
 	@Test
 	public void testStrawberry() {
-		IBeanInjector injector = new BeanInjector(resolver);
+		IBeanInjector injector = new BeanInjector(resolver, ICallerContext.prototype());
 		Strawberry strawberry = injector.getInstance(Strawberry.class);
 		assertNotNull(strawberry);
 	}
 	
 	@Test
 	public void testOnion() {
-		IBeanInjector injector = new BeanInjector(resolver);
+		IBeanInjector injector = new BeanInjector(resolver, ICallerContext.prototype());
 		Onion onion = injector.getInstance(Onion.class);
 		assertNotNull(onion.strawberry);
 	}
 	
 	@Test
 	public void testMango() {
-		IBeanInjector injector = new BeanInjector(resolver);
+		IBeanInjector injector = new BeanInjector(resolver, ICallerContext.prototype());
 		Mango mango = injector.getInstance(Mango.class);
 		assertNotNull(mango.onion);
 	}

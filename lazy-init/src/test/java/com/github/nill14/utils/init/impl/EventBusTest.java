@@ -37,7 +37,7 @@ public class EventBusTest {
 		serviceRegistry = IServiceRegistry.newRegistry();
 		serviceRegistry.addSingleton(eventBus = new EventBus());
 		serviceRegistry.addSingleton(printStream = spy(System.out));
-		beanInjector = serviceRegistry.toBeanInjector();
+		beanInjector = serviceRegistry.toBeanInjector(ICallerContext.prototype());
 		
 	}
 	

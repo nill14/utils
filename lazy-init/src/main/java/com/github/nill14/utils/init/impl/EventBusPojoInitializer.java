@@ -20,7 +20,7 @@ public final class EventBusPojoInitializer implements IPojoInitializer {
 	public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
 		EventBusSubscriber annotation = instance.getClass().getAnnotation(EventBusSubscriber.class);
 		if (annotation != null) {
-			EventBus eventBus = (EventBus) resolver.resolve(IParameterType.of(EventBus.class), ICallerContext.prototype());
+			EventBus eventBus = (EventBus) resolver.resolve(IParameterType.of(EventBus.class), context);
 			if (eventBus != null) {
 				eventBus.register(instance);
 			} else {

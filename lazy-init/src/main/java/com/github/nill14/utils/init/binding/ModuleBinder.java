@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanInjector;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IScope;
@@ -106,7 +107,7 @@ public final class ModuleBinder implements Binder {
 		
 		
 		
-		return propertyResolver.toBeanInjector();
+		return propertyResolver.toBeanInjector(ICallerContext.prototype());
 	}
 	
 	public void build() {

@@ -72,7 +72,8 @@ public final class MethodPojoFactory<T> implements IPojoFactory<T> {
 		try {
 			Object[] args = createArgs(resolver, member.getParameterTypes(), context);
 			return (T) member.invoke(instance, args);
-		} catch (ReflectiveOperationException e) {
+    }
+    catch (ReflectiveOperationException | RuntimeException e) {
 			throw new RuntimeException(String.format(
 					"Cannot inject %s", member), e);
 		}

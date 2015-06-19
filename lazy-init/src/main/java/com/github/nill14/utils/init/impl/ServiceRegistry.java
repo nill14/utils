@@ -240,8 +240,8 @@ public class ServiceRegistry implements IServiceRegistry {
 	}
 	
 	@Override
-	public IBeanInjector toBeanInjector() {
-		return new BeanInjector(toResolver());
+	public IBeanInjector toBeanInjector(ICallerContext context) {
+		return new BeanInjector(toResolver(), context);
 	}
 	
 	@SuppressWarnings("serial")

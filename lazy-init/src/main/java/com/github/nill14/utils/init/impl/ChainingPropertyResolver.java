@@ -2,12 +2,14 @@ package com.github.nill14.utils.init.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
+import com.google.common.collect.ImmutableList;
 
 @SuppressWarnings("serial")
 public final class ChainingPropertyResolver extends AbstractPropertyResolver {
@@ -78,7 +80,7 @@ public final class ChainingPropertyResolver extends AbstractPropertyResolver {
 				return result;
 			}
 		}
-		return null;
+    return Collections.emptyList();
 	}
 
 	@Override
@@ -90,6 +92,10 @@ public final class ChainingPropertyResolver extends AbstractPropertyResolver {
 			}
 		}
 		return null;
+	}
+	
+	public List<AbstractPropertyResolver> getResolvers() {
+		return ImmutableList.copyOf(items);
 	}
 	
 }
