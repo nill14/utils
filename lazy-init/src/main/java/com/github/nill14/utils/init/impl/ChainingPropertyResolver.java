@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 
@@ -48,9 +49,9 @@ public final class ChainingPropertyResolver extends AbstractPropertyResolver {
 	
 
 	@Override
-	protected Object findByName(String name, IParameterType type) {
+	protected Object findByName(String name, IParameterType type, ICallerContext context) {
 		for (AbstractPropertyResolver resolver : items) {
-			Object result = resolver.findByName(name, type);
+			Object result = resolver.findByName(name, type, context);
 			if (result != null) {
 				return result;
 			}
@@ -59,9 +60,9 @@ public final class ChainingPropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Override
-	protected Object findByType(IParameterType type) {
+	protected Object findByType(IParameterType type, ICallerContext context) {
 		for (AbstractPropertyResolver resolver : items) {
-			Object result = resolver.findByType(type);
+			Object result = resolver.findByType(type, context);
 			if (result != null) {
 				return result;
 			}
@@ -70,9 +71,9 @@ public final class ChainingPropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Override
-	protected Collection<?> findAllByType(IParameterType type) {
+	protected Collection<?> findAllByType(IParameterType type, ICallerContext context) {
 		for (AbstractPropertyResolver resolver : items) {
-			Collection<?> result = resolver.findAllByType(type);
+			Collection<?> result = resolver.findAllByType(type, context);
 			if (!result.isEmpty()) {
 				return result;
 			}
@@ -81,13 +82,14 @@ public final class ChainingPropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Override
-	protected Object findByQualifier(IParameterType type, Annotation qualifier) {
+	protected Object findByQualifier(IParameterType type, Annotation qualifier, ICallerContext context) {
 		for (AbstractPropertyResolver resolver : items) {
-			Object result = resolver.findByQualifier(type, qualifier);
+			Object result = resolver.findByQualifier(type, qualifier, context);
 			if (result != null) {
 				return result;
 			}
 		}
 		return null;
 	}
+	
 }

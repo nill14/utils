@@ -10,6 +10,7 @@ import java.util.concurrent.Future;
 
 import javax.inject.Provider;
 
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -88,7 +89,7 @@ public final class LazyPojo<T> implements ILazyPojo<T> {
 				instance = this.instance;
 				if (instance == null) {
 					
-					instance = factory.newInstance(resolver);
+					instance = factory.newInstance(resolver, ICallerContext.prototype());
 					this.instance = instance;
 				}
 			}

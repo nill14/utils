@@ -7,7 +7,7 @@ import com.github.nill14.utils.init.impl.EmptyPojoInitializer;
 
 public interface IPojoInitializer extends Serializable {
 
-	<T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance);
+	<T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context);
 	
 	default <T> void destroy(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {}
 	

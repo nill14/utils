@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 import com.github.nill14.utils.init.Calculator;
 import com.github.nill14.utils.init.ICalculator;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -28,7 +29,7 @@ public class LazyJavassistProxyTest {
 	private static final IPojoInitializer initializer = new IPojoInitializer() {
 
 		@Override
-		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
+		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
 			instances.incrementAndGet();
 		}
 

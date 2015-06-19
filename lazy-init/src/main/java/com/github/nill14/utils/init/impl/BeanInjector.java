@@ -6,9 +6,11 @@ import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanInjector;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
+import com.github.nill14.utils.init.api.IScope;
 import com.google.common.reflect.TypeToken;
 
 @SuppressWarnings({ "unchecked", "serial" })
@@ -23,12 +25,12 @@ public class BeanInjector implements IBeanInjector {
 	@Override
 	public void injectMembers(Object bean) {
 		IPojoFactory<Object> pojoFactory = BeanInstancePojoFactory.singleton(bean);
-		resolver.initializeBean(pojoFactory.getDescriptor(), bean);
+		resolver.initializeBean(pojoFactory.getDescriptor(), bean, ICallerContext.prototype());
 	}
 
 	private <T> T resolve(BindingKey<T> type) {
 		IParameterType parameterType = IParameterType.of(type);
-		T bean = (T) resolver.resolve(parameterType);
+		T bean = (T) resolver.resolve(parameterType, ICallerContext.prototype());
 		if (bean == null) {
 			throw new RuntimeException(String.format(
 					"Injection of bean %s failed!", type));
@@ -67,19 +69,19 @@ public class BeanInjector implements IBeanInjector {
 	@Override
 	public <T> Provider<T> getProvider(Class<T> beanClass) {
 		IParameterType type = IParameterType.of(BindingKey.of(beanClass));
-		return new LazyResolvingProvider<>(resolver, type);
+		return new LazyResolvingProvider<>(resolver, type, ICallerContext.prototype());
 	}
 
 	@Override
 	public <T> Provider<T> getProvider(TypeToken<T> typeToken) {
 		IParameterType type = IParameterType.of(BindingKey.of(typeToken));
-		return new LazyResolvingProvider<>(resolver, type);
+		return new LazyResolvingProvider<>(resolver, type, ICallerContext.prototype());
 	}
 
 	@Override
 	public <T> Provider<T> getProvider(BindingKey<T> BindingKey) {
 		IParameterType type = IParameterType.of(BindingKey);
-		return new LazyResolvingProvider<>(resolver, type);
+		return new LazyResolvingProvider<>(resolver, type, ICallerContext.prototype());
 	}
 
 

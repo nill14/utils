@@ -19,6 +19,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.google.common.collect.ImmutableMap;
 
@@ -47,7 +48,7 @@ public class SpringPropertyResolverTest {
 		Field field = MangoBean.class.getDeclaredField("helloMango");
 		AnotherNamed annotation = field.getAnnotation(AnotherNamed.class);
 		
-		Object result = resolver.findByQualifier(IParameterType.of(Mango.class), annotation);
+		Object result = resolver.findByQualifier(IParameterType.of(Mango.class), annotation, ICallerContext.prototype());
 		Assert.assertEquals(helloMango, result);
 	}
 	
@@ -59,7 +60,7 @@ public class SpringPropertyResolverTest {
 		Field field = MangoBean.class.getDeclaredField("missingMango");
 		AnotherNamed annotation = field.getAnnotation(AnotherNamed.class);
 		
-		Object result = resolver.findByQualifier(IParameterType.of(Mango.class), annotation);
+		Object result = resolver.findByQualifier(IParameterType.of(Mango.class), annotation, ICallerContext.prototype());
 		assertEquals(result, null);
 	}
 	

@@ -22,6 +22,7 @@ import org.testng.annotations.Test;
 import com.github.nill14.utils.init.GreeterFactory;
 import com.github.nill14.utils.init.IGreeter;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -49,7 +50,7 @@ public class LazyPojoTest {
 		}
 		
 		@Override
-		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
+		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
 			//instance could be also IGreeter
 			if (instance instanceof GreeterFactory) {
 				GreeterFactory factory = (GreeterFactory) instance;

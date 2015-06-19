@@ -10,6 +10,7 @@ import javax.inject.Named;
 
 import org.springframework.context.ApplicationContext;
 
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
@@ -25,12 +26,12 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Object findByQualifier(IParameterType type, Annotation qualifier) {
+	protected Object findByQualifier(IParameterType type, Annotation qualifier, ICallerContext context) {
 		
 		Class<? extends Annotation> annotationClass = qualifier.annotationType();
-		Map<String, Object> beansWithAnnotation = context.getBeansWithAnnotation(annotationClass);
+		Map<String, Object> beansWithAnnotation = this.context.getBeansWithAnnotation(annotationClass);
 		
-		Map<String, ?> beansOfType = context.getBeansOfType(type.getRawType());
+		Map<String, ?> beansOfType = this.context.getBeansOfType(type.getRawType());
 		Collection<Object> values = Maps.difference(beansWithAnnotation, beansOfType).entriesInCommon().values();
 		
 		List<Object> result = values.stream()
@@ -51,26 +52,26 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	
 
 	@Override
-	protected Object findByName(String name, IParameterType type) {
-		if (context.isTypeMatch(name, type.getRawType())) {
-			return context.getBean(name, type);
+	protected Object findByName(String name, IParameterType type, ICallerContext context) {
+		if (this.context.isTypeMatch(name, type.getRawType())) {
+			return this.context.getBean(name, type);
 		}
 		return null;
 	}
 
 	@Override
-	protected Object findByType(IParameterType type) {
+	protected Object findByType(IParameterType type, ICallerContext context) {
 		Class<?> clazz = type.getRawType();
-		String[] names = context.getBeanNamesForType(clazz);
+		String[] names = this.context.getBeanNamesForType(clazz);
 		if (names.length > 0) {
-			return context.getBean(names[0], clazz);
+			return this.context.getBean(names[0], clazz);
 		}
 		return null;
 	}
 
 	@Override
-	protected Collection<?> findAllByType(IParameterType type) {
-		return context.getBeansOfType(type.getRawType()).values();
+	protected Collection<?> findAllByType(IParameterType type, ICallerContext context) {
+		return this.context.getBeansOfType(type.getRawType()).values();
 	}
 
 

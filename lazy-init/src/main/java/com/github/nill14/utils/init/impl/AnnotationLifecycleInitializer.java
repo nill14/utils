@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.inject.ReflectionUtils;
@@ -17,7 +18,7 @@ import com.github.nill14.utils.init.inject.ReflectionUtils;
 public final class AnnotationLifecycleInitializer implements IPojoInitializer {
 
 	@Override
-	public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
+	public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
 		doPostConstruct(instance);
 	}
 

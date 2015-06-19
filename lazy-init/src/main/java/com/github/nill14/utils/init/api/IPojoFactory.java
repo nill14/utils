@@ -6,7 +6,7 @@ import com.google.common.reflect.TypeToken;
 
 public interface IPojoFactory<T> extends Serializable {
 	
-	T newInstance(IPropertyResolver resolver);
+	T newInstance(IPropertyResolver resolver, ICallerContext context);
 	
 	TypeToken<T> getType();
 	

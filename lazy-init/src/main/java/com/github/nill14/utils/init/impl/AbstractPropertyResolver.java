@@ -10,6 +10,7 @@ import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -43,7 +44,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	}	
 	
 	@Override
-	public Object resolve(IParameterType type) {
+	public Object resolve(IParameterType type, ICallerContext context) {
 		
 		boolean isCollection = type.isCollection();
 		if (isCollection || type.isOptional()) { 
@@ -51,28 +52,28 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			IParameterType paramType = type.getFirstParamType();
 
 			if (java.util.Optional.class.isAssignableFrom(baseType)) {
-				return java.util.Optional.ofNullable(doResolve(paramType));
+				return java.util.Optional.ofNullable(doResolve(paramType, context));
 			}
 			
 			if (com.google.common.base.Optional.class.isAssignableFrom(baseType)) {
-				return com.google.common.base.Optional.fromNullable(doResolve(paramType));
+				return com.google.common.base.Optional.fromNullable(doResolve(paramType, context));
 			}
 			
 			if (Iterable.class.isAssignableFrom(baseType)) {
-				return doResolveCollection(baseType, paramType);
+				return doResolveCollection(baseType, paramType, context);
 			}
 		} 
 	
-		Object result = doResolve(type);
+		Object result = doResolve(type, context);
 		if (result != null) {
 			return result;
 		}
 
-		return doPrototype(type);
+		return doPrototype(type, context);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected Object doResolve(IParameterType type) {
+	protected Object doResolve(IParameterType type, ICallerContext context) {
 		Class<?> rawType = type.getRawType();
 		
 		if (IBeanInjector.class.equals(rawType)) {
@@ -82,24 +83,24 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			return new QualifiedProvider(type.getFirstParamToken(), resolver);
 		
 		} else if (Provider.class.equals(rawType)) {
-			return new LazyResolvingProvider<>(resolver, type.getFirstParamType());
+			return new LazyResolvingProvider<>(resolver, type.getFirstParamType(), context);
 		}
 		
 		Optional<String> named = type.getNamed();
 		Annotation qualifier = type.getQualifier();
 		if (qualifier != null) {
-			Object result = findByQualifier(type, qualifier);
+			Object result = findByQualifier(type, qualifier, context);
 			if (result == null && named.isPresent()) {
-				return findByName(named.get(), type);
+				return findByName(named.get(), type, context);
 			}
 			return result;
 		
 		} else if (named.isPresent()) { // find by name if supported
-			return findByName(named.get(), type);
+			return findByName(named.get(), type, context);
 
 		} else { 
 			// find by type
-			Object result = findByType(type);
+			Object result = findByType(type, context);
 			if (result != null) {
 				return result;
 			}
@@ -107,8 +108,8 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 		return null;
 	}
 	
-	protected Object doResolveCollection(Class<?> collectionType, IParameterType paramType) {
-		Collection<?> providers = findAllByType(paramType);
+	protected Object doResolveCollection(Class<?> collectionType, IParameterType paramType, ICallerContext context) {
+		Collection<?> providers = findAllByType(paramType, context);
 		Preconditions.checkNotNull(providers);
 		
 		if (collectionType.isAssignableFrom(ImmutableList.class)) {
@@ -126,16 +127,16 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	}
 	
 	
-	protected abstract @Nullable Object findByName(String name, IParameterType type);
-	protected abstract @Nullable Object findByType(IParameterType type);
-	protected abstract Collection<?> findAllByType(IParameterType type);
+	protected abstract @Nullable Object findByName(String name, IParameterType type, ICallerContext context);
+	protected abstract @Nullable Object findByType(IParameterType type, ICallerContext context);
+	protected abstract Collection<?> findAllByType(IParameterType type, ICallerContext context);
 
-	protected abstract @Nullable Object findByQualifier(IParameterType type, Annotation qualifier);
+	protected abstract @Nullable Object findByQualifier(IParameterType type, Annotation qualifier, ICallerContext context);
 	
-	protected Object doPrototype(IParameterType type) {
+	protected Object doPrototype(IParameterType type, ICallerContext context) {
 		IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
 		if (typeDescriptor.canBeInstantiated()) {
-			return new BeanTypePojoFactory<>(typeDescriptor).newInstance(resolver);
+			return new BeanTypePojoFactory<>(typeDescriptor).newInstance(resolver, context);
 		}
 		return null;
 	}
@@ -151,8 +152,8 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	
 	
 	@Override
-	public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance) {
-		initializer.init(resolver, beanDescriptor, instance);
+	public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
+		initializer.init(resolver, beanDescriptor, instance, context);
 	}
 
 	@Override
@@ -179,4 +180,5 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	protected ChainingPojoInitializer getInitializer() {
 		return initializer;
 	}
+	
 }

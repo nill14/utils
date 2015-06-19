@@ -14,7 +14,7 @@ public interface IPropertyResolver extends Serializable {
 	 * @param type The property type descriptor.
 	 * @return The resolved property provider or nullProvider if property could not be resolved.
 	 */
-	@Nullable Object resolve(IParameterType type);
+	@Nullable Object resolve(IParameterType type, ICallerContext context);
 	
 	
 	static IPropertyResolver empty() {
@@ -28,7 +28,7 @@ public interface IPropertyResolver extends Serializable {
 	IBeanInjector toBeanInjector();
 	
 	
-	<T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance);
+	<T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context);
 	
 	<T> void destroyBean(IBeanDescriptor<T> beanDescriptor, Object instance);
 	
@@ -37,4 +37,5 @@ public interface IPropertyResolver extends Serializable {
 	void appendInitializer(IPojoInitializer extraInitializer);
 
 	List<IPojoInitializer> getInitializers(); 
+	
 }

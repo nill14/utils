@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IMemberDescriptor;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
@@ -35,10 +36,10 @@ public final class MethodPojoFactory<T> implements IPojoFactory<T> {
 	
 	
 	@Override
-	public T newInstance(IPropertyResolver resolver) {
-		T instance = injectMethod(resolver);
+	public T newInstance(IPropertyResolver resolver, ICallerContext context) {
+		T instance = injectMethod(resolver, context);
 		if (instance != null) {
-			resolver.initializeBean(getDescriptor(), instance);
+			resolver.initializeBean(getDescriptor(), instance, context);
 		}
 		return instance;
 	}
@@ -66,10 +67,10 @@ public final class MethodPojoFactory<T> implements IPojoFactory<T> {
 	
 	
 	@SuppressWarnings("unchecked")
-	public T injectMethod(IPropertyResolver resolver) {
+	public T injectMethod(IPropertyResolver resolver, ICallerContext context) {
 		
 		try {
-			Object[] args = createArgs(resolver, member.getParameterTypes());
+			Object[] args = createArgs(resolver, member.getParameterTypes(), context);
 			return (T) member.invoke(instance, args);
 		} catch (ReflectiveOperationException e) {
 			throw new RuntimeException(String.format(
@@ -78,7 +79,7 @@ public final class MethodPojoFactory<T> implements IPojoFactory<T> {
 			
 	}	
 	
-	private Object[] createArgs(IPropertyResolver resolver, Collection<IParameterType> types) {
+	private Object[] createArgs(IPropertyResolver resolver, Collection<IParameterType> types, ICallerContext context) {
 		if (types.isEmpty()) {
 			return null;
 		}
@@ -86,7 +87,7 @@ public final class MethodPojoFactory<T> implements IPojoFactory<T> {
 		Object[] args = new Object[types.size()];
 		int i = 0;
 		for (IParameterType type : types) {
-			Object arg = resolver.resolve(type);
+			Object arg = resolver.resolve(type, context);
 			if (null == arg && !type.isNullable()) {
 				throw new RuntimeException(String.format("Cannot resolve property %s", type.getToken()));
 			}

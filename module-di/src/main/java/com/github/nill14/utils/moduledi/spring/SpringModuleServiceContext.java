@@ -11,6 +11,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -73,21 +74,21 @@ public class SpringModuleServiceContext implements IServiceContext {
 	private final AbstractPropertyResolver applicationContextResolver = new AbstractPropertyResolver() {
 
 		@Override
-		public Object resolve(IParameterType type) {
+		public Object resolve(IParameterType type, ICallerContext context) {
 			if (springPropertyResolver == null) {
 				//TODO this might be eventually the case when calling resolver from PojoFactory
 				throw new IllegalStateException("Wrong order, first must be called initializer");
 			}
-			return springPropertyResolver.resolve(type);
+			return springPropertyResolver.resolve(type, context);
 		}
 		
 		@Override
-		public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance) {
+		public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
 			if (springPropertyResolver == null) {
 				//TODO this might be eventually the case when calling resolver from PojoFactory
 				throw new IllegalStateException("Wrong order, first must be called initializer");
 			}
-			springPropertyResolver.initializeBean(beanDescriptor, instance);
+			springPropertyResolver.initializeBean(beanDescriptor, instance, context);
 		}
 		
 		@Override
@@ -130,25 +131,25 @@ public class SpringModuleServiceContext implements IServiceContext {
 		}
 
 		@Override
-		protected Object findByName(String name, IParameterType type) {
+		protected Object findByName(String name, IParameterType type, ICallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		protected Object findByType(IParameterType type) {
+		protected Object findByType(IParameterType type, ICallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		protected Collection<?> findAllByType(IParameterType type) {
+		protected Collection<?> findAllByType(IParameterType type, ICallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		protected Object findByQualifier(IParameterType type, Annotation qualifier) {
+		protected Object findByQualifier(IParameterType type, Annotation qualifier, ICallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -158,7 +159,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 	private final IPojoInitializer applicationContextInitializer = new IPojoInitializer() {
 		
 		@Override
-		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
+		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
 			if (ctxStarted.compareAndSet(false, true)) {
 				initApplicationContext(registry);
 				if (ctx != null) {

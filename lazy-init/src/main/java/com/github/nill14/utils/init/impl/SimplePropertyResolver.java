@@ -1,5 +1,6 @@
 package com.github.nill14.utils.init.impl;
 
+import java.io.ObjectInputStream.GetField;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Map;
@@ -12,6 +13,7 @@ import javax.inject.Provider;
 import com.github.nill14.utils.annotation.Experimental;
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -106,18 +108,18 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Object findByName(String name, IParameterType type) {
+	protected Object findByName(String name, IParameterType type, ICallerContext context) {
 		return null;
 	}
 
 	@Override
-	protected Object findByType(IParameterType type) {
-		return simple(type);
+	protected Object findByType(IParameterType type, ICallerContext context) {
+		return simple(type, context);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected Collection<?> findAllByType(IParameterType type) {
+	protected Collection<?> findAllByType(IParameterType type, ICallerContext context) {
 		Collection<BindingImpl<?>> bindings = typeBindings.get(type.getToken());
 		ImmutableList.Builder<Object> builder = ImmutableList.builder();
 		for (BindingImpl<?> binding : bindings) {
@@ -125,7 +127,7 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 			IPojoFactory<Object> pojoFactory = (IPojoFactory<Object>) bindingFactories.get(binding.getBindingTarget());
 			
 			//TODO provide scope with info about "calling" scope
-			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, pojoFactory); 
+			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, pojoFactory, context); 
 			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) binding.getBindingKey(), provider);
 			Object element = scopedProvider.get();
 			if (element != null) {
@@ -136,12 +138,12 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Object findByQualifier(IParameterType type, Annotation qualifier) {
-		return simple(type);
+	protected Object findByQualifier(IParameterType type, Annotation qualifier, ICallerContext context) {
+		return simple(type, context);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Object simple(IParameterType type) {
+	private Object simple(IParameterType type, ICallerContext context) {
 		BindingKey<?> bindingKey = type.getBindingKey();
 		
 		if (bindings.containsKey(bindingKey)) {
@@ -150,7 +152,7 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 			IScope scope = binding.getScope();
 			IPojoFactory<Object> pojoFactory = (IPojoFactory<Object>) bindingFactories.get(binding.getBindingTarget());
 			
-			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, pojoFactory);
+			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, pojoFactory, context);
 			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) binding.getBindingKey(), provider);
 			
 			return scopedProvider.get();
@@ -225,5 +227,13 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 			}
 			return false;
 		});
+	}
+	
+	protected ImmutableMap<BindingKey<?>, BindingImpl<?>> getBindings() {
+		return bindings;
+	}
+	
+	protected ImmutableMap<BindingTarget<?>, IPojoFactory<?>> getBindingFactories() {
+		return bindingFactories;
 	}
 }

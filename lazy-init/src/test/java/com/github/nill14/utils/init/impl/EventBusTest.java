@@ -17,6 +17,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IServiceRegistry;
 import com.github.nill14.utils.init.meta.EventBusSubscriber;
@@ -51,7 +52,7 @@ public class EventBusTest {
 	@Test
 	public void testExtended() {
 		assertNotNull(serviceRegistry.getOptionalService(EventBus.class));
-		assertNotNull(serviceRegistry.toResolver().resolve(IParameterType.of(EventBus.class)));
+		assertNotNull(serviceRegistry.toResolver().resolve(IParameterType.of(EventBus.class), ICallerContext.prototype()));
 		
 		beanInjector.getInstance(EventBusSubscriberExtended.class);
 		

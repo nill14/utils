@@ -18,6 +18,7 @@ import javax.inject.Qualifier;
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -251,7 +252,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		}
 
 		@Override
-		protected Object findByQualifier(IParameterType type, Annotation qualifier) {
+		protected Object findByQualifier(IParameterType type, Annotation qualifier, ICallerContext context) {
 			ILazyPojo<?> lazyPojo = qualifiers.getOrDefault(type.getRawType(), Collections.emptyMap()).get(qualifier);
 			if (lazyPojo != null) {
 				return lazyPojo.getInstance();
@@ -261,7 +262,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		}
 		
 		@Override
-		protected Object findByName(String name, IParameterType type) {
+		protected Object findByName(String name, IParameterType type, ICallerContext context) {
 			ILazyPojo<?> bean = beans.get(name);
 			if (bean != null && type.getToken().isAssignableFrom(bean.getType())) {
 				return bean.getInstance();
@@ -271,7 +272,7 @@ public class ServiceRegistry implements IServiceRegistry {
 
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
-		protected Object findByType(IParameterType type) {
+		protected Object findByType(IParameterType type, ICallerContext context) {
 			Class<?> clazz = type.getRawType();
 			Map<String, ILazyPojo<?>> serviceMap = getServiceMap((Class) clazz);
 			Optional<ILazyPojo<?>> first = serviceMap.values().stream().findFirst();
@@ -279,7 +280,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		}
 
 		@Override
-		protected Collection<?> findAllByType(IParameterType type) {
+		protected Collection<?> findAllByType(IParameterType type, ICallerContext context) {
 			return getServices(type.getRawType());
 		}
 

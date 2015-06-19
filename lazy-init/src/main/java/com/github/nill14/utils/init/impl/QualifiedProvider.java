@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.BindingKey;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IQualifiedProvider;
@@ -24,7 +25,7 @@ public class QualifiedProvider<T> implements IQualifiedProvider<T> {
 	
 
 	private T resolveOrThrow(IParameterType type) {
-		T object = (T) resolver.resolve(type);
+		T object = (T) resolver.resolve(type, ICallerContext.prototype());
 		if (object != null) {
 			return object;
 		} else {
@@ -33,7 +34,7 @@ public class QualifiedProvider<T> implements IQualifiedProvider<T> {
 	}
 	
 	private Optional<T> resolveOptional(IParameterType type) {
-		return Optional.ofNullable((T) resolver.resolve(type));
+		return Optional.ofNullable((T) resolver.resolve(type, ICallerContext.prototype()));
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package com.github.nill14.utils.init.impl;
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
@@ -54,10 +55,10 @@ public final class ProviderInstancePojoFactory<T> implements IPojoFactory<T> {
 	}
 	
 	@Override
-	public T newInstance(IPropertyResolver resolver) {
+	public T newInstance(IPropertyResolver resolver, ICallerContext context) {
 		T instance = provider.get();
 		if (instance != null) {
-			resolver.initializeBean(getDescriptor(), instance);
+			resolver.initializeBean(getDescriptor(), instance, context);
 		}
 		return instance;
 	}

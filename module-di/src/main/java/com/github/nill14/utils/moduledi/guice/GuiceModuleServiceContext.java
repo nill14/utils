@@ -13,6 +13,7 @@ import org.aopalliance.intercept.MethodInvocation;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
+import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -58,9 +59,9 @@ public class GuiceModuleServiceContext implements IServiceContext {
 	private final AbstractPropertyResolver contextResolver = new AbstractPropertyResolver() {
 
 		@Override
-		public Object resolve(IParameterType type) {
+		public Object resolve(IParameterType type, ICallerContext context) {
 			if (propertyResolver != null) {
-				return propertyResolver.resolve(type);
+				return propertyResolver.resolve(type, context);
 			}
 			return null;
 		}
@@ -74,9 +75,9 @@ public class GuiceModuleServiceContext implements IServiceContext {
 		}
 
 		@Override
-		public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance) {
+		public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
 			if (propertyResolver != null) {
-				propertyResolver.initializeBean(beanDescriptor, instance);
+				propertyResolver.initializeBean(beanDescriptor, instance, context);
 			}
 		}
 		
@@ -108,25 +109,25 @@ public class GuiceModuleServiceContext implements IServiceContext {
 		}
 
 		@Override
-		protected Object findByName(String name, IParameterType type) {
+		protected Object findByName(String name, IParameterType type, ICallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		protected Object findByType(IParameterType type) {
+		protected Object findByType(IParameterType type, ICallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		protected Collection<?> findAllByType(IParameterType type) {
+		protected Collection<?> findAllByType(IParameterType type, ICallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		protected Object findByQualifier(IParameterType type, Annotation qualifier) {
+		protected Object findByQualifier(IParameterType type, Annotation qualifier, ICallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}		
@@ -135,7 +136,7 @@ public class GuiceModuleServiceContext implements IServiceContext {
 	private final IPojoInitializer contextInitializer = new IPojoInitializer() {
 		
 		@Override
-		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
+		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
 			if (ctxStarted.compareAndSet(false, true)) {
 //				Injector injector = Guice.createInjector((Module) module);
 				Injector injector = new InternalInjectorCreator()

@@ -152,7 +152,7 @@ public enum DependencyUtils {
 		return builder.build();
 	}
 	
-	public void splitDependencies(Map<TypeToken<?>, Boolean> dependencies, Set<Class<?>> requiredDependencies, Set<Class<?>> optionalDependencies) {
+	public static void splitDependencies(Map<TypeToken<?>, Boolean> dependencies, Set<Class<?>> requiredDependencies, Set<Class<?>> optionalDependencies) {
 		
 		for (Entry<TypeToken<?>, Boolean> dep : dependencies.entrySet()) {
 			boolean isRequired = dep.getValue();
