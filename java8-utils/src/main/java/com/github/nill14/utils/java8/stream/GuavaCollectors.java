@@ -7,8 +7,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.Collector.Characteristics;
 
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
@@ -53,4 +55,14 @@ public class GuavaCollectors {
 				ImmutableList.Builder<T>::build, 		//finisher
 				EnumSet.noneOf(Characteristics.class)); //characteristics
 	}	
+	
+	
+	public static <T> ImmutableList<T> toImmutableList(Stream<T> stream) {
+		return FluentIterable.from(stream::iterator).toList();
+	}
+	
+	public static <T> ImmutableSet<T> toImmutableSet(Stream<T> stream) {
+		return FluentIterable.from(stream::iterator).toSet();
+	}		
+
 }
