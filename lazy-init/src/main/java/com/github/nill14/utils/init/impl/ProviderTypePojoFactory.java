@@ -34,7 +34,9 @@ public final class ProviderTypePojoFactory<T, F extends Provider<? extends T>> i
 	public T newInstance(IPropertyResolver resolver, ICallerContext context) {
 		T instance = pojoFactory.newInstance(resolver, context).get();
 		if (instance != null) {
-			resolver.initializeBean(getDescriptor(), instance, context);
+			//take the descriptor of the real instance type, not of the published superclass
+			PojoInjectionDescriptor<?> descriptor = new PojoInjectionDescriptor<>(instance.getClass());
+			resolver.initializeBean(descriptor, instance, context);
 		}
 		return instance;
 	}

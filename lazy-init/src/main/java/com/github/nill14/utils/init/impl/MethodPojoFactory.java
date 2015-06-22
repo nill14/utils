@@ -26,7 +26,7 @@ public final class MethodPojoFactory<T> implements IPojoFactory<T> {
     private IBeanDescriptor<T> beanDescriptor;
 
 	private final Object instance;
-	private MethodInjectionDescriptor member; 
+	private final MethodInjectionDescriptor member; 
 	
 	public MethodPojoFactory(TypeToken<T> typeToken, Method m, Object instance) {
 		this.typeToken = typeToken;
@@ -39,7 +39,9 @@ public final class MethodPojoFactory<T> implements IPojoFactory<T> {
 	public T newInstance(IPropertyResolver resolver, ICallerContext context) {
 		T instance = injectMethod(resolver, context);
 		if (instance != null) {
-			resolver.initializeBean(getDescriptor(), instance, context);
+			//take the descriptor of the real instance type, not of the published superclass
+			PojoInjectionDescriptor<?> descriptor = new PojoInjectionDescriptor<>(instance.getClass());
+			resolver.initializeBean(descriptor, instance, context);
 		}
 		return instance;
 	}
