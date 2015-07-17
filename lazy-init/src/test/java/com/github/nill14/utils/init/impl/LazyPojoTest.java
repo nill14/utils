@@ -1,10 +1,7 @@
 package com.github.nill14.utils.init.impl;
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.testng.Assert.*;
 
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -22,7 +19,6 @@ import org.testng.annotations.Test;
 import com.github.nill14.utils.init.GreeterFactory;
 import com.github.nill14.utils.init.IGreeter;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.ILazyPojo;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -50,7 +46,7 @@ public class LazyPojoTest {
 		}
 		
 		@Override
-		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
+		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, CallerContext context) {
 			//instance could be also IGreeter
 			if (instance instanceof GreeterFactory) {
 				GreeterFactory factory = (GreeterFactory) instance;

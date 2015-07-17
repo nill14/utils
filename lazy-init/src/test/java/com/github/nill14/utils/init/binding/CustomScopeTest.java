@@ -120,11 +120,11 @@ public class CustomScopeTest {
 		beanInjector = b.toBeanInjector();
 	}	
 	
-	private interface IBean {
+	private static interface IBean {
 		
 	}
 	
-	private class Bean implements IBean {
+	private static class Bean implements IBean {
 		private final int num;
 
 		@Inject
@@ -143,7 +143,7 @@ public class CustomScopeTest {
 	}
 	
 	
-	private class Bean2 implements IBean {
+	private static class Bean2 implements IBean {
 		private final int num;
 
 		@Inject

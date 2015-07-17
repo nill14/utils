@@ -18,7 +18,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
 
@@ -33,7 +32,7 @@ public class QualifiersTest {
 		serviceRegistry.addService(MangoSync.class, IServiceContext.global());
 		serviceRegistry.addService(MangoAbc.class, IServiceContext.global());
 		serviceRegistry.addService(MangoHello.class, IServiceContext.global());
-		beanInjector = serviceRegistry.toBeanInjector(ICallerContext.prototype());
+		beanInjector = serviceRegistry.toBeanInjector(CallerContext.prototype());
 	}
 	
 	@Test

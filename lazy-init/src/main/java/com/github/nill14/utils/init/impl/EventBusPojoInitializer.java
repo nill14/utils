@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -17,7 +16,7 @@ public final class EventBusPojoInitializer implements IPojoInitializer {
 	private static final Logger log = LoggerFactory.getLogger(EventBusPojoInitializer.class);
 	
 	@Override
-	public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
+	public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, CallerContext context) {
 		EventBusSubscriber annotation = instance.getClass().getAnnotation(EventBusSubscriber.class);
 		if (annotation != null) {
 			EventBus eventBus = (EventBus) resolver.resolve(IParameterType.of(EventBus.class), context);
@@ -33,7 +32,7 @@ public final class EventBusPojoInitializer implements IPojoInitializer {
 	public <T> void destroy(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance) {
 		EventBusSubscriber annotation = instance.getClass().getAnnotation(EventBusSubscriber.class);
 		if (annotation != null) {
-			EventBus eventBus = (EventBus) resolver.resolve(IParameterType.of(EventBus.class), ICallerContext.prototype());
+			EventBus eventBus = (EventBus) resolver.resolve(IParameterType.of(EventBus.class), CallerContext.prototype());
 			if (eventBus != null) {
 				eventBus.unregister(instance);
 			} else {

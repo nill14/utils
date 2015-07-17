@@ -10,7 +10,6 @@ import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -24,7 +23,6 @@ import com.google.common.collect.ImmutableSortedSet;
 @SuppressWarnings("serial")
 public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	
-	private transient volatile IBeanInjector beanInjector;
 	private final ChainingPojoInitializer initializer;
 	protected final IPropertyResolver resolver;
 	
@@ -44,7 +42,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	}	
 	
 	@Override
-	public Object resolve(IParameterType type, ICallerContext context) {
+	public Object resolve(IParameterType type, CallerContext context) {
 		
 		boolean isCollection = type.isCollection();
 		if (isCollection || type.isOptional()) { 
@@ -52,11 +50,11 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			IParameterType paramType = type.getFirstParamType();
 
 			if (java.util.Optional.class.isAssignableFrom(baseType)) {
-				return java.util.Optional.ofNullable(doResolve(paramType, context));
+				return java.util.Optional.ofNullable(doResolve(paramType, context, true));
 			}
 			
 			if (com.google.common.base.Optional.class.isAssignableFrom(baseType)) {
-				return com.google.common.base.Optional.fromNullable(doResolve(paramType, context));
+				return com.google.common.base.Optional.fromNullable(doResolve(paramType, context, true));
 			}
 			
 			if (Iterable.class.isAssignableFrom(baseType)) {
@@ -64,16 +62,11 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			}
 		} 
 	
-		Object result = doResolve(type, context);
-		if (result != null) {
-			return result;
-		}
-
-		return doPrototype(type, context);
+		return doResolve(type, context, type.isNullable());
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected Object doResolve(IParameterType type, ICallerContext context) {
+	protected Object doResolve(IParameterType type, CallerContext context, boolean nullable) {
 		Class<?> rawType = type.getRawType();
 		
 		if (IBeanInjector.class.equals(rawType)) {
@@ -105,10 +98,11 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 				return result;
 			}
 		}
-		return null;
+		
+		return doPrototype(type, context, nullable);
 	}
 	
-	protected Object doResolveCollection(Class<?> collectionType, IParameterType paramType, ICallerContext context) {
+	protected Object doResolveCollection(Class<?> collectionType, IParameterType paramType, CallerContext context) {
 		Collection<?> providers = findAllByType(paramType, context);
 		Preconditions.checkNotNull(providers);
 		
@@ -127,32 +121,45 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 	}
 	
 	
-	protected abstract @Nullable Object findByName(String name, IParameterType type, ICallerContext context);
-	protected abstract @Nullable Object findByType(IParameterType type, ICallerContext context);
-	protected abstract Collection<?> findAllByType(IParameterType type, ICallerContext context);
+	protected abstract @Nullable Object findByName(String name, IParameterType type, CallerContext context);
+	protected abstract @Nullable Object findByType(IParameterType type, CallerContext context);
+	protected abstract Collection<?> findAllByType(IParameterType type, CallerContext context);
 
-	protected abstract @Nullable Object findByQualifier(IParameterType type, Annotation qualifier, ICallerContext context);
+	protected abstract @Nullable Object findByQualifier(IParameterType type, Annotation qualifier, CallerContext context);
 	
-	protected Object doPrototype(IParameterType type, ICallerContext context) {
+	protected Object doPrototype(IParameterType type, CallerContext context, boolean nullable) {
 		IBeanDescriptor<Object> typeDescriptor = new PojoInjectionDescriptor<>(type);
+		
 		if (typeDescriptor.canBeInstantiated()) {
-			return new BeanTypePojoFactory<>(typeDescriptor).newInstance(resolver, context);
+			BeanTypePojoFactory<Object> pojoFactory = new BeanTypePojoFactory<>(typeDescriptor);
+			return new UnscopedProvider<>(resolver, type.getBindingKey(), pojoFactory, context).get();
+
+		} else if (nullable) {
+			return null;
+		
+		} else {
+			throw new RuntimeException(String.format("Cannot create an instance of %s", type));
 		}
-		return null;
+		
 	}
 	
 	@Override
-	public IBeanInjector toBeanInjector(ICallerContext context) {
-		IBeanInjector beanInjector = this.beanInjector;
-		if (beanInjector == null) {
-			this.beanInjector = beanInjector = new BeanInjector(resolver, context);
-		}
-		return beanInjector;
+	public IBeanInjector toBeanInjector(CallerContext context) {
+		return new BeanInjector(resolver, context);
 	}
 	
 	
 	@Override
-	public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
+	public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance, CallerContext context) {
+		if (instance == null) {
+			throw new NullPointerException();
+		}
+		
+		if (!beanDescriptor.getRawType().isInstance(instance)) {
+			throw new ClassCastException(String.format("Cannot cast %s to %s", instance.getClass(), beanDescriptor.getRawType()));
+		}
+		
+		context.setSemiConstructedInstance(beanDescriptor.getToken(), instance);
 		initializer.init(resolver, beanDescriptor, instance, context);
 	}
 

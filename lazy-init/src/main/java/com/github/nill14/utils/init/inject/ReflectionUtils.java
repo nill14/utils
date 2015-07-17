@@ -2,6 +2,7 @@ package com.github.nill14.utils.init.inject;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
@@ -98,7 +99,33 @@ public enum ReflectionUtils {
 				.map(t -> t.getRawType());
 	}
 	
+	/**
+	 * 
+	 * @param clazz
+	 * @return All classes including self, excluding interfaces and Object.class
+	 */
+	public static <T> Stream<Class<? super T>> getSuperClasses(TypeToken<T> token) {
+		return token
+				.getTypes()
+				.stream()
+				.filter(t -> !t.getRawType().isInterface())
+				.filter(t -> !Object.class.equals(t.getRawType()))
+				.map(t -> t.getRawType());
+	}	
 	
+	/**
+	 * Stream of non-static methods declared on the class or it's super-classes.
+	 * Methods declared on Object are excluded unless they are overridden.
+	 * Methods are ordered from subclass to superclass
+	 * @param clazz
+	 * @return Stream of non-static methods declared on the class or it's super-classes (excluding Object-declared methods).
+	 */
+	public static <T> Stream<Method> getInstanceMethods(TypeToken<T> token) {
+		return getSuperClasses(token)
+				.flatMap(cls -> Stream.of(cls.getDeclaredMethods()))
+				.filter(m -> !Modifier.isStatic(m.getModifiers()));
+	}
+
 	/**
 	 * Stream of non-static methods declared on the class or it's super-classes.
 	 * Methods declared on Object are excluded unless they are overridden.
@@ -112,7 +139,17 @@ public enum ReflectionUtils {
 				.filter(m -> !Modifier.isStatic(m.getModifiers()));
 	}
 	
-
+	
+	/**
+	 * Stream of non-static fields declared on the class or it's super-classes.
+	 * @param clazz
+	 * @return Stream of non-static fields declared on the class or it's super-classes (excluding Object-declared methods).
+	 */
+	public static <T> Stream<Field> getInstanceFields(TypeToken<T> token) {
+		return getSuperClasses(token)
+				.flatMap(cls -> Stream.of(cls.getDeclaredFields()))
+				.filter(f -> !Modifier.isStatic(f.getModifiers()));
+	}
 	
 	private static final class OptionalGuiceDependency {
 		

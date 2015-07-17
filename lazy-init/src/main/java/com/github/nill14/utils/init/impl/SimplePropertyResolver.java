@@ -12,7 +12,6 @@ import javax.inject.Provider;
 import com.github.nill14.utils.annotation.Experimental;
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -22,7 +21,6 @@ import com.github.nill14.utils.init.binding.impl.BindingTarget;
 import com.github.nill14.utils.init.binding.target.BeanTypeBindingTarget;
 import com.github.nill14.utils.init.binding.target.LinkedBindingTarget;
 import com.github.nill14.utils.init.binding.target.PojoFactoryBindingTargetVisitor;
-import com.github.nill14.utils.init.binding.target.UnscopedProvider;
 import com.github.nill14.utils.init.inject.DependencyUtils;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.github.nill14.utils.init.scope.PrototypeScope;
@@ -115,28 +113,30 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Object findByName(String name, IParameterType type, ICallerContext context) {
+	protected Object findByName(String name, IParameterType type, CallerContext context) {
 		return null;
 	}
 
 	@Override
-	protected Object findByType(IParameterType type, ICallerContext context) {
+	protected Object findByType(IParameterType type, CallerContext context) {
 		return simple(type, context);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected Collection<?> findAllByType(IParameterType type, ICallerContext context) {
+	protected Collection<?> findAllByType(IParameterType type, CallerContext context) {
 		Collection<BindingImpl<?>> bindings = typeBindings.get(type.getToken());
 		ImmutableList.Builder<Object> builder = ImmutableList.builder();
 		for (BindingImpl<?> binding : bindings) {
 			binding = getLinkedBinding(binding);
+			BindingKey<?> bindingKey = binding.getBindingKey();
+
 			IScope scope = context.resolveScope(binding.getScope());
 			IPojoFactory<Object> pojoFactory = (IPojoFactory<Object>) bindingFactories.get(binding.getBindingTarget());
 			
 			//TODO provide scope with info about "calling" scope
-			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, pojoFactory, context); 
-			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) binding.getBindingKey(), provider);
+			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, bindingKey, pojoFactory, context); 
+			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) bindingKey, provider);
 			Object element = scopedProvider.get();
 			if (element != null) {
 				builder.add(element);
@@ -146,22 +146,24 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Object findByQualifier(IParameterType type, Annotation qualifier, ICallerContext context) {
+	protected Object findByQualifier(IParameterType type, Annotation qualifier, CallerContext context) {
 		return simple(type, context);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Object simple(IParameterType type, ICallerContext context) {
+	private Object simple(IParameterType type, CallerContext context) {
 		BindingKey<?> bindingKey = type.getBindingKey();
 		
 		if (bindings.containsKey(bindingKey)) {
 			BindingImpl<?> binding = bindings.get(bindingKey);
 			binding = getLinkedBinding(binding);
+			bindingKey = binding.getBindingKey();
+
 			IScope scope = context.resolveScope(binding.getScope());
 			IPojoFactory<Object> pojoFactory = (IPojoFactory<Object>) bindingFactories.get(binding.getBindingTarget());
 			
-			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, pojoFactory, context);
-			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) binding.getBindingKey(), provider);
+			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, bindingKey, pojoFactory, context);
+			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) bindingKey, provider);
 			
 			return scopedProvider.get();
 		} else {

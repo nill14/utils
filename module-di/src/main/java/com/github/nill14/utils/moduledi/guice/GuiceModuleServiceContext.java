@@ -13,13 +13,13 @@ import org.aopalliance.intercept.MethodInvocation;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
 import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
+import com.github.nill14.utils.init.impl.CallerContext;
 import com.github.nill14.utils.moduledi.IModule;
 import com.google.inject.Binder;
 import com.google.inject.Injector;
@@ -59,7 +59,7 @@ public class GuiceModuleServiceContext implements IServiceContext {
 	private final AbstractPropertyResolver contextResolver = new AbstractPropertyResolver() {
 
 		@Override
-		public Object resolve(IParameterType type, ICallerContext context) {
+		public Object resolve(IParameterType type, CallerContext context) {
 			if (propertyResolver != null) {
 				return propertyResolver.resolve(type, context);
 			}
@@ -67,7 +67,7 @@ public class GuiceModuleServiceContext implements IServiceContext {
 		}
 
 		@Override
-		public IBeanInjector toBeanInjector(ICallerContext context) {
+		public IBeanInjector toBeanInjector(CallerContext context) {
 			if (propertyResolver != null) {
 				return propertyResolver.toBeanInjector(context);
 			}
@@ -75,7 +75,7 @@ public class GuiceModuleServiceContext implements IServiceContext {
 		}
 
 		@Override
-		public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
+		public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance, CallerContext context) {
 			if (propertyResolver != null) {
 				propertyResolver.initializeBean(beanDescriptor, instance, context);
 			}
@@ -109,25 +109,25 @@ public class GuiceModuleServiceContext implements IServiceContext {
 		}
 
 		@Override
-		protected Object findByName(String name, IParameterType type, ICallerContext context) {
+		protected Object findByName(String name, IParameterType type, CallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		protected Object findByType(IParameterType type, ICallerContext context) {
+		protected Object findByType(IParameterType type, CallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		protected Collection<?> findAllByType(IParameterType type, ICallerContext context) {
+		protected Collection<?> findAllByType(IParameterType type, CallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		protected Object findByQualifier(IParameterType type, Annotation qualifier, ICallerContext context) {
+		protected Object findByQualifier(IParameterType type, Annotation qualifier, CallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}		
@@ -136,7 +136,7 @@ public class GuiceModuleServiceContext implements IServiceContext {
 	private final IPojoInitializer contextInitializer = new IPojoInitializer() {
 		
 		@Override
-		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
+		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, CallerContext context) {
 			if (ctxStarted.compareAndSet(false, true)) {
 //				Injector injector = Guice.createInjector((Module) module);
 				Injector injector = new InternalInjectorCreator()

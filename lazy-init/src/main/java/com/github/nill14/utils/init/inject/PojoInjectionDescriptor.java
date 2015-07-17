@@ -9,7 +9,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -41,18 +40,16 @@ public class PojoInjectionDescriptor<T> implements Serializable, IBeanDescriptor
 		this(TypeToken.of((Class<T>) pojoClazz));
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public PojoInjectionDescriptor(TypeToken<T> typeToken) {
 		Preconditions.checkNotNull(typeToken);
 		this.typeToken = typeToken;
-		Set<Class<?>> classes = (Set) typeToken.getTypes().classes().rawTypes();
 		interfaces = typeToken.getTypes().interfaces().rawTypes();
 		
 		fields = ImmutableList.copyOf(
-				injectableFields(nonStaticFields(classes.stream()), typeToken.getRawType()).iterator());
+				injectableFields(ReflectionUtils.getInstanceFields(typeToken), typeToken.getRawType()).iterator());
 		
 		methods = ImmutableList.copyOf(
-				injectableMethods(nonStaticMethods(classes.stream()), typeToken.getRawType()).iterator());
+				injectableMethods(ReflectionUtils.getInstanceMethods(typeToken), typeToken.getRawType()).iterator());
 		
 		constructors = ImmutableList.copyOf(
 				injectableConstructors(Stream.of(typeToken.getRawType().getDeclaredConstructors())).iterator());
@@ -92,18 +89,7 @@ public class PojoInjectionDescriptor<T> implements Serializable, IBeanDescriptor
 	public Set<Class<? super T>> getDeclaredTypes() {
 		return typeToken.getTypes().rawTypes();
 	}
-	
-	private Stream<Method> nonStaticMethods(Stream<Class<?>> declaredClasses) {
-		return declaredClasses
-			.flatMap(c -> Stream.of(c.getDeclaredMethods()))
-			.filter(f -> !Modifier.isStatic(f.getModifiers()));
-	}
 
-	private Stream<Field> nonStaticFields(Stream<Class<?>> declaredClasses) {
-		return declaredClasses
-				.flatMap(c -> Stream.of(c.getDeclaredFields()))
-				.filter(f -> !Modifier.isStatic(f.getModifiers()));
-	}
 
 	private Stream<? extends ConstructorInjectionDescriptor> injectableConstructors(Stream<Constructor<?>> constructors) {
 		return constructors.map(c -> {
@@ -183,4 +169,31 @@ public class PojoInjectionDescriptor<T> implements Serializable, IBeanDescriptor
 	public TypeToken<T> getToken() {
 		return typeToken;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((typeToken == null) ? 0 : typeToken.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PojoInjectionDescriptor other = (PojoInjectionDescriptor) obj;
+		if (typeToken == null) {
+			if (other.typeToken != null)
+				return false;
+		} else if (!typeToken.equals(other.typeToken))
+			return false;
+		return true;
+	}
+	
+	
 }

@@ -3,7 +3,6 @@ package com.github.nill14.utils.init.impl;
 import java.util.Collection;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IMemberDescriptor;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoFactory;
@@ -29,25 +28,27 @@ public class BeanTypePojoFactory<T> implements IPojoFactory<T> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T newInstance(IPropertyResolver resolver, ICallerContext context) {
+	public T newInstance(IPropertyResolver resolver, CallerContext context) {
 		T instance = doCreateInstance(resolver, context);
 		resolver.initializeBean(getDescriptor(), instance, context);
 		return instance;
+				
 	}
 
-	private T doCreateInstance(IPropertyResolver resolver, ICallerContext context) {
+	private T doCreateInstance(IPropertyResolver resolver, CallerContext context) {
 		IMemberDescriptor injectionDescriptor = beanDescriptor.getConstructorDescriptors().get(0);
 		
 		try {
 			Object[] args = createArgs(resolver, injectionDescriptor.getParameterTypes(), context);
 			return (T) injectionDescriptor.invoke(null, args);
-		} catch (ReflectiveOperationException | RuntimeException e) {
+		
+		} catch (ReflectiveOperationException | RuntimeException e) { 
 			throw new RuntimeException(String.format(
-					"Cannot inject constructor %s: %s", injectionDescriptor, e.getMessage()), e);
+					"Cannot inject constructor %s", injectionDescriptor), e);
 		}
 	}
 	
-	private Object[] createArgs(IPropertyResolver resolver, Collection<IParameterType> types, ICallerContext context) {
+	private Object[] createArgs(IPropertyResolver resolver, Collection<IParameterType> types, CallerContext context) {
 		if (types.isEmpty()) {
 			return null;
 		}

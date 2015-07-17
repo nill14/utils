@@ -38,7 +38,7 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 		TypeToken<?> firstParamToken = type.getFirstParamToken();
 		ImmutableMap<Class<? extends Annotation>, Annotation> annotations = AnnotationScanner.indexAnnotations(type.getAnnotations().stream());
 				
-		return new ParameterTypeInjectionDescriptor(firstParamToken.getType(), firstParamToken, type.getNamed(), type.getQualifier(), annotations, type.getDeclaringClass());
+		return new ParameterTypeInjectionDescriptor(firstParamToken, type.getNamed(), type.getQualifier(), annotations, type.getDeclaringClass());
 	}
 	
 	public static <T> ParameterTypeInjectionDescriptor of(BindingKey<T> bindingKey) {
@@ -50,10 +50,10 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 		ImmutableMap<Class<? extends Annotation>, Annotation> annotations = qualifier != null ? 
 				AnnotationScanner.indexAnnotations(Stream.of(qualifier)) : ImmutableMap.of();
 				
-		return new ParameterTypeInjectionDescriptor(bindingKey.getGenericType(), bindingKey.getToken(), optionalNamed, qualifier, annotations, null);
+		return new ParameterTypeInjectionDescriptor(bindingKey.getToken(), optionalNamed, qualifier, annotations, null);
 	}
 	
-	public static ParameterTypeInjectionDescriptor of(Type type, Annotation[] annotations, Member member, /*@Nullable Annotation qualifier,*/ @Nullable Class<?> declaringClass) {
+	public static ParameterTypeInjectionDescriptor of(Type type, Annotation[] annotations, Member member, @Nullable Class<?> declaringClass) {
 		Annotation qualifier = null;
 		ImmutableMap<Class<? extends Annotation>, Annotation> annotations2 = ImmutableMap.copyOf(AnnotationScanner.indexAnnotations(annotations));
 		Stream<Annotation> stream = Stream.of(annotations).filter(a -> a.annotationType().isAnnotationPresent(javax.inject.Qualifier.class));
@@ -64,7 +64,7 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 		Map<Class<? extends Annotation>, Annotation> qualifiers = AnnotationScanner.indexAnnotations(stream);
 		
 		if (qualifiers.size() > 1) {
-			throw new RuntimeException("Specification expects at most one qualifier: " + member); 
+			throw new RuntimeException("Specification allows at most one qualifier: " + member); 
 			
 		} else if (qualifiers.size() == 1){
 			qualifier = qualifiers.values().iterator().next();
@@ -80,16 +80,16 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 			optionalNamed = isGuicePresent ? OptionalGuiceDependency.getOptionalNamed(annotations2): Optional.empty();
 		}
 	
-		return new ParameterTypeInjectionDescriptor(type, TypeToken.of(type), optionalNamed, qualifier, annotations2, declaringClass);
+		return new ParameterTypeInjectionDescriptor(TypeToken.of(type), optionalNamed, qualifier, annotations2, declaringClass);
 	}
 	
 	
 	
 	
-	private ParameterTypeInjectionDescriptor(Type type, TypeToken<?> typeToken, Optional<String> named,
+	private ParameterTypeInjectionDescriptor(TypeToken<?> typeToken, Optional<String> named,
 			@Nullable Annotation qualifier, ImmutableMap<Class<? extends Annotation>, Annotation> annotations, 
 			@Nullable Class<?> declaringClass) {
-		this.type = type;
+		this.type = typeToken.getType();
 		this.typeToken = typeToken;
 		this.named = named;
 		this.qualifier = qualifier;
@@ -236,4 +236,50 @@ public class ParameterTypeInjectionDescriptor implements IParameterType {
 			return null;
 		}
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((annotations == null) ? 0 : annotations.hashCode());
+		result = prime * result + ((declaringClass == null) ? 0 : declaringClass.hashCode());
+		result = prime * result + ((qualifier == null) ? 0 : qualifier.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ParameterTypeInjectionDescriptor other = (ParameterTypeInjectionDescriptor) obj;
+		if (annotations == null) {
+			if (other.annotations != null)
+				return false;
+		} else if (!annotations.equals(other.annotations))
+			return false;
+		if (declaringClass == null) {
+			if (other.declaringClass != null)
+				return false;
+		} else if (!declaringClass.equals(other.declaringClass))
+			return false;
+		if (qualifier == null) {
+			if (other.qualifier != null)
+				return false;
+		} else if (!qualifier.equals(other.qualifier))
+			return false;
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.equals(other.type))
+			return false;
+		return true;
+	}
+	
+	
+	
 }

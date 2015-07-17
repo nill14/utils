@@ -14,10 +14,10 @@ import com.github.nill14.parsers.dependency.impl.DependencyTreePrinter;
 import com.github.nill14.parsers.dependency.impl.ModuleRankingsPrinter;
 import com.github.nill14.parsers.graph.CyclicGraphException;
 import com.github.nill14.utils.init.api.IBeanInjector;
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.binding.ModuleBinder;
 import com.github.nill14.utils.init.binding.TestBinder;
 import com.github.nill14.utils.init.binding.impl.BindingImpl;
+import com.github.nill14.utils.init.impl.CallerContext;
 import com.github.nill14.utils.init.impl.ServiceRegistry;
 import com.github.nill14.utils.java8.stream.ExecutorUtils;
 import com.github.nill14.utils.java8.stream.GuavaCollectors;
@@ -48,7 +48,7 @@ public final class ModularBeanInjectorBuilder {
 			throw new RuntimeException(e);
 		}
 		
-		return serviceRegistry.toBeanInjector(ICallerContext.prototype());
+		return serviceRegistry.toBeanInjector(CallerContext.prototype());
 	}
 
 	private void todo(ServiceRegistry registry, ImmutableSet<IModule> modules) throws UnsatisfiedDependencyException, CyclicGraphException, ExecutionException, InterruptedException {

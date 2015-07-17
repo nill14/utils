@@ -18,7 +18,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
 import com.google.common.reflect.TypeToken;
@@ -37,7 +36,7 @@ public class QualifiedProviderTest {
 		serviceRegistry.addService(MangoHello.class, IServiceContext.global());
 		QualifiedProvider<Mango> mangoQualifiedProvider = new QualifiedProvider<Mango>(new TypeToken<Mango>() {}, serviceRegistry.toResolver());
 		serviceRegistry.addSingleton(mangoQualifiedProvider);
-		beanInjector = serviceRegistry.toBeanInjector(ICallerContext.prototype());
+		beanInjector = serviceRegistry.toBeanInjector(CallerContext.prototype());
 	}
 
 	@Test

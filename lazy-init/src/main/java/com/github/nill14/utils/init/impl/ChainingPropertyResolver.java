@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.google.common.collect.ImmutableList;
@@ -51,7 +50,7 @@ public final class ChainingPropertyResolver extends AbstractPropertyResolver {
 	
 
 	@Override
-	protected Object findByName(String name, IParameterType type, ICallerContext context) {
+	protected Object findByName(String name, IParameterType type, CallerContext context) {
 		for (AbstractPropertyResolver resolver : items) {
 			Object result = resolver.findByName(name, type, context);
 			if (result != null) {
@@ -62,7 +61,7 @@ public final class ChainingPropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Override
-	protected Object findByType(IParameterType type, ICallerContext context) {
+	protected Object findByType(IParameterType type, CallerContext context) {
 		for (AbstractPropertyResolver resolver : items) {
 			Object result = resolver.findByType(type, context);
 			if (result != null) {
@@ -73,7 +72,7 @@ public final class ChainingPropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Override
-	protected Collection<?> findAllByType(IParameterType type, ICallerContext context) {
+	protected Collection<?> findAllByType(IParameterType type, CallerContext context) {
 		for (AbstractPropertyResolver resolver : items) {
 			Collection<?> result = resolver.findAllByType(type, context);
 			if (!result.isEmpty()) {
@@ -84,7 +83,7 @@ public final class ChainingPropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Override
-	protected Object findByQualifier(IParameterType type, Annotation qualifier, ICallerContext context) {
+	protected Object findByQualifier(IParameterType type, Annotation qualifier, CallerContext context) {
 		for (AbstractPropertyResolver resolver : items) {
 			Object result = resolver.findByQualifier(type, qualifier, context);
 			if (result != null) {

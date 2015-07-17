@@ -10,7 +10,7 @@ import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IScope;
-import com.github.nill14.utils.init.binding.target.UnscopedProvider;
+import com.github.nill14.utils.init.impl.UnscopedProvider;
 import com.google.common.collect.Lists;
 
 public final class ScopeContext implements IScope {

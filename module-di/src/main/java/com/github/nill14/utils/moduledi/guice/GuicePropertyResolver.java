@@ -4,9 +4,9 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
+import com.github.nill14.utils.init.impl.CallerContext;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
@@ -20,19 +20,19 @@ public class GuicePropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Override
-	protected Object findByName(String name, IParameterType type, ICallerContext context) {
+	protected Object findByName(String name, IParameterType type, CallerContext context) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	protected Object findByType(IParameterType type, ICallerContext context) {
+	protected Object findByType(IParameterType type, CallerContext context) {
 		Class<?> clazz = type.getRawType();
 		return injector.getInstance(clazz);
 	}
 
 	@Override
-	protected Collection<?> findAllByType(IParameterType type, ICallerContext context) {
+	protected Collection<?> findAllByType(IParameterType type, CallerContext context) {
 		TypeLiteral<Object> literal = (TypeLiteral<Object>) TypeLiteral.get(type.getGenericType());
 		return injector.findBindingsByType(literal).stream()
 				.map(b -> b.getProvider().get())
@@ -40,7 +40,7 @@ public class GuicePropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Override
-	protected Object findByQualifier(IParameterType type, Annotation qualifier, ICallerContext context) {
+	protected Object findByQualifier(IParameterType type, Annotation qualifier, CallerContext context) {
 		return injector.getInstance(Key.get(type.getRawType(), qualifier));
 	}
 

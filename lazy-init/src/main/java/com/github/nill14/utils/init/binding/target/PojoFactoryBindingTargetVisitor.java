@@ -25,7 +25,7 @@ public class PojoFactoryBindingTargetVisitor implements BindingTargetVisitor<IPo
 	@SuppressWarnings("unchecked")
 	@Override
 	public IPojoFactory<?> visit(ProviderInstanceBindingTarget<?> bindingTarget) {
-		return ProviderInstancePojoFactory.of((TypeToken<Object>) bindingTarget.getProviderToken(), (Provider<Object>) bindingTarget.getProvider());
+		return ProviderInstancePojoFactory.of((TypeToken<Object>) bindingTarget.getToken(), (Provider<Object>) bindingTarget.getProvider());
 	}
 
 	@Override

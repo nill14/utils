@@ -4,7 +4,6 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
 
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
@@ -20,25 +19,25 @@ public final class EmptyPropertyResolver extends AbstractPropertyResolver implem
 	}
 	
 	@Override
-	protected Object findByName(String name, IParameterType type, ICallerContext context) {
+	protected Object findByName(String name, IParameterType type, CallerContext context) {
 		return null;
 	}
 
 
 	@Override
-	protected Object findByType(IParameterType type, ICallerContext context) {
+	protected Object findByType(IParameterType type, CallerContext context) {
 		return null;
 	}
 
 
 	@Override
-	protected Collection<?> findAllByType(IParameterType type, ICallerContext context) {
+	protected Collection<?> findAllByType(IParameterType type, CallerContext context) {
 		return Collections.emptyList();
 	}
 
 
 	@Override
-	protected Object findByQualifier(IParameterType type, Annotation qualifier, ICallerContext context) {
+	protected Object findByQualifier(IParameterType type, Annotation qualifier, CallerContext context) {
 		return null;
 	}
 	

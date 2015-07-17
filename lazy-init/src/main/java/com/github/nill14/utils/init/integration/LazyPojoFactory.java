@@ -4,11 +4,11 @@ package com.github.nill14.utils.init.integration;
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.impl.ProviderTypePojoFactory;
 import com.github.nill14.utils.init.impl.BeanTypePojoFactory;
+import com.github.nill14.utils.init.impl.CallerContext;
 import com.google.common.reflect.TypeToken;
 
 public /*non-final on purpose*/ class LazyPojoFactory<F> implements IPojoFactory<F> {
@@ -51,7 +51,7 @@ public /*non-final on purpose*/ class LazyPojoFactory<F> implements IPojoFactory
 	}
 
 	@Override
-	public F newInstance(IPropertyResolver resolver, ICallerContext context) {
+	public F newInstance(IPropertyResolver resolver, CallerContext context) {
 		F instance = delegate.newInstance(resolver, context);
 		resolver.initializeBean(getDescriptor(), instance, context);
 		return instance;

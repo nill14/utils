@@ -3,7 +3,6 @@ package com.github.nill14.utils.init.impl;
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
@@ -31,7 +30,7 @@ public final class ProviderTypePojoFactory<T, F extends Provider<? extends T>> i
 	}
 
 	@Override
-	public T newInstance(IPropertyResolver resolver, ICallerContext context) {
+	public T newInstance(IPropertyResolver resolver, CallerContext context) {
 		T instance = pojoFactory.newInstance(resolver, context).get();
 		if (instance != null) {
 			//take the descriptor of the real instance type, not of the published superclass

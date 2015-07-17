@@ -10,7 +10,6 @@ import javax.inject.Provider;
 import org.hamcrest.CoreMatchers;
 import org.testng.annotations.Test;
 
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IPojoFactory;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.google.common.reflect.TypeToken;
@@ -34,12 +33,16 @@ public class PojoFactoriesTest {
 			return new Impl();
 		}
 	}; 	
+	
+	private CallerContext constructionContext() {
+		return CallerContext.prototype();
+	}
 
 	@Test
 	public void nullFactoryTest() {
 		IPojoFactory<Integer> factory = BeanInstancePojoFactory.nullFactory(Integer.class);
 		assertEquals(TypeToken.of(Integer.class), factory.getType());
-		assertEquals(null, factory.newInstance(IPropertyResolver.empty(), ICallerContext.prototype()));
+		assertEquals(null, factory.newInstance(IPropertyResolver.empty(), constructionContext()));
 	}
 	
 	@Test
@@ -47,7 +50,7 @@ public class PojoFactoriesTest {
 		Impl singleton = new Impl();
 		IPojoFactory<IFace<List<String>>> factory = BeanInstancePojoFactory.singleton(singleton);
 		assertEquals(TypeToken.of(Impl.class), factory.getType());
-		assertEquals(singleton, factory.newInstance(IPropertyResolver.empty(), ICallerContext.prototype()));
+		assertEquals(singleton, factory.newInstance(IPropertyResolver.empty(), constructionContext()));
 	}
 	
 	@Test
@@ -63,7 +66,7 @@ public class PojoFactoriesTest {
 		};
 		IPojoFactory<IFace<List<String>>> factory = new ProviderInstancePojoFactory<>(provider);
 		assertEquals(expectedToken, factory.getType());
-		assertEquals(singleton, factory.newInstance( IPropertyResolver.empty(), ICallerContext.prototype()));
+		assertEquals(singleton, factory.newInstance( IPropertyResolver.empty(), constructionContext()));
 	}
 	
 	@Test
@@ -71,7 +74,7 @@ public class PojoFactoriesTest {
 		TypeToken<Impl> typeToken = TypeToken.of(Impl.class);
 		IPojoFactory<Impl> factory = new BeanTypePojoFactory<>(typeToken);
 		assertEquals(typeToken, factory.getType());
-		assertThat(factory.newInstance(IPropertyResolver.empty(), ICallerContext.prototype()), CoreMatchers.instanceOf(Impl.class));
+		assertThat(factory.newInstance(IPropertyResolver.empty(), constructionContext()), CoreMatchers.instanceOf(Impl.class));
 	}
 	
 	@Test
@@ -81,7 +84,7 @@ public class PojoFactoriesTest {
 		ProviderTypePojoFactory<Impl, ImplProvider> adapter = new ProviderTypePojoFactory<>(providerToken);
 		IPojoFactory<Impl> factory = adapter;
 		assertEquals(typeToken, factory.getType());
-		assertThat(factory.newInstance( IPropertyResolver.empty(), ICallerContext.prototype()), CoreMatchers.instanceOf(Impl.class));
+		assertThat(factory.newInstance( IPropertyResolver.empty(), constructionContext()), CoreMatchers.instanceOf(Impl.class));
 		assertEquals(providerToken, adapter.getFactoryType());
 	}
 

@@ -6,14 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Named;
-
 import org.springframework.context.ApplicationContext;
 
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
+import com.github.nill14.utils.init.impl.CallerContext;
 import com.google.common.collect.Maps;
 
 @SuppressWarnings("serial")
@@ -26,7 +24,7 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Object findByQualifier(IParameterType type, Annotation qualifier, ICallerContext context) {
+	protected Object findByQualifier(IParameterType type, Annotation qualifier, CallerContext context) {
 		
 		Class<? extends Annotation> annotationClass = qualifier.annotationType();
 		Map<String, Object> beansWithAnnotation = this.context.getBeansWithAnnotation(annotationClass);
@@ -52,7 +50,7 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	
 
 	@Override
-	protected Object findByName(String name, IParameterType type, ICallerContext context) {
+	protected Object findByName(String name, IParameterType type, CallerContext context) {
 		if (this.context.isTypeMatch(name, type.getRawType())) {
 			return this.context.getBean(name, type);
 		}
@@ -60,7 +58,7 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Object findByType(IParameterType type, ICallerContext context) {
+	protected Object findByType(IParameterType type, CallerContext context) {
 		Class<?> clazz = type.getRawType();
 		String[] names = this.context.getBeanNamesForType(clazz);
 		if (names.length > 0) {
@@ -70,7 +68,7 @@ public class SpringPropertyResolver extends AbstractPropertyResolver implements 
 	}
 
 	@Override
-	protected Collection<?> findAllByType(IParameterType type, ICallerContext context) {
+	protected Collection<?> findAllByType(IParameterType type, CallerContext context) {
 		return this.context.getBeansOfType(type.getRawType()).values();
 	}
 

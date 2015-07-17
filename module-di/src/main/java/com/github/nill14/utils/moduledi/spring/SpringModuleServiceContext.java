@@ -11,13 +11,13 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IBeanInjector;
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
 import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
+import com.github.nill14.utils.init.impl.CallerContext;
 import com.github.nill14.utils.init.impl.ServiceRegistry;
 import com.github.nill14.utils.moduledi.IModule;
 
@@ -74,7 +74,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 	private final AbstractPropertyResolver applicationContextResolver = new AbstractPropertyResolver() {
 
 		@Override
-		public Object resolve(IParameterType type, ICallerContext context) {
+		public Object resolve(IParameterType type, CallerContext context) {
 			if (springPropertyResolver == null) {
 				//TODO this might be eventually the case when calling resolver from PojoFactory
 				throw new IllegalStateException("Wrong order, first must be called initializer");
@@ -83,7 +83,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 		}
 		
 		@Override
-		public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
+		public <T> void initializeBean(IBeanDescriptor<T> beanDescriptor, Object instance, CallerContext context) {
 			if (springPropertyResolver == null) {
 				//TODO this might be eventually the case when calling resolver from PojoFactory
 				throw new IllegalStateException("Wrong order, first must be called initializer");
@@ -92,7 +92,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 		}
 		
 		@Override
-		public IBeanInjector toBeanInjector(ICallerContext context) {
+		public IBeanInjector toBeanInjector(CallerContext context) {
 			if (springPropertyResolver == null) {
 				//TODO this might be eventually the case when calling resolver from PojoFactory
 				throw new IllegalStateException("Wrong order, first must be called initializer");
@@ -131,25 +131,25 @@ public class SpringModuleServiceContext implements IServiceContext {
 		}
 
 		@Override
-		protected Object findByName(String name, IParameterType type, ICallerContext context) {
+		protected Object findByName(String name, IParameterType type, CallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		protected Object findByType(IParameterType type, ICallerContext context) {
+		protected Object findByType(IParameterType type, CallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		protected Collection<?> findAllByType(IParameterType type, ICallerContext context) {
+		protected Collection<?> findAllByType(IParameterType type, CallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		protected Object findByQualifier(IParameterType type, Annotation qualifier, ICallerContext context) {
+		protected Object findByQualifier(IParameterType type, Annotation qualifier, CallerContext context) {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -159,7 +159,7 @@ public class SpringModuleServiceContext implements IServiceContext {
 	private final IPojoInitializer applicationContextInitializer = new IPojoInitializer() {
 		
 		@Override
-		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
+		public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, CallerContext context) {
 			if (ctxStarted.compareAndSet(false, true)) {
 				initApplicationContext(registry);
 				if (ctx != null) {

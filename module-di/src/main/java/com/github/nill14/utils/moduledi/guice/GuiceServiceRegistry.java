@@ -9,11 +9,10 @@ import java.util.stream.Collectors;
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.IBeanInjector;
-import com.github.nill14.utils.init.api.ICallerContext;
-import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IServiceContext;
 import com.github.nill14.utils.init.api.IServiceRegistry;
+import com.github.nill14.utils.init.impl.CallerContext;
 import com.github.nill14.utils.init.impl.LazyPojo;
 import com.github.nill14.utils.init.meta.Annotations;
 import com.google.inject.Binder;
@@ -158,7 +157,7 @@ public class GuiceServiceRegistry implements IServiceRegistry {
 	}
 
 	@Override
-	public IBeanInjector toBeanInjector(ICallerContext context) {
+	public IBeanInjector toBeanInjector(CallerContext context) {
 		return new GuiceBeanInjector(injector);
 	}
 	

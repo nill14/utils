@@ -2,7 +2,6 @@ package com.github.nill14.utils.init.impl;
 
 import javax.inject.Provider;
 
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 
@@ -11,9 +10,9 @@ public class LazyResolvingProvider<T> implements Provider<T>{
 	
 	private final IParameterType type;
 	private final IPropertyResolver resolver;
-	private final ICallerContext context;
+	private final CallerContext context;
 
-	public LazyResolvingProvider(IPropertyResolver resolver, IParameterType type, ICallerContext context) {
+	public LazyResolvingProvider(IPropertyResolver resolver, IParameterType type, CallerContext context) {
 		this.resolver = resolver;
 		this.type = type;
 		this.context = context;

@@ -3,7 +3,6 @@ package com.github.nill14.utils.init.impl;
 import java.util.Collection;
 
 import com.github.nill14.utils.init.api.IBeanDescriptor;
-import com.github.nill14.utils.init.api.ICallerContext;
 import com.github.nill14.utils.init.api.IMemberDescriptor;
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPojoInitializer;
@@ -15,7 +14,7 @@ import com.github.nill14.utils.init.inject.ParameterTypeInjectionDescriptor;
 public final class AnnotationInjectInitializer implements IPojoInitializer {
 
 	@Override
-	public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, ICallerContext context) {
+	public <T> void init(IPropertyResolver resolver, IBeanDescriptor<T> beanDescriptor, Object instance, CallerContext context) {
 		//according to specification, fields are injected before methods
 		for (IMemberDescriptor fd : beanDescriptor.getFieldDescriptors()) {
 			ParameterTypeInjectionDescriptor parameterType = ((FieldInjectionDescriptor) fd).getParameterType();
@@ -32,7 +31,7 @@ public final class AnnotationInjectInitializer implements IPojoInitializer {
 		
 	}
 
-	private void injectParam(IPropertyResolver resolver, Object instance, IMemberDescriptor member, IParameterType parameterType, ICallerContext context) {
+	private void injectParam(IPropertyResolver resolver, Object instance, IMemberDescriptor member, IParameterType parameterType, CallerContext context) {
 		Object value = resolver.resolve(parameterType, context);
 		
 		if (value != null) {
@@ -51,7 +50,7 @@ public final class AnnotationInjectInitializer implements IPojoInitializer {
 		}
 	}
 	
-	private void injectMethod(IPropertyResolver resolver, Object instance, IMemberDescriptor member, ICallerContext context) {
+	private void injectMethod(IPropertyResolver resolver, Object instance, IMemberDescriptor member, CallerContext context) {
 		
 		try {
 			Object[] args = createArgs(resolver, member.getParameterTypes(), context);
@@ -63,7 +62,7 @@ public final class AnnotationInjectInitializer implements IPojoInitializer {
 			
 	}	
 	
-	private Object[] createArgs(IPropertyResolver resolver, Collection<IParameterType> types, ICallerContext context) {
+	private Object[] createArgs(IPropertyResolver resolver, Collection<IParameterType> types, CallerContext context) {
 		if (types.isEmpty()) {
 			return null;
 		}

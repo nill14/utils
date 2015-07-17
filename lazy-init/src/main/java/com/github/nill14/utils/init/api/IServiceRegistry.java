@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.inject.Provider;
 
+import com.github.nill14.utils.init.impl.CallerContext;
 import com.github.nill14.utils.init.impl.ServiceRegistry;
 
 @Deprecated
@@ -36,7 +37,7 @@ public interface IServiceRegistry {
 
 	IPropertyResolver toResolver();
 
-	IBeanInjector toBeanInjector(ICallerContext context);
+	IBeanInjector toBeanInjector(CallerContext context);
 
 
 	static IServiceRegistry newRegistry() {
