@@ -12,13 +12,13 @@ import java.util.stream.Stream;
 import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.BindingKey;
-import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.Binder;
-import com.github.nill14.utils.init.binding.impl.BindingImpl;
+import com.github.nill14.utils.init.binding.impl.Binding;
 import com.github.nill14.utils.init.binding.target.ProvidesMethodBindingTarget;
 import com.github.nill14.utils.init.meta.AnnotationScanner;
 import com.github.nill14.utils.init.meta.Provides;
-import com.github.nill14.utils.init.scope.PrototypeScope;
+import com.github.nill14.utils.init.scope.AnnotationScopeStrategy;
+import com.github.nill14.utils.init.scope.IScopeStrategy;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 
@@ -56,11 +56,11 @@ public enum ReflectionUtils {
 	
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static List<BindingImpl<?>> scanProvidesBindings(Binder binder, Object module) {
+	public static List<Binding<?>> scanProvidesBindings(Binder binder, Object module) {
 		//avoid confusion with importing the wrong import
 		boolean isGuicePresent = ReflectionUtils.isClassPresent("com.google.inject.Provides");
 		
-		List<BindingImpl<?>> result = Lists.newArrayList();
+		List<Binding<?>> result = Lists.newArrayList();
 		Stream<Method> stream = ReflectionUtils.getInstanceMethods(module.getClass());
 		
 		Iterable<Method> iterable = stream::iterator;
@@ -75,9 +75,11 @@ public enum ReflectionUtils {
 				
 				
 				BindingKey type = BindingKey.of(typeToken, qualifier);
-				IScope scope = scopeAnnotation.map(a -> binder.getScope(a.annotationType())).orElse(PrototypeScope.instance());
+				IScopeStrategy scope = scopeAnnotation
+						.<IScopeStrategy>map(a -> AnnotationScopeStrategy.of(a.annotationType()))
+						.orElse(AnnotationScopeStrategy.prototype());
 				
-				BindingImpl binding = new BindingImpl(type, target, scope, module);				
+				Binding binding = new Binding(type, target, scope, module);				
 				result.add(binding);
 			}
 		}

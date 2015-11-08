@@ -16,7 +16,7 @@ import com.github.nill14.parsers.graph.CyclicGraphException;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.binding.ModuleBinder;
 import com.github.nill14.utils.init.binding.TestBinder;
-import com.github.nill14.utils.init.binding.impl.BindingImpl;
+import com.github.nill14.utils.init.binding.impl.Binding;
 import com.github.nill14.utils.init.impl.CallerContext;
 import com.github.nill14.utils.init.impl.ServiceRegistry;
 import com.github.nill14.utils.java8.stream.ExecutorUtils;
@@ -28,7 +28,7 @@ public final class ModularBeanInjectorBuilder {
 	
 	private final ExecutorService executor = Executors.newCachedThreadPool();
 	private final ServiceRegistry serviceRegistry = new ServiceRegistry();
-	private final List<BindingImpl<?>> elements = Lists.newArrayList();
+	private final List<Binding<?>> elements = Lists.newArrayList();
 	private final ImmutableSet<IModule> modules;
 
 	public ModularBeanInjectorBuilder(Iterable<? extends IModule> modules) {

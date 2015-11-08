@@ -1,32 +1,25 @@
 package com.github.nill14.utils.init.binding;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.inject.Singleton;
-
 import com.github.nill14.utils.annotation.Experimental;
-import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanInjector;
 import com.github.nill14.utils.init.api.IPojoInitializer;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.github.nill14.utils.init.api.IScope;
+import com.github.nill14.utils.init.binding.impl.Binding;
 import com.github.nill14.utils.init.binding.impl.BindingBuilder;
-import com.github.nill14.utils.init.binding.impl.BindingImpl;
-import com.github.nill14.utils.init.binding.target.AnnotatedElementBindingTargetVisitor;
 import com.github.nill14.utils.init.impl.AbstractPropertyResolver;
+import com.github.nill14.utils.init.impl.BinderUtils;
 import com.github.nill14.utils.init.impl.CallerContext;
 import com.github.nill14.utils.init.impl.ChainingPojoInitializer;
 import com.github.nill14.utils.init.impl.ChainingPropertyResolver;
 import com.github.nill14.utils.init.impl.SimplePropertyResolver;
 import com.github.nill14.utils.init.inject.ReflectionUtils;
-import com.github.nill14.utils.init.meta.AnnotationScanner;
-import com.github.nill14.utils.init.scope.PrototypeScope;
-import com.github.nill14.utils.init.scope.SingletonScope;
 import com.github.nill14.utils.init.util.Element;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -38,12 +31,12 @@ public final class TestBinder implements Binder {
 	private final List<AbstractPropertyResolver> extraResolvers = Lists.newArrayList();
 	private final ChainingPojoInitializer initializer = ChainingPojoInitializer.defaultInitializer();
 
-	private final List<Element<BindingImpl<?>>> elements = Lists.newArrayList();
+	private final List<Element<Binding<?>>> elements = Lists.newArrayList();
 	private final AtomicBoolean configurationLocker = new AtomicBoolean(false);
 
 	
-	private Element<BindingImpl<?>> newElement() {
-		Element<BindingImpl<?>> element = new Element<BindingImpl<?>>(configurationLocker);
+	private Element<Binding<?>> newElement() {
+		Element<Binding<?>> element = new Element<Binding<?>>(configurationLocker);
 		elements.add(element);
 		return element;
 	}
@@ -63,18 +56,6 @@ public final class TestBinder implements Binder {
 		scopes.put(annotationType, scope);
 	}
 	
-	@Override
-	public IScope getScope(Class<? extends Annotation> annotationType) {
-		if (Singleton.class.equals(annotationType)) {
-			return SingletonScope.instance();
-		}
-		IScope scope = scopes.get(annotationType);
-		if (scope == null) {
-			throw new RuntimeException("Scope is missing: " + annotationType);
-		}
-		return scope;
-	}
-
 	public TestBinder withInitializer(IPojoInitializer initializer) {
 		this.initializer.append(initializer);
 		return this;
@@ -102,7 +83,7 @@ public Object resolve(Object pojo, IParameterType type) {
 	@Deprecated
 	public IPropertyResolver toResolver() {
 		
-		ImmutableList<BindingImpl<?>> bindings = freezeBindings();
+		ImmutableList<Binding<?>> bindings = freezeBindings();
 		
 		
 		return new SimplePropertyResolver(bindings, 
@@ -113,7 +94,7 @@ public Object resolve(Object pojo, IParameterType type) {
 	public IBeanInjector toBeanInjector() {
 //		bindScope(Singleton.class, SingletonScope.instance());
 		
-		ImmutableList<BindingImpl<?>> bindings = freezeBindings();
+		ImmutableList<Binding<?>> bindings = freezeBindings();
 		
 		
 		
@@ -130,44 +111,20 @@ public Object resolve(Object pojo, IParameterType type) {
 		}
 	}
 
-	public ImmutableList<BindingImpl<?>> freezeBindings() {
+	public ImmutableList<Binding<?>> freezeBindings() {
 		configurationLocker.set(true);
 		
-		ImmutableList<BindingImpl<?>> bindings = ImmutableList.copyOf(
-				elements.stream().map(Element::getValue).map(this::scanQualifierAndScope).iterator());
+		ImmutableList<Binding<?>> bindings = ImmutableList.copyOf(
+				elements.stream().map(Element::getValue).map(BinderUtils::scanQualifierAndScope).iterator());
 		return bindings;
 	}
 	
-	private <T> BindingImpl<T> scanQualifierAndScope(BindingImpl<T> binding) {
-		AnnotatedElementBindingTargetVisitor targetVisitor = new AnnotatedElementBindingTargetVisitor();
-		BindingKey<T> bindingKey = binding.getBindingKey();
-		boolean isPrototypeScope = binding.getScope() == PrototypeScope.instance();
-		//TODO make the prototype check safer
-		
-		if (bindingKey.getQualifier() == null || isPrototypeScope) {
-			AnnotatedElement annotatedElement = binding.getBindingTarget().accept(targetVisitor);
-			
-			if (bindingKey.getQualifier() == null) {
-				Annotation qualifier = AnnotationScanner.findQualifier(annotatedElement).orElse(null);
-				binding = binding.keyWithQualifier(qualifier);
-			}
-			
-			if (isPrototypeScope) {
-				Annotation scopeAnnotation = AnnotationScanner.findScope(annotatedElement).orElse(null);
-				if (scopeAnnotation != null) {
-					IScope scope = getScope(scopeAnnotation.annotationType());
-					binding = binding.withScope(scope);
-				}
-			}
-		}
-		
-		return binding;
-	}
+
 	
 	public void scanProvidesBindings(Object module) {
-		List<BindingImpl<?>> list = ReflectionUtils.scanProvidesBindings(this, module);
-		for (final BindingImpl<?> binding : list) {
-			final Element<BindingImpl<?>> element = newElement();
+		List<Binding<?>> list = ReflectionUtils.scanProvidesBindings(this, module);
+		for (final Binding<?> binding : list) {
+			final Element<Binding<?>> element = newElement();
 			element.update(binding);
 		}
 	}

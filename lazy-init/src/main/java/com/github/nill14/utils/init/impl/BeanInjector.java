@@ -10,8 +10,8 @@ import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
 
-@SuppressWarnings({ "unchecked", "serial" })
-public class BeanInjector implements IBeanInjector {
+@SuppressWarnings({ "unchecked" })
+public final class BeanInjector implements IBeanInjector {
 	
 	private final IPropertyResolver resolver;
 	private final Object context;
