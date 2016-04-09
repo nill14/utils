@@ -2,13 +2,13 @@ package com.github.nill14.utils.init.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.github.nill14.utils.init.api.IParameterType;
 import com.github.nill14.utils.init.api.IPropertyResolver;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 @SuppressWarnings("serial")
 public final class ChainingPropertyResolver extends AbstractPropertyResolver {
@@ -71,15 +71,15 @@ public final class ChainingPropertyResolver extends AbstractPropertyResolver {
 		return null;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected Collection<?> findAllByType(IParameterType type, CallerContext context) {
+		List result = Lists.newArrayList();
 		for (AbstractPropertyResolver resolver : items) {
-			Collection<?> result = resolver.findAllByType(type, context);
-			if (!result.isEmpty()) {
-				return result;
-			}
+			Collection findAllByType = resolver.findAllByType(type, context);
+			result.addAll(findAllByType);
 		}
-    return Collections.emptyList();
+		return result;
 	}
 
 	@Override
