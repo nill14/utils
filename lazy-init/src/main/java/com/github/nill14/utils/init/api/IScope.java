@@ -4,7 +4,7 @@ import javax.inject.Provider;
 
 public interface IScope {
 
-  public <T> Provider<T> scope(BindingKey<T> bindingKey, Provider<T> unscoped);
+  public <T> Provider<T> scope(BindingKey<T> bindingKey, Provider<T> unscoped, IScopeContext scopeContext);
 
   
 }

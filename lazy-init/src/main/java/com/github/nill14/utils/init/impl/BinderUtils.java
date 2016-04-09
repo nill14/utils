@@ -4,8 +4,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.github.nill14.utils.init.api.BindingKey;
@@ -20,8 +20,8 @@ import com.github.nill14.utils.init.binding.target.PojoFactoryBindingTargetVisit
 import com.github.nill14.utils.init.inject.DependencyUtils;
 import com.github.nill14.utils.init.inject.PojoInjectionDescriptor;
 import com.github.nill14.utils.init.meta.AnnotationScanner;
-import com.github.nill14.utils.init.scope.AnnotationScopeStrategy;
 import com.github.nill14.utils.init.scope.IScopeStrategy;
+import com.github.nill14.utils.init.scope.ScopeStrategies;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -48,7 +48,7 @@ public enum BinderUtils {
 			if (isPrototypeScope) {
 				Annotation scopeAnnotation = AnnotationScanner.findScope(annotatedElement).orElse(null);
 				if (scopeAnnotation != null) {
-					IScopeStrategy scope = AnnotationScopeStrategy.of(scopeAnnotation.annotationType());
+					IScopeStrategy scope = ScopeStrategies.of(scopeAnnotation.annotationType());
 					binding = binding.withScopeStrategy(scope);
 				}
 			}

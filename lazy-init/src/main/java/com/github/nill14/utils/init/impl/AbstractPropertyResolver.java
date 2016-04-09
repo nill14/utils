@@ -99,7 +99,7 @@ public abstract class AbstractPropertyResolver implements IPropertyResolver {
 			}
 		}
 		
-		return doPrototype(type, context, nullable);
+		return doPrototype(type, context, nullable); //TODO How about outOfScope provider? - findByType could be the last.
 	}
 	
 	protected Object doResolveCollection(Class<?> collectionType, IParameterType paramType, CallerContext context) {

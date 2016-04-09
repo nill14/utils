@@ -9,11 +9,11 @@ import javax.inject.Provider;
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IBeanDescriptor;
 import com.github.nill14.utils.init.api.IPropertyResolver;
-import com.github.nill14.utils.init.api.IScope;
+import com.github.nill14.utils.init.api.IScopeContext;
 import com.github.nill14.utils.init.impl.UnscopedProvider;
 import com.google.common.collect.Lists;
 
-public final class ScopeContext implements IScope {
+public final class ScopeContext implements IScopeContext {
 
 	private final AtomicBoolean lifecycleTracker = new AtomicBoolean(true);
 	private final ConcurrentHashMap<BindingKey<?>, ScopedProvider<?>> map = new ConcurrentHashMap<>();
@@ -90,5 +90,5 @@ public final class ScopeContext implements IScope {
 			}
 		}
 	}
-	
+
 }

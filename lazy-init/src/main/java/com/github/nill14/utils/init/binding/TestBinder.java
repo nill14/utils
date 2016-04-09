@@ -20,6 +20,7 @@ import com.github.nill14.utils.init.impl.ChainingPojoInitializer;
 import com.github.nill14.utils.init.impl.ChainingPropertyResolver;
 import com.github.nill14.utils.init.impl.SimplePropertyResolver;
 import com.github.nill14.utils.init.inject.ReflectionUtils;
+import com.github.nill14.utils.init.scope.ScopeStrategies;
 import com.github.nill14.utils.init.util.Element;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -92,8 +93,6 @@ public Object resolve(Object pojo, IParameterType type) {
 	
 	
 	public IBeanInjector toBeanInjector() {
-//		bindScope(Singleton.class, SingletonScope.instance());
-		
 		ImmutableList<Binding<?>> bindings = freezeBindings();
 		
 		
@@ -115,7 +114,7 @@ public Object resolve(Object pojo, IParameterType type) {
 		configurationLocker.set(true);
 		
 		ImmutableList<Binding<?>> bindings = ImmutableList.copyOf(
-				elements.stream().map(Element::getValue).map(BinderUtils::scanQualifierAndScope).iterator());
+				elements.stream().map(Element::getValue).map(BinderUtils::scanQualifierAndScope).map(binding -> ScopeStrategies.replaceScopes(binding, scopes)).iterator());
 		return bindings;
 	}
 	

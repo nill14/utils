@@ -13,11 +13,13 @@ import com.github.nill14.utils.init.api.IScope;
 import com.github.nill14.utils.init.binding.impl.Binding;
 import com.github.nill14.utils.init.binding.impl.BindingBuilder;
 import com.github.nill14.utils.init.binding.target.AnnotatedElementBindingTargetVisitor;
+import com.github.nill14.utils.init.impl.BinderUtils;
 import com.github.nill14.utils.init.impl.CallerContext;
 import com.github.nill14.utils.init.impl.ChainingPojoInitializer;
 import com.github.nill14.utils.init.impl.ChainingPropertyResolver;
 import com.github.nill14.utils.init.impl.SimplePropertyResolver;
 import com.github.nill14.utils.init.meta.AnnotationScanner;
+import com.github.nill14.utils.init.scope.ScopeStrategies;
 import com.github.nill14.utils.init.util.Element;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -59,7 +61,7 @@ public final class ModuleBinder implements Binder {
 	
 	@Override
 	public void bindScope(Class<? extends Annotation> annotationType, IScope scope) {
-		scopes.put(annotationType, scope);
+		scopes.put(annotationType, scope); //TODO IScopeStrategy?
 	}
 	
 	public IPropertyResolver toResolver() {
@@ -75,7 +77,7 @@ public final class ModuleBinder implements Binder {
 		configurationLocker.set(true);
 		
 		ImmutableList<Binding<?>> bindings = ImmutableList.copyOf(
-				elements.stream().map(Element::getValue).map(this::scanQualifier).iterator());
+				elements.stream().map(Element::getValue).map(BinderUtils::scanQualifierAndScope).map(binding -> ScopeStrategies.replaceScopes(binding, scopes)).iterator());
 		return bindings;
 	}	
 	

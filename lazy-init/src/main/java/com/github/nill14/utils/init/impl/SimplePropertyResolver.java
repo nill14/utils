@@ -67,12 +67,11 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 			BindingKey<?> bindingKey = binding.getBindingKey();
 
 			
-			IScope scope = binding.getScopeStrategy().resolveScope(context);
+			IScope scope = binding.getScopeStrategy().resolveScope();
 			IPojoFactory<Object> pojoFactory = (IPojoFactory<Object>) bindingFactories.get(binding.getBindingTarget());
 			
-			//TODO provide scope with info about "calling" scope
 			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, bindingKey, pojoFactory, context); 
-			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) bindingKey, provider);
+			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) bindingKey, provider, context.getScopeContext());
 			Object element = scopedProvider.get();
 			if (element != null) {
 				builder.add(element);
@@ -95,11 +94,11 @@ public class SimplePropertyResolver extends AbstractPropertyResolver implements 
 			binding = getLinkedBinding(binding);
 			bindingKey = binding.getBindingKey();
 
-			IScope scope = binding.getScopeStrategy().resolveScope(context);
+			IScope scope = binding.getScopeStrategy().resolveScope();
 			IPojoFactory<Object> pojoFactory = (IPojoFactory<Object>) bindingFactories.get(binding.getBindingTarget());
 			
 			UnscopedProvider<Object> provider = new UnscopedProvider<>(resolver, bindingKey, pojoFactory, context);
-			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) bindingKey, provider);
+			Provider<?> scopedProvider = scope.scope((BindingKey<Object>) bindingKey, provider, context.getScopeContext());
 			
 			return scopedProvider.get();
 		} else {

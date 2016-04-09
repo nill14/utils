@@ -14,22 +14,27 @@ import com.google.common.reflect.TypeToken;
 public final class BeanInjector implements IBeanInjector {
 	
 	private final IPropertyResolver resolver;
-	private final Object context;
+	private final CallerContext context;
 
-	public BeanInjector(IPropertyResolver resolver, Object context) { 
+	public BeanInjector(IPropertyResolver resolver, CallerContext context) { 
 		this.resolver = Preconditions.checkNotNull(resolver);
 		this.context = Preconditions.checkNotNull(context);
 	}
 
+	public BeanInjector(IPropertyResolver resolver) { 
+		this.resolver = Preconditions.checkNotNull(resolver);
+		this.context = CallerContext.prototype();
+	}
+	
 	@Override
 	public void injectMembers(Object bean) {
 		IPojoFactory<Object> pojoFactory = BeanInstancePojoFactory.singleton(bean);
-		resolver.initializeBean(pojoFactory.getDescriptor(), bean, createContext());
+		resolver.initializeBean(pojoFactory.getDescriptor(), bean, context);
 	}
 
 	private <T> T resolve(BindingKey<T> type) {
 		IParameterType parameterType = IParameterType.of(type);
-		T bean = (T) resolver.resolve(parameterType, createContext());
+		T bean = (T) resolver.resolve(parameterType, context);
 		if (bean == null) {
 			throw new RuntimeException(String.format(
 					"Injection of bean %s failed!", type));
@@ -68,27 +73,19 @@ public final class BeanInjector implements IBeanInjector {
 	@Override
 	public <T> Provider<T> getProvider(Class<T> beanClass) {
 		IParameterType type = IParameterType.of(BindingKey.of(beanClass));
-		return new LazyResolvingProvider<>(resolver, type, createContext());
+		return new LazyResolvingProvider<>(resolver, type, context);
 	}
 
 	@Override
 	public <T> Provider<T> getProvider(TypeToken<T> typeToken) {
 		IParameterType type = IParameterType.of(BindingKey.of(typeToken));
-		return new LazyResolvingProvider<>(resolver, type, createContext());
+		return new LazyResolvingProvider<>(resolver, type, context);
 	}
 
 	@Override
 	public <T> Provider<T> getProvider(BindingKey<T> BindingKey) {
 		IParameterType type = IParameterType.of(BindingKey);
-		return new LazyResolvingProvider<>(resolver, type, createContext());
-	}
-
-	private CallerContext createContext() {
-		if (context instanceof CallerContext) {
-			return (CallerContext) context;
-		} else {
-			return new CallerContext(context);
-		}
+		return new LazyResolvingProvider<>(resolver, type, context);
 	}
 	
 }

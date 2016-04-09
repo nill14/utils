@@ -4,6 +4,7 @@ import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IScope;
+import com.github.nill14.utils.init.api.IScopeContext;
 
 public abstract class AbstractThreadScope implements IScope {
 
@@ -11,20 +12,24 @@ public abstract class AbstractThreadScope implements IScope {
 	
 
 	@Override
-	public <T> Provider<T> scope(BindingKey<T> type, Provider<T> unscoped) {
+	public <T> Provider<T> scope(BindingKey<T> type, Provider<T> unscoped, IScopeContext scopeContext) {
 		return threadLocal.get().scope(type, unscoped);
 	}
 	
 	
-	public ScopeContext get() {
+	protected ScopeContext get() {
 		return threadLocal.get();
 	}
 	
-	public void set(ScopeContext context) {
+	protected void set(ScopeContext context) {
 		threadLocal.set(context);
 	}
 	
-	public void remove() {
+	protected void remove() {
 		threadLocal.remove();
+	}
+	
+	protected <T> Provider<T> outOfScopeProvider() {
+		return () -> null;
 	}
 }

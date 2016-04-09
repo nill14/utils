@@ -14,8 +14,8 @@ import com.github.nill14.utils.init.binding.target.BeanTypeBindingTarget;
 import com.github.nill14.utils.init.binding.target.ProviderInstanceBindingTarget;
 import com.github.nill14.utils.init.binding.target.ProviderTypeBindingTarget;
 import com.github.nill14.utils.init.meta.Annotations;
-import com.github.nill14.utils.init.scope.AnnotationScopeStrategy;
 import com.github.nill14.utils.init.scope.IScopeStrategy;
+import com.github.nill14.utils.init.scope.ScopeStrategies;
 import com.github.nill14.utils.init.util.Element;
 import com.google.common.reflect.TypeToken;
 
@@ -24,7 +24,7 @@ public final class BindingBuilder<T> implements AnnotatedBindingBuilder<T> {
 	private final TypeToken<T> keyToken;
 	private Annotation qualifier;
 	private BindingTarget<? extends T> target;
-	private IScopeStrategy scope = AnnotationScopeStrategy.prototype();
+	private IScopeStrategy scope = ScopeStrategies.prototype();
 	private final Object source;
 	private final Element<Binding<?>> element;
 	private final Binder binder;
@@ -85,7 +85,7 @@ public final class BindingBuilder<T> implements AnnotatedBindingBuilder<T> {
 
 	@Override
 	public void in(Class<? extends Annotation> scopeAnnotation) {
-		scope = AnnotationScopeStrategy.of(scopeAnnotation);
+		scope = ScopeStrategies.of(scopeAnnotation);
 		buildBinder();
 	}
 

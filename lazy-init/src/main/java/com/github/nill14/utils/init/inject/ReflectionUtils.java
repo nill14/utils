@@ -17,8 +17,8 @@ import com.github.nill14.utils.init.binding.impl.Binding;
 import com.github.nill14.utils.init.binding.target.ProvidesMethodBindingTarget;
 import com.github.nill14.utils.init.meta.AnnotationScanner;
 import com.github.nill14.utils.init.meta.Provides;
-import com.github.nill14.utils.init.scope.AnnotationScopeStrategy;
 import com.github.nill14.utils.init.scope.IScopeStrategy;
+import com.github.nill14.utils.init.scope.ScopeStrategies;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 
@@ -76,8 +76,8 @@ public enum ReflectionUtils {
 				
 				BindingKey type = BindingKey.of(typeToken, qualifier);
 				IScopeStrategy scope = scopeAnnotation
-						.<IScopeStrategy>map(a -> AnnotationScopeStrategy.of(a.annotationType()))
-						.orElse(AnnotationScopeStrategy.prototype());
+						.<IScopeStrategy>map(a -> ScopeStrategies.of(a.annotationType()))
+						.orElse(ScopeStrategies.prototype());
 				
 				Binding binding = new Binding(type, target, scope, module);				
 				result.add(binding);

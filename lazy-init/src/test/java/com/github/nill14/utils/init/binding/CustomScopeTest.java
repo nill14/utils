@@ -4,7 +4,9 @@ import static java.lang.annotation.RetentionPolicy.*;
 
 import java.lang.annotation.Retention;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -92,13 +94,15 @@ public class CustomScopeTest {
 		Assert.assertEquals(beans.size(), 5);
 		Assert.assertEquals(instances.get(), 5);
 		
-		MatcherAssert.assertThat(beans.get(0), CoreMatchers.instanceOf(Bean.class));
-		MatcherAssert.assertThat(beans.get(1), CoreMatchers.instanceOf(Bean.class));
-		MatcherAssert.assertThat(beans.get(2), CoreMatchers.instanceOf(Bean.class));
-		MatcherAssert.assertThat(beans.get(3), CoreMatchers.instanceOf(Bean2.class));
-		MatcherAssert.assertThat(beans.get(4), CoreMatchers.instanceOf(Bean2.class));
-		Assert.assertNotEquals(beans.get(3), beans.get(4));
-		Assert.assertNotEquals(beans.get(1), beans.get(2));
+		Map<?, List<IBean>> map = beans.stream().collect(Collectors.groupingBy(Object::getClass));
+		
+		Assert.assertEquals(map.get(Bean.class).size(), 3);
+		Assert.assertEquals(map.get(Bean2.class).size(), 2);
+
+		Assert.assertNotEquals(map.get(Bean.class).get(0), map.get(Bean.class).get(1));
+		Assert.assertNotEquals(map.get(Bean.class).get(0), map.get(Bean.class).get(2));
+		Assert.assertNotEquals(map.get(Bean.class).get(1), map.get(Bean.class).get(2));
+		Assert.assertNotEquals(map.get(Bean2.class).get(0), map.get(Bean2.class).get(1));
 		
 		scope.destroy();
 		Assert.assertEquals(instances.get(), 1); //prototype scope
@@ -182,6 +186,5 @@ public class CustomScopeTest {
 		
 	}
 	
-
 
 }

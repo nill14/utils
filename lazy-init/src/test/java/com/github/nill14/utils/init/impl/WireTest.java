@@ -18,21 +18,21 @@ public class WireTest {
 	
 	@Test
 	public void testStrawberry() {
-		IBeanInjector injector = new BeanInjector(resolver, Object.class);
+		IBeanInjector injector = new BeanInjector(resolver);
 		Strawberry strawberry = injector.getInstance(Strawberry.class);
 		assertNotNull(strawberry);
 	}
 	
 	@Test
 	public void testOnion() {
-		IBeanInjector injector = new BeanInjector(resolver, Object.class);
+		IBeanInjector injector = new BeanInjector(resolver);
 		Onion onion = injector.getInstance(Onion.class);
 		assertNotNull(onion.strawberry);
 	}
 	
 	@Test
 	public void testMango() {
-		IBeanInjector injector = new BeanInjector(resolver, Object.class);
+		IBeanInjector injector = new BeanInjector(resolver);
 		Mango mango = injector.getInstance(Mango.class);
 		assertNotNull(mango.onion);
 	}

@@ -4,6 +4,7 @@ import javax.inject.Provider;
 
 import com.github.nill14.utils.init.api.BindingKey;
 import com.github.nill14.utils.init.api.IScope;
+import com.github.nill14.utils.init.api.IScopeContext;
 
 public class RequestScope implements IScope {
 
@@ -14,7 +15,7 @@ public class RequestScope implements IScope {
 	}
 
 	@Override
-	public <T> Provider<T> scope(BindingKey<T> type, Provider<T> unscoped) {
+	public <T> Provider<T> scope(BindingKey<T> type, Provider<T> unscoped, IScopeContext scopeContext) {
 		return threadLocal.get().scope(type, unscoped);
 	}
 	

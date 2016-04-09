@@ -3,9 +3,8 @@ package com.github.nill14.utils.init.impl;
 import java.util.Deque;
 import java.util.Map;
 
-import com.github.nill14.utils.annotation.Experimental;
 import com.github.nill14.utils.init.api.BindingKey;
-import com.github.nill14.utils.init.api.IScope;
+import com.github.nill14.utils.init.api.IScopeContext;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
@@ -17,18 +16,12 @@ public final class CallerContext {
 	
 	private final Deque<ConstructionContext> stack = Queues.newArrayDeque();
 
-	private final Object externalContext;
+	private final IScopeContext scopeContext;
 	
-	public CallerContext(Object externalContext) {
-		this.externalContext = Preconditions.checkNotNull(externalContext);
+	public CallerContext(IScopeContext scopeContext) {
+		this.scopeContext = Preconditions.checkNotNull(scopeContext);
 	}
 	
-	@Experimental
-	@Deprecated
-	public IScope resolveScope(IScope scope) {
-		return scope;
-	}
-
 	public boolean isConstructing(BindingKey<?> bindingKey) {
 		return constructions.containsKey(bindingKey);
 	}
@@ -65,12 +58,12 @@ public final class CallerContext {
 		}
 	}
 
-	public Object getExternalContext() {
-		return externalContext;
+	public IScopeContext getScopeContext() {
+		return scopeContext;
 	}
 
 	public static CallerContext prototype() {
-		return new CallerContext(Thread.currentThread());
+		return new CallerContext(IScopeContext.none());
 	}
 	
 }
