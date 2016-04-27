@@ -50,6 +50,7 @@
 	</properties>
 
 	<modules>
+		<module>executor-pool</module>
 		<module>java8-utils</module>
 		<module>lazy-init</module>
 		<module>module-di</module>
