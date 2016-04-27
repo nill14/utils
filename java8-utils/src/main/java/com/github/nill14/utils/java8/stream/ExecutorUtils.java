@@ -24,7 +24,8 @@ public class ExecutorUtils {
 	 * @param executor
 	 * @param elements
 	 * @param mappingFunction
-	 * @return
+	 * @return List of results from the mappingFunction
+	 * @throws InterruptedException 
 	 * @throws ExecutionException when mappingFunction throws exception
 	 */
 	public static <E, R> ImmutableList<R> parallelExecution(ExecutorService executor, Collection<E> elements,

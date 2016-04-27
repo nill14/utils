@@ -103,7 +103,7 @@ public enum ReflectionUtils {
 	
 	/**
 	 * 
-	 * @param clazz
+	 * @param token 
 	 * @return All classes including self, excluding interfaces and Object.class
 	 */
 	public static <T> Stream<Class<? super T>> getSuperClasses(TypeToken<T> token) {
@@ -119,7 +119,7 @@ public enum ReflectionUtils {
 	 * Stream of non-static methods declared on the class or it's super-classes.
 	 * Methods declared on Object are excluded unless they are overridden.
 	 * Methods are ordered from subclass to superclass
-	 * @param clazz
+	 * @param token 
 	 * @return Stream of non-static methods declared on the class or it's super-classes (excluding Object-declared methods).
 	 */
 	public static <T> Stream<Method> getInstanceMethods(TypeToken<T> token) {
@@ -144,7 +144,7 @@ public enum ReflectionUtils {
 	
 	/**
 	 * Stream of non-static fields declared on the class or it's super-classes.
-	 * @param clazz
+	 * @param token 
 	 * @return Stream of non-static fields declared on the class or it's super-classes (excluding Object-declared methods).
 	 */
 	public static <T> Stream<Field> getInstanceFields(TypeToken<T> token) {

@@ -111,6 +111,8 @@ public enum BinderUtils {
 
 	/**
 	 * 
+	 * @param bindingFactories 
+	 * @param bindings 
 	 * @return a map where key is a dependency (e.g. @Inject) and value is whether the dependency is required. 
 	 */
 	@SuppressWarnings("unchecked")

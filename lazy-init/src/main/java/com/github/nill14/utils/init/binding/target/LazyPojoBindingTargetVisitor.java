@@ -23,8 +23,6 @@ public class LazyPojoBindingTargetVisitor implements BindingTargetVisitor<ILazyP
 	/**
 	 * 
 	 * @param resolver
-	 * @param initializer
-	 * @param lookupFunction A lookup function, may return null
 	 */
 	public LazyPojoBindingTargetVisitor(IPropertyResolver resolver) {
 		this.resolver = resolver;

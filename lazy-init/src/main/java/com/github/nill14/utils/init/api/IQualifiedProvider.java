@@ -9,6 +9,8 @@ import com.google.inject.Key;
 public interface IQualifiedProvider<T> {
 
   /**
+   * @param named 
+   * @return a named object from the registry
    * @see Annotations#named(String)
    *
    * Returns from registry the object of given type and qualified with name.
@@ -17,6 +19,8 @@ public interface IQualifiedProvider<T> {
   T getNamed(String named);
 
   /**
+   * @param named 
+   * @return an optional object from the registry
    * @see Annotations#named(String)
    *
    * Returns from registry the object of given type and qualified with name.
@@ -24,6 +28,8 @@ public interface IQualifiedProvider<T> {
   Optional<T> getOptionalNamed(String named);
 
   /**
+   * @param annotationType 
+   * @return a qualified object from the registry
    * @see Annotations#annotation(Class)
    *
    * Returns from registry the object of given type and qualified with the annotation.
@@ -33,6 +39,8 @@ public interface IQualifiedProvider<T> {
   T getQualified(Class<? extends Annotation> annotationType);
 
   /**
+   * @param annotationType 
+   * @return an optional qualified object from the registry
    * @see Annotations#annotation(Class)
    *
    * Returns from registry the object of given type and qualified with the annotation.
@@ -41,14 +49,19 @@ public interface IQualifiedProvider<T> {
   Optional<T> getOptionalQualified(Class<? extends Annotation> annotationType);
 
   /**
-   * @see Key#get(Class, Annotation)
    *
    * Returns from registry the object of given type and qualified with the annotation.
    * If object is not found, an exception is thrown.
+   * 
+   * @param qualifier 	
+   * @return a qualified object from the registry
+   * @see Key#get(Class, Annotation)
    */
   T getQualified(Annotation qualifier);
 
   /**
+   * @param qualifier 	
+   * @return an optional qualified object from the registry
    * @see Key#get(Class, Annotation)
    *
    * Returns from registry the object of given type and qualified with the annotation.

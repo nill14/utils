@@ -34,7 +34,7 @@ public final class ChainingPojoInitializer implements IPojoInitializer {
 	/**
 	 * 
 	 * @param extraInitializer The first initializer to execute
-	 * @return
+	 * @return self
 	 */
 	public ChainingPojoInitializer with(IPojoInitializer extraInitializer) {
 		ImmutableList.Builder<IPojoInitializer> builder = ImmutableList.builder();

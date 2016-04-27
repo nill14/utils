@@ -130,6 +130,8 @@ public enum DependencyUtils {
 	
 	/**
 	 * 
+	 * @param pojoFactories 
+	 * @param requiresAnalyse 
 	 * @return a map where key is a dependency (e.g. @Inject) and value is whether the dependency is required. 
 	 */
 	public static Map<TypeToken<?>, Boolean> collectDependencies(Collection<IPojoFactory<?>> pojoFactories, Predicate<BindingKey<?>> requiresAnalyse) {

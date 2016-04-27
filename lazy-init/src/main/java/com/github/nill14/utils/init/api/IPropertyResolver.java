@@ -13,6 +13,7 @@ public interface IPropertyResolver extends Serializable {
 	/**
 	 * 
 	 * @param type The property type descriptor.
+	 * @param context 
 	 * @return The resolved property provider or nullProvider if property could not be resolved.
 	 */
 	@Nullable Object resolve(IParameterType type, CallerContext context);

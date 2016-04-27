@@ -73,6 +73,8 @@ public Object resolve(Object pojo, IParameterType type) {
 }
 	 * 
 	 * </pre>
+	 * @param resolver 
+	 * @return self
 	 * 
 	 */
 	public TestBinder withFallbackResolver(AbstractPropertyResolver resolver) {

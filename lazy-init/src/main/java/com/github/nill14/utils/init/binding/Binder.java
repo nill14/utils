@@ -14,6 +14,8 @@ public interface Binder {
 	/**
 	 * Binds a scope to a a scope annotation. 
 	 * The scope annotation must be annotated with {@link IScope}
+	 * @param annotationType 
+	 * @param scope 
 	 */
 	void bindScope(Class<? extends Annotation> annotationType, IScope scope);
 

@@ -12,6 +12,7 @@ public interface LinkedBindingBuilder<T> extends ScopedBindingBuilder {
 
 	/**
 	 *
+	 * @param instance 
 	 * @see com.github.nill14.utils.init.api.IBeanInjector#injectMembers(Object)
 	 */
 	void toInstance(T instance);
@@ -19,6 +20,8 @@ public interface LinkedBindingBuilder<T> extends ScopedBindingBuilder {
 
 	/**
 	 *
+	 * @param provider 
+	 * @return a BindingBuilder
 	 * @see com.github.nill14.utils.init.api.IBeanInjector#injectMembers(Object)
 	 */
 	ScopedBindingBuilder toProvider(Provider<? extends T> provider);

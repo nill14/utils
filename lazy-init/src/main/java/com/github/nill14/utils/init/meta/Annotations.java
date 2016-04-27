@@ -17,7 +17,6 @@ package com.github.nill14.utils.init.meta;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Map;
 
 import javax.inject.Named;
 
@@ -39,8 +38,11 @@ public class Annotations {
 	}
 
 	/**
-	 * Generates an Annotation for the annotation class. 
-	 * All values are defaults.
+	 * Generates an annotation of the expected annotation type. <br>
+	 * All annotation type properties are expected to have a default value.
+	 * 
+	 * @param annotationType The annotation class
+	 * @return annotation object for the annotation class
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends Annotation> T annotation(Class<T> annotationType) {
@@ -51,24 +53,34 @@ public class Annotations {
 	
 	
 	/**
-	 * Generates an Annotation with value for the annotation class. 
-	 * All other values are defaults.
+	 * Generates an annotation of the expected annotation type. 
+	 * 
+	 * @param annotationType The annotation class
+	 * @param value The result of the annotation's value() method
+	 * @return annotation object for the annotation class
 	 */
 	public static <T extends Annotation> T withValue(Class<T> annotationType, String value) {
 		return withValue0(annotationType, value);
 	}
 	
 	/**
-	 * Generates an Annotation with value for the annotation class. 
-	 * All other values are defaults.
+	 * Generates an annotation of the expected annotation type. 
+	 * 
+	 * @param annotationType The annotation class
+	 * @param value The result of the annotation's value() method
+	 * @return annotation object for the annotation class
+	 * 
 	 */
 	public static <T extends Annotation> T withValue(Class<T> annotationType, int value) {
 		return withValue0(annotationType, value);
 	}	
 	
 	/**
-	 * Generates an Annotation with value for the annotation class. 
-	 * All other values are defaults.
+	 * Generates an annotation of the expected annotation type. 
+	 * 
+	 * @param annotationType The annotation class
+	 * @param value The result of the annotation's value() method
+	 * @return annotation object for the annotation class
 	 */
 	public static <T extends Annotation> T withValue(Class<T> annotationType, Class<?> value) {
 		return withValue0(annotationType, value);
@@ -79,24 +91,33 @@ public class Annotations {
 	}
 	
 	/**
-	 * Generates an Annotation with value for the annotation class. 
-	 * All other values are defaults.
+	 * Generates an annotation of the expected annotation type. 
+	 * 
+	 * @param annotationType The annotation class
+	 * @param value The result of the annotation's value() method
+	 * @return annotation object for the annotation class
 	 */
 	public static <T extends Annotation> T withValue(Class<T> annotationType, float value) {
 		return withValue0(annotationType, value);
 	}	
 	
 	/**
-	 * Generates an Annotation with value for the annotation class. 
-	 * All other values are defaults.
+	 * Generates an annotation of the expected annotation type. 
+	 * 
+	 * @param annotationType The annotation class
+	 * @param value The result of the annotation's value() method
+	 * @return annotation object for the annotation class
 	 */
 	public static <T extends Annotation> T withValue(Class<T> annotationType, double value) {
 		return withValue0(annotationType, value);
 	}	
 	
 	/**
-	 * Generates an Annotation with value for the annotation class. 
-	 * All other values are defaults.
+	 * Generates an annotation of the expected annotation type. 
+	 * 
+	 * @param annotationType The annotation class
+	 * @param value The result of the annotation's value() method
+	 * @return annotation object for the annotation class
 	 */
 	public static <T extends Annotation> T withValue(Class<T> annotationType, long value) {
 		return withValue0(annotationType, value);

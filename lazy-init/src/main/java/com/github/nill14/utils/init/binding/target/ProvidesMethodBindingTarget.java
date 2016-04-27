@@ -22,6 +22,7 @@ public class ProvidesMethodBindingTarget<T> implements BindingTarget<T> {
 
 	/**
 	 * 
+	 * @param m 
 	 * @param instance Nullable instance when the method is static
 	 */
 	@SuppressWarnings("unchecked")

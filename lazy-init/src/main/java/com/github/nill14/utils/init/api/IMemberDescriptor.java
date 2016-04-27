@@ -19,6 +19,7 @@ public interface IMemberDescriptor {
 	 * 
 	 * All members are @Nullable or Inject(optional) so that we can skip invoke
 	 * {@link java.util.Optional} is not such a case
+	 * @return whether the inject is optional
 	 */
 	boolean isOptionalInject();
 

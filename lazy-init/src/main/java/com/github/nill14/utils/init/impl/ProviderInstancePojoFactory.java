@@ -28,7 +28,6 @@ public final class ProviderInstancePojoFactory<T> implements IPojoFactory<T> {
      * The {@link #getType()} will return always Object!!!
      * 
      * @param provider
-     * @param resolver
      */
 	public ProviderInstancePojoFactory(Provider<T> provider) {
 		this.typeToken = ReflectionUtils.getProviderReturnTypeToken(provider);

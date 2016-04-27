@@ -7,6 +7,7 @@ public enum StackTraceParser {
 
 	/**
 	 * 
+	 * @param exception 
 	 * @param level The caller className level, must be bigger than zero
 	 * @return e.g. "(Dummy.java:9): getCalledMethod()" for level=1
 	 */
