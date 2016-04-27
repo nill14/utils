@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.github.nill14.utils</groupId>
 		<artifactId>utils-parent</artifactId>
-		<version>0.3.5-SNAPSHOT</version>
+		<version>0.3.5</version>
 	</parent>
 
 	<name>Executor Utils</name>
@@ -31,7 +31,7 @@
 	<scm>
 		<url>scm:git:git@github.com:nill14/utils.git</url>
 		<connection>scm:git:git@github.com:nill14/utils.git</connection>
-	  <tag>HEAD</tag>
+	  <tag>v0.3.5</tag>
   </scm>
 
 	<properties>
