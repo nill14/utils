@@ -1,7 +1,8 @@
 package com.github.nill14.utils.executor;
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
-import static org.testng.Assert.*;
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,8 +12,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
+
 
 public class ReschedulableTaskTest {
 
@@ -23,7 +25,7 @@ public class ReschedulableTaskTest {
 	private ReschedulableTask task;
 	
 	
-	@BeforeMethod
+	@Before
 	public void setUp() {
 		counter = new AtomicLong();
 		task = new ReschedulableTask(scheduler, () -> counter.incrementAndGet());

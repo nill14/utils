@@ -18,8 +18,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.testng.collections.Lists;
-
+import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 
 /**

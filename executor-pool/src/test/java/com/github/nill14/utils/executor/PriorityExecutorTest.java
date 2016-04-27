@@ -1,24 +1,23 @@
 package com.github.nill14.utils.executor;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
 public class PriorityExecutorTest {
 	private static final int coreSize = 12;
 	private static final int batches = 12;
-	private static final int orderTolerance = 1;
+	private static final int orderTolerance = 3;
 	private static final ExecutorService executor = PriorityExecutor.newFixedThreadPool(coreSize);
 	
 	
-	@BeforeMethod
+	@Before
 	public void setUp() {
 	}
 	
@@ -67,7 +66,7 @@ public class PriorityExecutorTest {
 		for (int i = 1; i < averages.size(); i++) {
 			if (Double.compare(averages.get(i - 1 ), averages.get(i)) <  0) {
 				if (errorRate++ >= orderTolerance) {
-					assertTrue(false, String.format("Average priority should decrease: %f >= %f", averages.get(i - 1 ), averages.get(i)));
+					assertTrue(String.format("Average priority should decrease: %f >= %f", averages.get(i - 1 ), averages.get(i)), false);
 				}
 			}
 		}

@@ -2,6 +2,7 @@
 */bin/
 /target/
 /bin/
+/.work/
 
 .classpath
 .project

@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -16,6 +17,7 @@ import com.google.common.collect.Maps;
 
 public class BlockingReadTest {
 
+	@Ignore
 	@Test(timeout = 20000)
 	public void test() throws IOException, InterruptedException, ExecutionException {
 		ServerEngine server = new ServerEngine(8, 2000, 10000);
